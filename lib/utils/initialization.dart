@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
 import 'package:googoogagaapp/utils/tokens.dart';
+import 'package:googoogagaapp/widgets/global_alerts.dart';
 
 Future setUpFCM() async {
   await Firebase.initializeApp();
@@ -31,7 +32,7 @@ Future setUpFCM() async {
       ?.createNotificationChannel(channel);
 }
 
-setUpMessaging(BuildContext context) async {
+Future setUpMessaging(BuildContext context) async {
   FirebaseMessaging.onMessage.listen((message) {
     final notification = message.notification;
     if (notification != null) {
@@ -47,4 +48,11 @@ setUpMessaging(BuildContext context) async {
           body: notification.body!, title: notification.title);
     }
   });
+}
+
+Future checkBabyTokenExists(BuildContext context) async {
+  final tokenExists = await checkTokenExists('baby');
+  if (!tokenExists) {
+    showTokenAlert(context);
+  }
 }

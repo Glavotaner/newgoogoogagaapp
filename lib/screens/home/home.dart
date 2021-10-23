@@ -11,20 +11,22 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late Future _setUpMessaging;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
-      checkTokenExists('baby').then((tokenExists) => {
-            if (!tokenExists) {showTokenAlert(context)}
-          });
-      setUpMessaging(context);
-    });
+    _setUpMessaging =
+        Future.wait([setUpMessaging(context), checkBabyTokenExists(context)]);
   }
 
   @override
   Widget build(BuildContext context) {
     // TODO implement home page
-    return const Placeholder();
+    return FutureBuilder(
+        future: _setUpMessaging,
+        builder: (BuildContext context, _) {
+          return const Placeholder();
+        });
   }
 }
