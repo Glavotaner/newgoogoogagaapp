@@ -32,17 +32,13 @@ Future sendRequest(BuildContext context, String message) async {
 processMessage(BuildContext context, RemoteMessage message) {
   final notification = message.notification;
   // TODO implement handling data
-  // final data = message.data;
+  final data = message.data;
+  if (data['quickKissRequest'] != null) {
+    // TODO implement quick kiss
+  }
   if (notification != null) {
-    final title = notification.title;
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: title != null && title.isNotEmpty ? Text(title) : null,
-            content: Text(notification.body!),
-          );
-        });
+    showAlert(
+        context: context, body: notification.body!, title: notification.title);
     Future.delayed(Duration(seconds: 2), () => Navigator.of(context).pop());
   }
 }
