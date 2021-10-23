@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/utils/initialization.dart';
-import 'package:googoogagaapp/utils/tokens.dart';
-import 'package:googoogagaapp/widgets/global_alerts.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);

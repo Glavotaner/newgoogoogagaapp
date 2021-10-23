@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:googoogagaapp/screens/kiss_selection/models/kiss_type.dart';
+import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/tokens.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,6 +29,24 @@ Future sendRequest(BuildContext context, String message) async {
   sendKiss(context, kissType);
 }
 
+processMessage(BuildContext context, RemoteMessage message) {
+  final notification = message.notification;
+  // TODO implement handling data
+  // final data = message.data;
+  if (notification != null) {
+    final title = notification.title;
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: title != null && title.isNotEmpty ? Text(title) : null,
+            content: Text(notification.body!),
+          );
+        });
+    Future.delayed(Duration(seconds: 2), () => Navigator.of(context).pop());
+  }
+}
+
 Future saveMessageInBg(RemoteMessage remoteMessage) async {
   final SharedPreferences sharedPreferences =
       await SharedPreferences.getInstance();
@@ -38,24 +57,6 @@ Future saveMessageInBg(RemoteMessage remoteMessage) async {
   };
   messages.add(jsonEncode(message));
   sharedPreferences.setStringList('messages', messages);
-}
-
-showConfirmSnackbar(BuildContext context, String message) {
-  ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), duration: Duration(seconds: 1)));
-}
-
-showMessageAlert(BuildContext context,
-    {String? title, required String body, Map<String, dynamic>? extras}) {
-  showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: title != null && title.isNotEmpty ? Text(title) : null,
-          content: Text(body),
-        );
-      });
-  Future.delayed(Duration(seconds: 2), () => Navigator.of(context).pop());
 }
 
 Future<Response> _sendMessage(String token,

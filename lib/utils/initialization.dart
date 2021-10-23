@@ -33,21 +33,11 @@ Future setUpFCM() async {
 }
 
 Future setUpMessaging(BuildContext context) async {
-  FirebaseMessaging.onMessage.listen((message) {
-    final notification = message.notification;
-    if (notification != null) {
-      showMessageAlert(context,
-          body: notification.body!, title: notification.title);
-    }
-  });
+  FirebaseMessaging.onMessage
+      .listen((message) => processMessage(context, message));
   FirebaseMessaging.onBackgroundMessage(saveMessageInBg);
-  FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    final notification = message.notification;
-    if (notification != null) {
-      showMessageAlert(context,
-          body: notification.body!, title: notification.title);
-    }
-  });
+  FirebaseMessaging.onMessageOpenedApp
+      .listen((message) => processMessage(context, message));
 }
 
 Future checkBabyTokenExists(BuildContext context) async {
