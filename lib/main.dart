@@ -6,17 +6,15 @@ import 'package:googoogagaapp/widgets/scaffold.dart';
 
 void main() => runApp(GoogooGagaApp());
 
-Future<dynamic> _initialize = setUpFCM();
-
 class GoogooGagaApp extends StatelessWidget {
-  final Future<dynamic> initialize = _initialize;
+  final Future<dynamic> _initialize = setUpFCM();
 
   GoogooGagaApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: initialize,
+        future: _initialize,
         builder: (context, initSnapshot) {
           if (initSnapshot.connectionState == ConnectionState.waiting) {
             return MaterialApp(

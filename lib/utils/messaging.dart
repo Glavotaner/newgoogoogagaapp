@@ -9,8 +9,8 @@ import 'package:googoogagaapp/utils/tokens.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Future<Map<String, String>> getFCMData() async {
-  return jsonDecode(await rootBundle.loadString('/assets/fcm.json'))['data'];
+Future<Map<String, dynamic>> getFCMData() async {
+  return jsonDecode((await rootBundle.loadString('assets/fcm.json')))['data'];
 }
 
 Future sendKiss(BuildContext context, KissType kissType,

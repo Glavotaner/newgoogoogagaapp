@@ -7,6 +7,7 @@ import 'package:googoogagaapp/utils/tokens.dart';
 import 'package:googoogagaapp/widgets/global_alerts.dart';
 
 Future setUpFCM() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   if (!(await checkTokenExists('me'))) {
     final messaging = FirebaseMessaging.instance;
