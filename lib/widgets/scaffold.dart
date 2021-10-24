@@ -16,6 +16,12 @@ class _ScaffoldPageState extends State<ScaffoldPage> {
           title: const Text('Googoo Gaga App'),
           bottomOpacity: 0,
           centerTitle: true),
+      bottomNavigationBar: BottomNavigationBar(items: [
+        BottomNavigationBarItem(
+            icon: Icon(Icons.message_sharp), label: 'Send kiss'),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.archive_sharp), label: 'Kiss archive')
+      ]),
       backgroundColor: Colors.white,
       body: widget.body ?? const Placeholder(),
     );

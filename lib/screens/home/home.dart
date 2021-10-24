@@ -14,8 +14,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _setUpMessaging =
-        Future.wait([setUpMessaging(context), checkBabyTokenExists(context)]);
+    // _setUpMessaging =
+    //     Future.wait([setUpMessaging(context), checkBabyTokenExists(context)]);
   }
 
   @override

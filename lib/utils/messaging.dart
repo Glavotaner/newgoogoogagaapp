@@ -29,13 +29,21 @@ Future sendRequest(BuildContext context, String message) async {
   sendKiss(context, kissType);
 }
 
-processMessage(BuildContext context, RemoteMessage message) {
-  final notification = message.notification;
-  // TODO implement handling data
+Future sendDataMessage(String to, Map<String, dynamic> data) async {
+  _sendMessage(to, data: data);
+}
+
+processMessage(BuildContext context, RemoteMessage message) async {
+  final topic = message.from;
   final data = message.data;
-  if (data['quickKissRequest'] != null) {
-    // TODO implement quick kiss
+  if (topic?.isNotEmpty == true) {
+    if (topic == 'tokens') {
+      _setReceivedToken(data['token']);
+      return showConfirmSnackbar(context, 'Saved babba token!');
+    }
   }
+  _processData(data);
+  final notification = message.notification;
   if (notification != null) {
     showAlert(
         context: context, body: notification.body!, title: notification.title);
@@ -43,7 +51,32 @@ processMessage(BuildContext context, RemoteMessage message) {
   }
 }
 
-Future saveMessageInBg(RemoteMessage remoteMessage) async {
+Future processMessageInBg(RemoteMessage remoteMessage) async {
+  final topic = remoteMessage.from;
+  _saveMessageInBg(remoteMessage);
+  if (topic?.isNotEmpty == true) {
+    if (topic == 'tokens') {
+      return _setReceivedToken(remoteMessage.data['token']);
+    }
+  }
+}
+
+Future _processData(Map<String, dynamic> data) async {
+  if (data.keys.any((element) => ['token', 'quickKiss'].contains(element))) {
+    // TODO implement quick kiss
+    if (data['token']?.isNotEmpty == true) {
+      return await setToken('baby', data['token']);
+    }
+  }
+}
+
+Future _setReceivedToken(String receivedToken) async {
+  final myToken = await getToken('me');
+  sendDataMessage(receivedToken, {'token': myToken});
+  return await setToken('baby', receivedToken);
+}
+
+Future _saveMessageInBg(RemoteMessage remoteMessage) async {
   final SharedPreferences sharedPreferences =
       await SharedPreferences.getInstance();
   List<String>? messages = sharedPreferences.getStringList('messages') ?? [];
@@ -55,12 +88,12 @@ Future saveMessageInBg(RemoteMessage remoteMessage) async {
   sharedPreferences.setStringList('messages', messages);
 }
 
-Future<Response> _sendMessage(String token,
+Future<Response> _sendMessage(String to,
     {Map<String, String>? notification, Map<String, dynamic>? data}) async {
   final fcmData = await getFCMData();
   Map<String, dynamic> requestBody = {
     "project_id": fcmData['projectId'],
-    "to": token
+    "to": to
   };
   if (notification != null) {
     requestBody['notification'] = notification;

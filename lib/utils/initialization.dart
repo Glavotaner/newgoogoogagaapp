@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
 import 'package:googoogagaapp/utils/tokens.dart';
-import 'package:googoogagaapp/widgets/global_alerts.dart';
 
 Future setUpFCM() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  if (!(await checkTokenExists('me'))) {
-    final messaging = FirebaseMessaging.instance;
+  final messaging = FirebaseMessaging.instance;
+  final token = await getToken('me');
+  if (!(token != null && token.isNotEmpty)) {
     final String? newToken = await messaging.getToken();
     if (newToken != null && newToken.isNotEmpty) {
       setToken('me', newToken);
@@ -36,14 +36,7 @@ Future setUpFCM() async {
 Future setUpMessaging(BuildContext context) async {
   FirebaseMessaging.onMessage
       .listen((message) => processMessage(context, message));
-  FirebaseMessaging.onBackgroundMessage(saveMessageInBg);
+  FirebaseMessaging.onBackgroundMessage(processMessageInBg);
   FirebaseMessaging.onMessageOpenedApp
       .listen((message) => processMessage(context, message));
-}
-
-Future checkBabyTokenExists(BuildContext context) async {
-  final tokenExists = await checkTokenExists('baby');
-  if (!tokenExists) {
-    showTokenAlert(context);
-  }
 }
