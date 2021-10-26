@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:googoogagaapp/screens/loading/loading.dart';
 import 'package:googoogagaapp/utils/initialization.dart';
+import 'package:googoogagaapp/widgets/scaffold.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -14,8 +16,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    // _setUpMessaging =
-    //     Future.wait([setUpMessaging(context), checkBabyTokenExists(context)]);
+    _setUpMessaging = setUpMessaging(context);
   }
 
   @override
@@ -23,8 +24,16 @@ class _HomePageState extends State<HomePage> {
     // TODO implement home page
     return FutureBuilder(
         future: _setUpMessaging,
-        builder: (BuildContext context, _) {
-          return const Placeholder();
+        builder: (BuildContext context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return MaterialApp(
+              home: ScaffoldPage(
+                  body: Column(
+                children: [Text('test')],
+              )),
+            );
+          }
+          return LoadingScreen(message: 'Loading messaging...');
         });
   }
 }

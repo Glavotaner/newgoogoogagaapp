@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:googoogagaapp/screens/kiss_selection/models/kiss_type.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
-import 'package:googoogagaapp/utils/tokens.dart';
+import 'package:googoogagaapp/utils/user_data.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,7 +15,7 @@ Future<Map<String, dynamic>> getFCMData() async {
 
 Future sendKiss(BuildContext context, KissType kissType,
     {Map<String, dynamic>? data}) async {
-  final babyToken = await getToken('baby');
+  final babyToken = await getUserToken('baby');
   await _sendMessage(babyToken!,
       notification: {'title': kissType.title, 'body': kissType.body});
   showConfirmSnackbar(context, kissType.confirmMessage);
@@ -36,13 +36,14 @@ Future sendDataMessage(String to, Map<String, dynamic> data) async {
 processMessage(BuildContext context, RemoteMessage message) async {
   final topic = message.from;
   final data = message.data;
-  if (topic?.isNotEmpty == true) {
+  if (topic?.isNotEmpty ?? false) {
     if (topic == 'tokens') {
-      _setReceivedToken(data['token']);
-      return showConfirmSnackbar(context, 'Saved babba token!');
+      return _processTokenMessage(context: context, data: data['customData']);
     }
   }
-  _processData(data);
+  if (data['customData'] != null) {
+    _processData(data['customData']);
+  }
   final notification = message.notification;
   if (notification != null) {
     showAlert(
@@ -53,39 +54,69 @@ processMessage(BuildContext context, RemoteMessage message) async {
 
 Future processMessageInBg(RemoteMessage remoteMessage) async {
   final topic = remoteMessage.from;
-  _saveMessageInBg(remoteMessage);
-  if (topic?.isNotEmpty == true) {
+  if (topic?.isNotEmpty ?? false) {
     if (topic == 'tokens') {
-      return _setReceivedToken(remoteMessage.data['token']);
+      if (remoteMessage.data['tokenRequest'] != null) {
+        final myData = await getUserData(user: 'me');
+        if (myData.userName == remoteMessage.data['username']) {
+          return _saveMessageInBg(remoteMessage, 'request');
+        }
+      }
+    }
+    if (remoteMessage.data['username']) {
+      return _saveMessageInBg(remoteMessage, 'response');
+    }
+  }
+}
+
+Future processBgMessages(BuildContext context) async {
+  final sharedPreferences = await SharedPreferences.getInstance();
+  final request = sharedPreferences.getString('request');
+  final response = sharedPreferences.getString('response');
+  if (response != null || request != null) {
+    final userData = await getUserData(user: 'me');
+    final babyData = await getUserData(user: 'baby');
+    String? token;
+    if (response != null) {
+      final RemoteMessage remoteMessage = jsonDecode(response);
+      token = remoteMessage.data['token'];
+    }
+    if (request != null) {
+      final RemoteMessage remoteMessage = jsonDecode(request);
+      token ??= remoteMessage.data['token'];
+      sendDataMessage(token!, {'token': userData.token});
+      showConfirmSnackbar(context, 'Sending token to babby!');
+    }
+    setUserData('baby', babyData..token = token);
+    _clearBgMessages(sharedPreferences);
+  }
+}
+
+_clearBgMessages(SharedPreferences sharedPreferences) async {
+  sharedPreferences.remove('request');
+  sharedPreferences.remove('response');
+}
+
+_processTokenMessage(
+    {required BuildContext context, required Map<String, dynamic> data}) async {
+  final userData = (await getUserData(user: 'me'));
+  final babyData = (await getUserData(user: 'baby'));
+  if (data['tokenRequest'] ?? false) {
+    if (data['username'] == babyData.userName) {
+      sendDataMessage(data['token'], {'token': userData.token});
+      showConfirmSnackbar(context, 'Sending token to babby!');
     }
   }
 }
 
 Future _processData(Map<String, dynamic> data) async {
-  if (data.keys.any((element) => ['token', 'quickKiss'].contains(element))) {
-    // TODO implement quick kiss
-    if (data['token']?.isNotEmpty == true) {
-      return await setToken('baby', data['token']);
-    }
-  }
+  // TODO implement process data
 }
 
-Future _setReceivedToken(String receivedToken) async {
-  final myToken = await getToken('me');
-  sendDataMessage(receivedToken, {'token': myToken});
-  return await setToken('baby', receivedToken);
-}
-
-Future _saveMessageInBg(RemoteMessage remoteMessage) async {
+Future _saveMessageInBg(RemoteMessage remoteMessage, String key) async {
   final SharedPreferences sharedPreferences =
       await SharedPreferences.getInstance();
-  List<String>? messages = sharedPreferences.getStringList('messages') ?? [];
-  Map<String, dynamic> message = {
-    'data': remoteMessage.data,
-    'notification': remoteMessage.notification
-  };
-  messages.add(jsonEncode(message));
-  sharedPreferences.setStringList('messages', messages);
+  sharedPreferences.setString(key, jsonEncode(remoteMessage));
 }
 
 Future<Response> _sendMessage(String to,
