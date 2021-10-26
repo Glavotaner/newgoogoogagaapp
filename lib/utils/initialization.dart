@@ -52,8 +52,7 @@ Future _setFCMToken(
   final messaging = FirebaseMessaging.instance;
   final token = await messaging.getToken();
   if (token?.isNotEmpty ?? false) {
-    userData.token = token;
-    setUserData('me', userData);
+    setUserData('me', userData..token = token);
   } else {
     showErrorSnackbar(context, 'Token error!');
     throw ErrorDescription('Token error!');
@@ -61,10 +60,7 @@ Future _setFCMToken(
 }
 
 Future _refreshBabyToken(BuildContext context) async {
-  final babyUser = await getUserData(context: context, user: 'baby');
-  sendDataMessage('topics/tokens', {
-    'customData': true,
-    'tokenRequest': true,
-    'username': babyUser.userName
-  });
+  final myUser = await getUserData(context: context, user: 'me');
+  sendDataMessage('topics/tokens',
+      {'customData': true, 'tokenRequest': true, 'username': myUser.userName});
 }

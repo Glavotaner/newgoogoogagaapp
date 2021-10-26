@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
             return MaterialApp(
               home: ScaffoldPage(
                   body: Column(
-                children: [Text('test')],
+                children: [Placeholder()],
               )),
             );
           }

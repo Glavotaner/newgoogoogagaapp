@@ -34,15 +34,9 @@ Future sendDataMessage(String to, Map<String, dynamic> data) async {
 }
 
 processMessage(BuildContext context, RemoteMessage message) async {
-  final topic = message.from;
   final data = message.data;
-  if (topic?.isNotEmpty ?? false) {
-    if (topic == 'tokens') {
-      return _processTokenMessage(context: context, data: data['customData']);
-    }
-  }
   if (data['customData'] != null) {
-    _processData(data['customData']);
+    _processData(context, data: data['customData']);
   }
   final notification = message.notification;
   if (notification != null) {
@@ -57,14 +51,14 @@ Future processMessageInBg(RemoteMessage remoteMessage) async {
   if (topic?.isNotEmpty ?? false) {
     if (topic == 'tokens') {
       if (remoteMessage.data['tokenRequest'] != null) {
-        final myData = await getUserData(user: 'me');
-        if (myData.userName == remoteMessage.data['username']) {
+        final babyData = await getUserData(user: 'baby');
+        if (babyData.userName == remoteMessage.data['username']) {
           return _saveMessageInBg(remoteMessage, 'request');
         }
       }
     }
-    if (remoteMessage.data['username']) {
-      return _saveMessageInBg(remoteMessage, 'response');
+    if (remoteMessage.data['token']) {
+      _saveMessageInBg(remoteMessage, 'response');
     }
   }
 }
@@ -74,19 +68,19 @@ Future processBgMessages(BuildContext context) async {
   final request = sharedPreferences.getString('request');
   final response = sharedPreferences.getString('response');
   if (response != null || request != null) {
-    final userData = await getUserData(user: 'me');
-    final babyData = await getUserData(user: 'baby');
     String? token;
     if (response != null) {
       final RemoteMessage remoteMessage = jsonDecode(response);
       token = remoteMessage.data['token'];
     }
     if (request != null) {
+      final userData = await getUserData(user: 'me');
       final RemoteMessage remoteMessage = jsonDecode(request);
       token ??= remoteMessage.data['token'];
       sendDataMessage(token!, {'token': userData.token});
       showConfirmSnackbar(context, 'Sending token to babby!');
     }
+    final babyData = await getUserData(user: 'baby');
     setUserData('baby', babyData..token = token);
     _clearBgMessages(sharedPreferences);
   }
@@ -99,18 +93,23 @@ _clearBgMessages(SharedPreferences sharedPreferences) async {
 
 _processTokenMessage(
     {required BuildContext context, required Map<String, dynamic> data}) async {
-  final userData = (await getUserData(user: 'me'));
-  final babyData = (await getUserData(user: 'baby'));
+  final babyData = await getUserData(user: 'baby');
   if (data['tokenRequest'] ?? false) {
+    final userData = await getUserData(user: 'me');
     if (data['username'] == babyData.userName) {
       sendDataMessage(data['token'], {'token': userData.token});
       showConfirmSnackbar(context, 'Sending token to babby!');
+      setUserData('baby', babyData..token = data['token']);
     }
+  } else if (data['token'] != null) {
+    setUserData('baby', babyData..token = data['token']);
   }
 }
 
-Future _processData(Map<String, dynamic> data) async {
+Future _processData(BuildContext context,
+    {required Map<String, dynamic> data}) async {
   // TODO implement process data
+  _processTokenMessage(context: context, data: data);
 }
 
 Future _saveMessageInBg(RemoteMessage remoteMessage, String key) async {
