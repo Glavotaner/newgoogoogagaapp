@@ -48,8 +48,9 @@ Future<User?> _checkUserExists(String user) async {
   try {
     return await getUserData(user: user);
   } catch (exception) {
-    if (exception.toString().contains("User doesn't exist!")) {
+    if (exception == "User doesn't exist!") {
       return null;
     }
+    rethrow;
   }
 }

@@ -6,7 +6,10 @@ import 'package:googoogagaapp/utils/user_data.dart';
 import 'package:googoogagaapp/widgets/scaffold.dart';
 import 'package:googoogagaapp/widgets/users_setup.dart';
 
-void main() => runApp(GoogooGagaApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(GoogooGagaApp());
+}
 
 class GoogooGagaApp extends StatelessWidget {
   final Future<Map<String, User?>> _checkUserNames = checkUsernamesSetUp();
@@ -21,7 +24,10 @@ class GoogooGagaApp extends StatelessWidget {
           if (usersData.connectionState == ConnectionState.done) {
             if (usersData.hasData) {
               if (usersData.data?.containsValue(null) ?? false) {
-                return UsersSetUpWidget(usersData.data!);
+                return MaterialApp(
+                    home: Scaffold(
+                  body: UsersSetUpWidget(usersData.data!),
+                ));
               }
               return MaterialApp(home: const ScaffoldPage(body: HomePage()));
             }

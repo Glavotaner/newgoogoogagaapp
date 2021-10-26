@@ -38,49 +38,53 @@ class _UsersSetUpWidgetState extends State<UsersSetUpWidget> {
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Text('Please put in some usernames please thank you'),
           ),
-          TextFormField(
-              controller: _controllers['me'],
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'You hab to put in something gooooshuh';
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                  hintText: widget.usersData['me'] == null
-                      ? 'Please put in your username here'
-                      : null)),
-          TextFormField(
-              controller: _controllers['baby'],
-              validator: (String? value) {
-                if (value?.isEmpty ?? true) {
-                  return 'You hab to put in something gooooshuh';
-                }
-                if (value?.isNotEmpty ?? false) {
-                  return value == '69marinisababy69'
-                      ? 'Forbidden username'
-                      : null;
-                }
-                return null;
-              },
-              decoration: InputDecoration(
-                  hintText: widget.usersData['baby'] == null
-                      ? 'Please put in baby username here'
-                      : null)),
+          Center(
+            child: TextFormField(
+                controller: _controllers['me'],
+                validator: (value) {
+                  if (value?.isEmpty ?? true) {
+                    return 'You hab to put in something gooooshuh';
+                  }
+                  return null;
+                },
+                decoration: InputDecoration(
+                    hintText: widget.usersData['me'] == null
+                        ? 'Please put in your username here'
+                        : null)),
+          ),
+          Center(
+            child: TextFormField(
+                controller: _controllers['baby'],
+                validator: (String? value) {
+                  if (value?.isEmpty ?? true) {
+                    return 'You hab to put in something gooooshuh';
+                  }
+                  if (value?.isNotEmpty ?? false) {
+                    return value == '6969marinsux6969'
+                        ? 'Forbidden username'
+                        : null;
+                  }
+                  return null;
+                },
+                decoration: InputDecoration(
+                    hintText: widget.usersData['baby'] == null
+                        ? 'Please put in baby username here'
+                        : null)),
+          ),
           Padding(
               padding: EdgeInsets.symmetric(vertical: 10.0),
               child: ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text('saving da data'),
-                        duration: Duration(seconds: 2),
-                      ));
+                          content: Text('saving da data'),
+                          duration: Duration(seconds: 2),
+                          backgroundColor: Colors.greenAccent));
                       await Future.wait([
-                        setUserData('me',
-                            User(userName: _controllers['me']!.value.text)),
-                        setUserData('baby',
-                            User(userName: _controllers['baby']!.value.text))
+                        setUserData(
+                            'me', User(userName: _controllers['me']!.text)),
+                        setUserData(
+                            'baby', User(userName: _controllers['baby']!.text))
                       ]);
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
