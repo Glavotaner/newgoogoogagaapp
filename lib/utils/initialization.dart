@@ -15,10 +15,17 @@ Future setUpMessaging(BuildContext context) async {
   }
   final babyUserData = await getUserData(user: 'baby');
   if (!babyUserData.hasToken) {
-    await _refreshBabyToken(context);
+    await refreshBabyToken(context);
   }
   await Future.wait([_setUpNotificationChannel(), _setUpMessaging(context)]);
   processBgMessages(context);
+}
+
+Future refreshBabyToken(BuildContext context) async {
+  final myUser = await getUserData(context: context, user: 'me');
+  sendDataMessage('topics/tokens',
+      {'customData': true, 'tokenRequest': true, 'username': myUser.userName});
+  FirebaseMessaging.instance.subscribeToTopic('tokens');
 }
 
 Future _setUpMessaging(BuildContext context) async {
@@ -37,9 +44,8 @@ Future _setUpNotificationChannel() async {
   );
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-  // TODO add icon
   const initSettings = InitializationSettings(
-      android: AndroidInitializationSettings('@mipmap/launcher_icon'));
+      android: AndroidInitializationSettings('@mipmap/ic_launcher'));
   await flutterLocalNotificationsPlugin.initialize(initSettings);
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
@@ -57,10 +63,4 @@ Future _setFCMToken(
     showErrorSnackbar(context, 'Token error!');
     throw ErrorDescription('Token error!');
   }
-}
-
-Future _refreshBabyToken(BuildContext context) async {
-  final myUser = await getUserData(context: context, user: 'me');
-  sendDataMessage('topics/tokens',
-      {'customData': true, 'tokenRequest': true, 'username': myUser.userName});
 }

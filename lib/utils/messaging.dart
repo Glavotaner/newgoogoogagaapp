@@ -72,6 +72,8 @@ Future processBgMessages(BuildContext context) async {
     if (response != null) {
       final RemoteMessage remoteMessage = jsonDecode(response);
       token = remoteMessage.data['token'];
+      FirebaseMessaging.instance.unsubscribeFromTopic('tokens');
+      showConfirmSnackbar(context, 'Saved babba token!');
     }
     if (request != null) {
       final userData = await getUserData(user: 'me');
@@ -103,6 +105,8 @@ _processTokenMessage(
     }
   } else if (data['token'] != null) {
     setUserData('baby', babyData..token = data['token']);
+    FirebaseMessaging.instance.unsubscribeFromTopic('tokens');
+    showConfirmSnackbar(context, 'Saved babba token!');
   }
 }
 

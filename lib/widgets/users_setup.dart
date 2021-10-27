@@ -47,6 +47,7 @@ class _UsersSetUpWidgetState extends State<UsersSetUpWidget> {
                   }
                   return null;
                 },
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 decoration: InputDecoration(
                     hintText: widget.usersData['me'] == null
                         ? 'Please put in your username here'
@@ -60,12 +61,13 @@ class _UsersSetUpWidgetState extends State<UsersSetUpWidget> {
                     return 'You hab to put in something gooooshuh';
                   }
                   if (value?.isNotEmpty ?? false) {
-                    return value == '6969marinsux6969'
+                    return value!.contains('marinsux')
                         ? 'Forbidden username'
                         : null;
                   }
                   return null;
                 },
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 decoration: InputDecoration(
                     hintText: widget.usersData['baby'] == null
                         ? 'Please put in baby username here'
@@ -86,6 +88,7 @@ class _UsersSetUpWidgetState extends State<UsersSetUpWidget> {
                         setUserData(
                             'baby', User(userName: _controllers['baby']!.text))
                       ]);
+                      Navigator.popAndPushNamed(context, 'home');
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text('fix your mistakes then we can talk'),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:googoogagaapp/utils/initialization.dart';
 
 class ScaffoldPage extends StatefulWidget {
   const ScaffoldPage({Key? key, this.body}) : super(key: key);
@@ -13,6 +14,11 @@ class _ScaffoldPageState extends State<ScaffoldPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+          actions: [
+            IconButton(
+                onPressed: () => refreshBabyToken(context),
+                icon: Icon(Icons.baby_changing_station_sharp))
+          ],
           title: const Text('Googoo Gaga App'),
           bottomOpacity: 0,
           centerTitle: true),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/screens/loading/loading.dart';
 import 'package:googoogagaapp/utils/initialization.dart';
-import 'package:googoogagaapp/widgets/scaffold.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -26,12 +25,7 @@ class _HomePageState extends State<HomePage> {
         future: _setUpMessaging,
         builder: (BuildContext context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return MaterialApp(
-              home: ScaffoldPage(
-                  body: Column(
-                children: [Placeholder()],
-              )),
-            );
+            return Placeholder();
           }
           return LoadingScreen(message: 'Loading messaging...');
         });

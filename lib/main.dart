@@ -24,10 +24,13 @@ class GoogooGagaApp extends StatelessWidget {
           if (usersData.connectionState == ConnectionState.done) {
             if (usersData.hasData) {
               if (usersData.data?.containsValue(null) ?? false) {
-                return MaterialApp(
-                    home: Scaffold(
-                  body: UsersSetUpWidget(usersData.data!),
-                ));
+                return MaterialApp(initialRoute: '/', routes: {
+                  '/': (context) => Scaffold(
+                      body: UsersSetUpWidget(usersData.data!),
+                      key: ValueKey('UsersPage')),
+                  'home': (context) =>
+                      ScaffoldPage(body: HomePage(), key: ValueKey('HomePage'))
+                });
               }
               return MaterialApp(home: const ScaffoldPage(body: HomePage()));
             }
