@@ -19,7 +19,7 @@ Future showAlert(
 
 showConfirmSnackbar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), duration: Duration(seconds: 1)));
+      SnackBar(content: Text(message), duration: Duration(seconds: 10)));
 }
 
 showErrorSnackbar(BuildContext context, String message) {

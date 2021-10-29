@@ -1,4 +1,4 @@
-package com.example.newgoogoogagaapp
+package com.mglavas.googoogagaapp
 
 import io.flutter.embedding.android.FlutterActivity
 

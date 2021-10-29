@@ -15,8 +15,9 @@ Future<Map<String, dynamic>> getFCMData() async {
 
 Future sendKiss(BuildContext context, KissType kissType,
     {Map<String, dynamic>? data}) async {
-  final babyToken = await getUserToken('baby');
-  await _sendMessage(babyToken!,
+  final babyData = await getUserData(user: 'baby');
+  await _sendMessage(
+      token: babyData.token,
       notification: {'title': kissType.title, 'body': kissType.body});
   showConfirmSnackbar(context, kissType.confirmMessage);
 }
@@ -29,19 +30,19 @@ Future sendRequest(BuildContext context, String message) async {
   sendKiss(context, kissType);
 }
 
-Future sendDataMessage(String to, Map<String, dynamic> data) async {
-  _sendMessage(to, data: data);
+Future sendDataMessage(
+    {String? token, String? topic, required Map<String, dynamic> data}) async {
+  await _sendMessage(token: token, topic: topic, data: data);
 }
 
 processMessage(BuildContext context, RemoteMessage message) async {
-  final data = message.data;
-  if (data['customData'] != null) {
-    _processData(context, data: data['customData']);
+  if (message.data.keys.isNotEmpty) {
+    _processData(context, data: message.data);
   }
-  final notification = message.notification;
-  if (notification != null) {
+  if (message.notification != null) {
+    final notification = message.notification;
     showAlert(
-        context: context, body: notification.body!, title: notification.title);
+        context: context, body: notification!.body!, title: notification.title);
     Future.delayed(Duration(seconds: 2), () => Navigator.of(context).pop());
   }
 }
@@ -49,15 +50,15 @@ processMessage(BuildContext context, RemoteMessage message) async {
 Future processMessageInBg(RemoteMessage remoteMessage) async {
   final topic = remoteMessage.from;
   if (topic?.isNotEmpty ?? false) {
-    if (topic == 'tokens') {
-      if (remoteMessage.data['tokenRequest'] != null) {
+    if (topic!.contains('tokens')) {
+      if (remoteMessage.data.containsKey('tokenRequest')) {
         final babyData = await getUserData(user: 'baby');
         if (babyData.userName == remoteMessage.data['username']) {
           return _saveMessageInBg(remoteMessage, 'request');
         }
       }
     }
-    if (remoteMessage.data['token']) {
+    if (remoteMessage.data.containsKey('token')) {
       _saveMessageInBg(remoteMessage, 'response');
     }
   }
@@ -79,7 +80,7 @@ Future processBgMessages(BuildContext context) async {
       final userData = await getUserData(user: 'me');
       final RemoteMessage remoteMessage = jsonDecode(request);
       token ??= remoteMessage.data['token'];
-      sendDataMessage(token!, {'token': userData.token});
+      sendDataMessage(token: token, data: {'token': userData.token});
       showConfirmSnackbar(context, 'Sending token to babby!');
     }
     final babyData = await getUserData(user: 'baby');
@@ -96,14 +97,14 @@ _clearBgMessages(SharedPreferences sharedPreferences) async {
 _processTokenMessage(
     {required BuildContext context, required Map<String, dynamic> data}) async {
   final babyData = await getUserData(user: 'baby');
-  if (data['tokenRequest'] ?? false) {
+  if (data.containsKey('tokenRequest')) {
     final userData = await getUserData(user: 'me');
     if (data['username'] == babyData.userName) {
-      sendDataMessage(data['token'], {'token': userData.token});
+      sendDataMessage(token: data['token'], data: {'token': userData.token});
       showConfirmSnackbar(context, 'Sending token to babby!');
       setUserData('baby', babyData..token = data['token']);
     }
-  } else if (data['token'] != null) {
+  } else if (data.containsKey('token')) {
     setUserData('baby', babyData..token = data['token']);
     FirebaseMessaging.instance.unsubscribeFromTopic('tokens');
     showConfirmSnackbar(context, 'Saved babba token!');
@@ -122,12 +123,15 @@ Future _saveMessageInBg(RemoteMessage remoteMessage, String key) async {
   sharedPreferences.setString(key, jsonEncode(remoteMessage));
 }
 
-Future<Response> _sendMessage(String to,
-    {Map<String, String>? notification, Map<String, dynamic>? data}) async {
+Future<Response> _sendMessage(
+    {String? token,
+    String? topic,
+    Map<String, String>? notification,
+    Map<String, dynamic>? data}) async {
   final fcmData = await getFCMData();
   Map<String, dynamic> requestBody = {
     "project_id": fcmData['projectId'],
-    "to": to
+    "to": token ?? '/topics/$topic'
   };
   if (notification != null) {
     requestBody['notification'] = notification;
@@ -135,10 +139,11 @@ Future<Response> _sendMessage(String to,
   if (data != null) {
     requestBody['data'] = data;
   }
+  final serverKey = fcmData['serverKey'];
   return await post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'key=$fcmData["serverKey"]'
+        'Authorization': 'key=$serverKey'
       },
       body: jsonEncode(requestBody));
 }

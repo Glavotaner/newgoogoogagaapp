@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:googoogagaapp/screens/home/widgets/request_input.dart';
 import 'package:googoogagaapp/screens/loading/loading.dart';
 import 'package:googoogagaapp/utils/initialization.dart';
 
@@ -25,7 +26,14 @@ class _HomePageState extends State<HomePage> {
         future: _setUpMessaging,
         builder: (BuildContext context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return Placeholder();
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                const Placeholder(fallbackHeight: 200),
+                const KissRequest()
+              ],
+            );
           }
           return LoadingScreen(message: 'Loading messaging...');
         });

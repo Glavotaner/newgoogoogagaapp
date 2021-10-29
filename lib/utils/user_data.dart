@@ -8,8 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<User> getUserData({BuildContext? context, required String user}) async {
   final sharedPreferences = await SharedPreferences.getInstance();
   final userData = sharedPreferences.getString(user);
-  if (userData != null && userData.isNotEmpty) {
-    return User.fromJson(jsonDecode(userData));
+  if (userData?.isNotEmpty ?? false) {
+    return User.fromJson(jsonDecode(userData!));
   } else {
     final errorMessage = "User data doesn't exist!";
     if (context != null) {
@@ -22,10 +22,6 @@ Future<User> getUserData({BuildContext? context, required String user}) async {
 Future setUserData(String name, User userData) async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sharedPreferences.setString(name, jsonEncode(userData.toJson()));
-}
-
-Future<String?> getUserToken(String user) async {
-  (await getUserData(user: user)).token;
 }
 
 Future setUserToken(

@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.newgoogoogagaapp">
+    package="com.mglavas.googoogagaapp">
    <application
-        android:label="newgoogoogagaapp"
+        android:label="googoogagaapp"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

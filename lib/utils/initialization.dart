@@ -13,19 +13,21 @@ Future setUpMessaging(BuildContext context) async {
   if (!userData.hasToken) {
     await _setFCMToken(context: context, userData: userData);
   }
+  await Future.wait([_setUpNotificationChannel(), _setUpMessaging(context)]);
   final babyUserData = await getUserData(user: 'baby');
   if (!babyUserData.hasToken) {
     await refreshBabyToken(context);
   }
-  await Future.wait([_setUpNotificationChannel(), _setUpMessaging(context)]);
   processBgMessages(context);
 }
 
 Future refreshBabyToken(BuildContext context) async {
   final myUser = await getUserData(context: context, user: 'me');
-  sendDataMessage('topics/tokens',
-      {'customData': true, 'tokenRequest': true, 'username': myUser.userName});
+  sendDataMessage(
+      topic: 'tokens',
+      data: {'tokenRequest': true, 'username': myUser.userName});
   FirebaseMessaging.instance.subscribeToTopic('tokens');
+  showConfirmSnackbar(context, 'Refreshing!');
 }
 
 Future _setUpMessaging(BuildContext context) async {
