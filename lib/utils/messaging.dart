@@ -16,6 +16,10 @@ Future<Map<String, dynamic>> getFCMData() async {
 Future sendKiss(BuildContext context, KissType kissType,
     {Map<String, dynamic>? data}) async {
   final babyData = await getUserData(user: 'baby');
+  if (!babyData.hasToken) {
+    showErrorSnackbar(context, 'Baby token missing!');
+    throw ErrorDescription('Token missing');
+  }
   await _sendMessage(
       token: babyData.token,
       notification: {'title': kissType.title, 'body': kissType.body});
@@ -98,8 +102,8 @@ _processTokenMessage(
     {required BuildContext context, required Map<String, dynamic> data}) async {
   final babyData = await getUserData(user: 'baby');
   if (data.containsKey('tokenRequest')) {
-    final userData = await getUserData(user: 'me');
     if (data['username'] == babyData.userName) {
+      final userData = await getUserData(user: 'me');
       sendDataMessage(token: data['token'], data: {'token': userData.token});
       showConfirmSnackbar(context, 'Sending token to babby!');
       setUserData('baby', babyData..token = data['token']);

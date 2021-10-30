@@ -16,15 +16,15 @@ class _ScaffoldPageState extends State<ScaffoldPage> {
       appBar: AppBar(
           actions: [
             IconButton(
+                color: Colors.redAccent,
                 onPressed: () => refreshBabyToken(context),
-                icon: Icon(Icons.baby_changing_station_sharp))
+                icon: Icon(Icons.favorite))
           ],
           title: const Text('Googoo Gaga App'),
           bottomOpacity: 0,
           centerTitle: true),
       bottomNavigationBar: BottomNavigationBar(items: [
-        BottomNavigationBarItem(
-            icon: Icon(Icons.message_sharp), label: 'Send kiss'),
+        BottomNavigationBarItem(icon: Icon(Icons.send), label: 'Send kiss'),
         BottomNavigationBarItem(
             icon: Icon(Icons.archive_sharp), label: 'Kiss archive')
       ]),
