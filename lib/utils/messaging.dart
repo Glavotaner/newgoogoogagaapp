@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:googoogagaapp/screens/kiss_selection/models/kiss_type.dart';
+import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
+import 'package:googoogagaapp/utils/app_state_manager.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
 import 'package:http/http.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<Map<String, dynamic>> getFCMData() async {
@@ -36,7 +38,7 @@ Future sendRequest(BuildContext context, String message) async {
 
 Future sendDataMessage(
     {String? token, String? topic, required Map<String, dynamic> data}) async {
-  await _sendMessage(token: token, topic: topic, data: data);
+  return await _sendMessage(token: token, topic: topic, data: data);
 }
 
 processMessage(BuildContext context, RemoteMessage message) async {
@@ -46,29 +48,26 @@ processMessage(BuildContext context, RemoteMessage message) async {
   if (message.notification != null) {
     final notification = message.notification;
     showAlert(
-        context: context, body: notification!.body!, title: notification.title);
-    Future.delayed(Duration(seconds: 2), () => Navigator.of(context).pop());
+        context: context,
+        body: notification!.body!,
+        title: notification.title,
+        duration: 5);
   }
 }
 
 Future processMessageInBg(RemoteMessage remoteMessage) async {
-  final topic = remoteMessage.from;
-  if (topic?.isNotEmpty ?? false) {
-    if (topic!.contains('tokens')) {
-      if (remoteMessage.data.containsKey('tokenRequest')) {
-        final babyData = await getUserData(user: 'baby');
-        if (babyData.userName == remoteMessage.data['username']) {
-          return _saveMessageInBg(remoteMessage, 'request');
-        }
-      }
+  if (remoteMessage.data.containsKey('tokenRequest')) {
+    final babyData = await getUserData(user: 'baby');
+    if (babyData.userName == remoteMessage.data['username']) {
+      return _saveMessageInBg(remoteMessage, 'request');
     }
-    if (remoteMessage.data.containsKey('token')) {
-      _saveMessageInBg(remoteMessage, 'response');
-    }
+  } else if (remoteMessage.data.containsKey('token')) {
+    _saveMessageInBg(remoteMessage, 'response');
   }
 }
 
-Future processBgMessages(BuildContext context) async {
+Future processBgMessages(GlobalKey key) async {
+  final context = key.currentContext!;
   final sharedPreferences = await SharedPreferences.getInstance();
   final request = sharedPreferences.getString('request');
   final response = sharedPreferences.getString('response');
@@ -89,6 +88,8 @@ Future processBgMessages(BuildContext context) async {
     }
     final babyData = await getUserData(user: 'baby');
     setUserData('baby', babyData..token = token);
+    Provider.of<AppStateManager>(context, listen: false)
+        .setUpUserNames(true, {'baby': babyData..token = token});
     _clearBgMessages(sharedPreferences);
   }
 }
@@ -107,9 +108,14 @@ _processTokenMessage(
       sendDataMessage(token: data['token'], data: {'token': userData.token});
       showConfirmSnackbar(context, 'Sending token to babby!');
       setUserData('baby', babyData..token = data['token']);
+      Provider.of<AppStateManager>(context, listen: false)
+          .setUpUserNames(true, {'baby': babyData..token = data['token']});
     }
   } else if (data.containsKey('token')) {
+    await Future.delayed(Duration(seconds: 2));
     setUserData('baby', babyData..token = data['token']);
+    Provider.of<AppStateManager>(context, listen: false)
+        .setUpUserNames(true, {'baby': babyData..token = data['token']});
     FirebaseMessaging.instance.unsubscribeFromTopic('tokens');
     showConfirmSnackbar(context, 'Saved babba token!');
   }
@@ -124,7 +130,7 @@ Future _processData(BuildContext context,
 Future _saveMessageInBg(RemoteMessage remoteMessage, String key) async {
   final SharedPreferences sharedPreferences =
       await SharedPreferences.getInstance();
-  sharedPreferences.setString(key, jsonEncode(remoteMessage));
+  sharedPreferences.setString(key, jsonEncode(remoteMessage.toString()));
 }
 
 Future<Response> _sendMessage(
@@ -137,12 +143,8 @@ Future<Response> _sendMessage(
     "project_id": fcmData['projectId'],
     "to": token ?? '/topics/$topic'
   };
-  if (notification != null) {
-    requestBody['notification'] = notification;
-  }
-  if (data != null) {
-    requestBody['data'] = data;
-  }
+  requestBody['notification'] = notification;
+  requestBody['data'] = data;
   final serverKey = fcmData['serverKey'];
   return await post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
       headers: {

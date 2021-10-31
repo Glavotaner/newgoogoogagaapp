@@ -4,38 +4,48 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:googoogagaapp/models/user.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
+import 'package:googoogagaapp/utils/app_state_manager.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
+import 'package:provider/provider.dart';
 
-Future setUpMessaging(BuildContext context) async {
+Future setUpMessaging(GlobalKey<NavigatorState> navKey) async {
   final userData = await getUserData(user: 'me');
   await Firebase.initializeApp();
   if (!userData.hasToken) {
-    await _setFCMToken(context: context, userData: userData);
+    _setFCMToken(context: navKey, userData: userData);
   }
-  await Future.wait([_setUpNotificationChannel(), _setUpMessaging(context)]);
+  await Future.wait([_setUpNotificationChannel(), _setUpMessaging(navKey)]);
   final babyUserData = await getUserData(user: 'baby');
+  final context = navKey.currentContext!;
   if (!babyUserData.hasToken) {
     await refreshBabyToken(context);
   }
-  processBgMessages(context);
+  processBgMessages(navKey);
+  Provider.of<AppStateManager>(context, listen: false).initializeMessaging();
 }
 
 Future refreshBabyToken(BuildContext context) async {
   final myUser = await getUserData(context: context, user: 'me');
-  sendDataMessage(
-      topic: 'tokens',
-      data: {'tokenRequest': true, 'username': myUser.userName});
-  FirebaseMessaging.instance.subscribeToTopic('tokens');
+  await FirebaseMessaging.instance.subscribeToTopic('tokens');
+  sendDataMessage(topic: 'tokens', data: {
+    'token': myUser.token,
+    'tokenRequest': true,
+    'username': myUser.userName
+  });
   showConfirmSnackbar(context, 'Refreshing!');
 }
 
-Future _setUpMessaging(BuildContext context) async {
-  FirebaseMessaging.onMessage
-      .listen((message) => processMessage(context, message));
+Future _setUpMessaging(GlobalKey key) async {
+  FirebaseMessaging.onMessage.listen((message) {
+    final context = key.currentContext;
+    processMessage(context!, message);
+  });
   FirebaseMessaging.onBackgroundMessage(processMessageInBg);
-  FirebaseMessaging.onMessageOpenedApp
-      .listen((message) => processMessage(context, message));
+  FirebaseMessaging.onMessageOpenedApp.listen((message) {
+    final context = key.currentContext;
+    processMessage(context!, message);
+  });
 }
 
 Future _setUpNotificationChannel() async {
@@ -56,13 +66,14 @@ Future _setUpNotificationChannel() async {
 }
 
 Future _setFCMToken(
-    {required BuildContext context, required User userData}) async {
+    {required GlobalKey context, required User userData}) async {
   final messaging = FirebaseMessaging.instance;
   final token = await messaging.getToken();
   if (token?.isNotEmpty ?? false) {
     setUserData('me', userData..token = token);
   } else {
-    showErrorSnackbar(context, 'Token error!');
+    final ctx = context.currentContext;
+    showErrorSnackbar(ctx!, 'Token error!');
     throw ErrorDescription('Token error!');
   }
 }

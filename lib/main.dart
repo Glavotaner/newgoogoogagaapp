@@ -1,41 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:googoogagaapp/models/user.dart';
-import 'package:googoogagaapp/screens/home/home.dart';
-import 'package:googoogagaapp/screens/loading/loading.dart';
-import 'package:googoogagaapp/utils/user_data.dart';
-import 'package:googoogagaapp/widgets/scaffold.dart';
-import 'package:googoogagaapp/widgets/users_setup.dart';
+import 'package:googoogagaapp/screens/app_router.dart';
+import 'package:googoogagaapp/utils/app_state_manager.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(GoogooGagaApp());
 }
 
-class GoogooGagaApp extends StatelessWidget {
-  final Future<Map<String, User?>> _checkUserNames = checkUsernamesSetUp();
-
+class GoogooGagaApp extends StatefulWidget {
   GoogooGagaApp({Key? key}) : super(key: key);
 
   @override
+  State<GoogooGagaApp> createState() => _GoogooGagaAppState();
+}
+
+class _GoogooGagaAppState extends State<GoogooGagaApp> {
+  late AppRouter _appRouter;
+  final _appStateManager = AppStateManager();
+
+  @override
+  void initState() {
+    _appRouter = AppRouter(appStateManager: _appStateManager);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: _checkUserNames,
-        builder: (context, AsyncSnapshot<Map<String, User?>> usersData) {
-          if (usersData.connectionState == ConnectionState.done) {
-            if (usersData.hasData) {
-              if (usersData.data?.containsValue(null) ?? false) {
-                return MaterialApp(initialRoute: '/', routes: {
-                  '/': (context) => Scaffold(
-                      body: UsersSetUpWidget(usersData.data!),
-                      key: ValueKey('UsersPage')),
-                  'home': (context) =>
-                      ScaffoldPage(body: HomePage(), key: ValueKey('HomePage'))
-                });
-              }
-              return MaterialApp(home: const ScaffoldPage(body: HomePage()));
-            }
-          }
-          return LoadingScreen(message: 'Loading...');
-        });
+    return ChangeNotifierProvider(
+        create: (context) => _appStateManager,
+        child: MaterialApp(home: Router(routerDelegate: _appRouter)));
   }
 }

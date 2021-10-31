@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:googoogagaapp/screens/kiss_selection/models/kiss_type.dart';
+import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
 
 class KissTypeWidget extends StatelessWidget {

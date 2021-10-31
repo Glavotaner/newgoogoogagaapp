@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:googoogagaapp/utils/app_state_manager.dart';
 import 'package:googoogagaapp/utils/initialization.dart';
+import 'package:provider/provider.dart';
 
 class ScaffoldPage extends StatefulWidget {
   const ScaffoldPage({Key? key, this.body}) : super(key: key);
@@ -16,9 +18,26 @@ class _ScaffoldPageState extends State<ScaffoldPage> {
       appBar: AppBar(
           actions: [
             IconButton(
+                color: Theme.of(context).hintColor,
+                onPressed: () =>
+                    Provider.of<AppStateManager>(context, listen: false)
+                        .setUpUserNames(false),
+                icon: Icon(Icons.people)),
+            IconButton(
                 color: Colors.redAccent,
-                onPressed: () => refreshBabyToken(context),
-                icon: Icon(Icons.favorite))
+                onPressed: () =>
+                    Provider.of<AppStateManager>(context, listen: false)
+                                .usersData['me']
+                                ?.token !=
+                            null
+                        ? refreshBabyToken(context)
+                        : null,
+                icon: Icon(Provider.of<AppStateManager>(context, listen: false)
+                            .usersData['baby']
+                            ?.token !=
+                        null
+                    ? Icons.favorite
+                    : Icons.favorite_border))
           ],
           title: const Text('Googoo Gaga App'),
           bottomOpacity: 0,

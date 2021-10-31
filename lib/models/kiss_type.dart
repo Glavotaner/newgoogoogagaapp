@@ -1,16 +1,18 @@
-import 'package:googoogagaapp/screens/kiss_selection/widgets/kiss_type.dart';
+import 'package:googoogagaapp/components/kiss_type.dart';
 
 class KissType {
   String body;
   String title;
   String confirmMessage;
   String? assetPath;
+  DateTime? timeReceived;
 
   KissType(
       {required this.body,
       required this.title,
       required this.confirmMessage,
-      this.assetPath});
+      this.assetPath,
+      this.timeReceived});
 
   static final List<KissType> kissTypes = [
     KissType(
