@@ -9,23 +9,27 @@ import 'package:googoogagaapp/utils/messaging.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
 import 'package:provider/provider.dart';
 
-Future setUpMessaging(GlobalKey<NavigatorState> navKey) async {
-  final userData = await getUserData(user: 'me');
+Future setUpMessaging(BuildContext context) async {
+  await Future.delayed(Duration(seconds: 1));
   await Firebase.initializeApp();
-  if (!userData.hasToken) {
-    _setFCMToken(context: navKey, userData: userData);
-  }
-  await Future.wait([_setUpNotificationChannel(), _setUpMessaging(navKey)]);
-  final babyUserData = await getUserData(user: 'baby');
-  final context = navKey.currentContext!;
-  if (!babyUserData.hasToken) {
-    await refreshBabyToken(context);
-  }
-  processBgMessages(navKey);
+  await Future.wait([_setUpNotificationChannel(), _setUpMessaging(context)]);
+  _refreshTokens(context);
   Provider.of<AppStateManager>(context, listen: false).initializeMessaging();
 }
 
-Future refreshBabyToken(BuildContext context) async {
+Future _refreshTokens(BuildContext context) async {
+  final userData = await getUserData(user: 'me');
+  if (!userData.hasToken) {
+    _setFCMToken(context: context, userData: userData);
+  }
+  final babyUserData = await getUserData(user: 'baby');
+  if (!babyUserData.hasToken) {
+    refreshBabyToken(context);
+  }
+  processBgMessages(context);
+}
+
+Future refreshBabyToken([BuildContext? context, GlobalKey? navKey]) async {
   final myUser = await getUserData(context: context, user: 'me');
   await FirebaseMessaging.instance.subscribeToTopic('tokens');
   sendDataMessage(topic: 'tokens', data: {
@@ -33,18 +37,16 @@ Future refreshBabyToken(BuildContext context) async {
     'tokenRequest': true,
     'username': myUser.userName
   });
-  showConfirmSnackbar(context, 'Refreshing!');
+  showConfirmSnackbar(context!, 'Refreshing!');
 }
 
-Future _setUpMessaging(GlobalKey key) async {
+Future _setUpMessaging(BuildContext context) async {
   FirebaseMessaging.onMessage.listen((message) {
-    final context = key.currentContext;
-    processMessage(context!, message);
+    processMessage(context, message);
   });
   FirebaseMessaging.onBackgroundMessage(processMessageInBg);
   FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    final context = key.currentContext;
-    processMessage(context!, message);
+    processMessage(context, message);
   });
 }
 
@@ -66,14 +68,13 @@ Future _setUpNotificationChannel() async {
 }
 
 Future _setFCMToken(
-    {required GlobalKey context, required User userData}) async {
+    {required BuildContext context, required User userData}) async {
   final messaging = FirebaseMessaging.instance;
   final token = await messaging.getToken();
   if (token?.isNotEmpty ?? false) {
-    setUserData('me', userData..token = token);
+    setUserData(context, 'me', userData..token = token);
   } else {
-    final ctx = context.currentContext;
-    showErrorSnackbar(ctx!, 'Token error!');
+    showErrorSnackbar(context, 'Token error!');
     throw ErrorDescription('Token error!');
   }
 }

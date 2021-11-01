@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:googoogagaapp/models/routes.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -7,8 +8,8 @@ class SplashScreen extends StatefulWidget {
   static MaterialPage page() {
     return MaterialPage(
         child: SplashScreen(),
-        name: 'SplashScreen',
-        key: ValueKey('SplashScreen'));
+        name: Routes.splash,
+        key: ValueKey(Routes.splash));
   }
 
   @override
@@ -18,9 +19,10 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    checkUsernamesSetUp(context);
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      checkUsernamesSetUp(context);
+    });
   }
 
   @override
@@ -30,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Column(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [CircularProgressIndicator(), Text('Setting fings up...')],
+        children: [CircularProgressIndicator(), Text('Checking user data...')],
       )),
     );
   }

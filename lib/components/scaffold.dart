@@ -14,6 +14,8 @@ class ScaffoldPage extends StatefulWidget {
 class _ScaffoldPageState extends State<ScaffoldPage> {
   @override
   Widget build(BuildContext context) {
+    bool _refreshDisabled =
+        context.watch<AppStateManager>().usersData['me']?.token == null;
     return Scaffold(
       appBar: AppBar(
           actions: [
@@ -25,19 +27,13 @@ class _ScaffoldPageState extends State<ScaffoldPage> {
                 icon: Icon(Icons.people)),
             IconButton(
                 color: Colors.redAccent,
-                onPressed: () =>
-                    Provider.of<AppStateManager>(context, listen: false)
-                                .usersData['me']
-                                ?.token !=
+                onPressed:
+                    _refreshDisabled ? null : () => refreshBabyToken(context),
+                icon: Icon(
+                    context.watch<AppStateManager>().usersData['baby']?.token !=
                             null
-                        ? refreshBabyToken(context)
-                        : null,
-                icon: Icon(Provider.of<AppStateManager>(context, listen: false)
-                            .usersData['baby']
-                            ?.token !=
-                        null
-                    ? Icons.favorite
-                    : Icons.favorite_border))
+                        ? Icons.favorite
+                        : Icons.favorite_border))
           ],
           title: const Text('Googoo Gaga App'),
           bottomOpacity: 0,

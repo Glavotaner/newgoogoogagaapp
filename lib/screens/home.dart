@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/components/request_input.dart';
+import 'package:googoogagaapp/models/kiss_type.dart';
+import 'package:googoogagaapp/models/routes.dart';
 import 'package:googoogagaapp/screens/loading.dart';
 import 'package:googoogagaapp/utils/app_state_manager.dart';
 import 'package:googoogagaapp/utils/initialization.dart';
@@ -12,8 +14,8 @@ class HomePage extends StatefulWidget {
 
   static MaterialPage page(GlobalKey<NavigatorState> navKey) {
     return MaterialPage(
-      name: 'Home',
-      key: ValueKey('Home'),
+      name: Routes.home,
+      key: ValueKey(Routes.home),
       child: HomePage(navKey),
     );
   }
@@ -24,41 +26,57 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late Future _setUpMessaging;
-  late bool _needsInit;
 
   @override
   void initState() {
     super.initState();
-    _needsInit =
-        !Provider.of<AppStateManager>(context, listen: false).isinitialized;
-    if (_needsInit) {
-      _setUpMessaging = setUpMessaging(widget.navKey);
-    }
+    WidgetsFlutterBinding.ensureInitialized();
+    _setUpMessaging = setUpMessaging(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<AppStateManager>(
-      builder: (context, appStateManager, child) {
-        if (_needsInit) {
-          return FutureBuilder(
-              future: _setUpMessaging,
-              builder: (BuildContext context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return ScaffoldPage(body: homePage());
-                }
-                return LoadingScreen();
-              });
-        }
-        return ScaffoldPage(body: homePage());
-      },
-    );
+        builder: (context, appStateManager, child) {
+      return FutureBuilder(
+          future: _setUpMessaging,
+          builder: (BuildContext context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return pages();
+            }
+            return LoadingScreen(
+              message: 'Setting up messaging...',
+            );
+          });
+    });
   }
 
   Widget homePage() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [Expanded(child: Placeholder()), KissRequest()],
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Placeholder(),
+          ),
+        ),
+        KissRequest()
+      ],
     );
+  }
+
+  Widget pages() {
+    return ScaffoldPage(
+        body: PageView(
+      scrollDirection: Axis.vertical,
+      children: [
+        homePage(),
+        PageView(
+          scrollDirection: Axis.horizontal,
+          children: buildKissTypes(),
+        )
+      ],
+    ));
   }
 }

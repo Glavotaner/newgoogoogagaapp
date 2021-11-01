@@ -21,30 +21,23 @@ Future<User> getUserData({BuildContext? context, required String user}) async {
   }
 }
 
-Future setUserData(String name, User userData) async {
+Future setUserData(BuildContext context, String name, User userData) async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sharedPreferences.setString(name.toString(), jsonEncode(userData.toJson()));
+  Provider.of<AppStateManager>(context, listen: false)
+      .setUpUserNames(true, {name: userData});
 }
 
-Future setUserToken(
-    {BuildContext? context,
-    required String user,
-    required String token}) async {
-  setUserData(
-      user,
-      (await getUserData(user: user)
-        ..token = token));
-}
-
-Future<Map<String, User?>> checkUsernamesSetUp(BuildContext context) async {
+Future<void> checkUsernamesSetUp(BuildContext context) async {
+  await Future.delayed(Duration.zero);
   final provider = Provider.of<AppStateManager>(context, listen: false);
   final meData = await _checkUserExists('me');
   final babyData = await _checkUserExists('baby');
   if (meData != null && babyData != null && !provider.isinitialized) {
     provider.setUpUserNames(true, {'me': meData, 'baby': babyData});
+    return provider.logIn();
   }
   provider.finishLoading();
-  return {'me': meData, 'baby': babyData};
 }
 
 Future<User?> _checkUserExists(String user) async {

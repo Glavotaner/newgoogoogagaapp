@@ -20,17 +20,18 @@ class _LoadingScreenState extends State<LoadingScreen> {
   Widget build(BuildContext context) {
     final List<Widget> pageData = [const CircularProgressIndicator()];
     if (widget.message?.isNotEmpty ?? false) {
-      pageData.add(Text(widget.message!));
+      pageData.add(Text(
+        widget.message!,
+        style: TextStyle(fontSize: 24),
+      ));
     }
-    return MaterialApp(
-      home: Scaffold(
-        body: Center(
-            child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: pageData,
-        )),
-      ),
+    return Scaffold(
+      body: Center(
+          child: Column(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: pageData,
+      )),
     );
   }
 }

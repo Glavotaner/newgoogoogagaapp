@@ -29,6 +29,9 @@ class _GoogooGagaAppState extends State<GoogooGagaApp> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
         create: (context) => _appStateManager,
-        child: MaterialApp(home: Router(routerDelegate: _appRouter)));
+        child: MaterialApp(
+            home: Router(
+                routerDelegate: _appRouter,
+                backButtonDispatcher: RootBackButtonDispatcher())));
   }
 }

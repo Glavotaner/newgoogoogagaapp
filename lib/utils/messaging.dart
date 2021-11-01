@@ -66,8 +66,7 @@ Future processMessageInBg(RemoteMessage remoteMessage) async {
   }
 }
 
-Future processBgMessages(GlobalKey key) async {
-  final context = key.currentContext!;
+Future processBgMessages(BuildContext context) async {
   final sharedPreferences = await SharedPreferences.getInstance();
   final request = sharedPreferences.getString('request');
   final response = sharedPreferences.getString('response');
@@ -87,7 +86,7 @@ Future processBgMessages(GlobalKey key) async {
       showConfirmSnackbar(context, 'Sending token to babby!');
     }
     final babyData = await getUserData(user: 'baby');
-    setUserData('baby', babyData..token = token);
+    setUserData(context, 'baby', babyData..token = token);
     Provider.of<AppStateManager>(context, listen: false)
         .setUpUserNames(true, {'baby': babyData..token = token});
     _clearBgMessages(sharedPreferences);
@@ -107,15 +106,11 @@ _processTokenMessage(
       final userData = await getUserData(user: 'me');
       sendDataMessage(token: data['token'], data: {'token': userData.token});
       showConfirmSnackbar(context, 'Sending token to babby!');
-      setUserData('baby', babyData..token = data['token']);
-      Provider.of<AppStateManager>(context, listen: false)
-          .setUpUserNames(true, {'baby': babyData..token = data['token']});
+      setUserData(context, 'baby', babyData..token = data['token']);
     }
   } else if (data.containsKey('token')) {
     await Future.delayed(Duration(seconds: 2));
-    setUserData('baby', babyData..token = data['token']);
-    Provider.of<AppStateManager>(context, listen: false)
-        .setUpUserNames(true, {'baby': babyData..token = data['token']});
+    setUserData(context, 'baby', babyData..token = data['token']);
     FirebaseMessaging.instance.unsubscribeFromTopic('tokens');
     showConfirmSnackbar(context, 'Saved babba token!');
   }

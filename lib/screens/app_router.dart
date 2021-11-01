@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:googoogagaapp/models/routes.dart';
 import 'package:googoogagaapp/screens/home.dart';
 import 'package:googoogagaapp/screens/splash.dart';
 import 'package:googoogagaapp/utils/app_state_manager.dart';
@@ -26,18 +27,29 @@ class AppRouter extends RouterDelegate
       key: navigatorKey,
       pages: [
         if (appStateManager.isLoading) SplashScreen.page(),
-        if (!appStateManager.isUserNamesSetUp && !appStateManager.isLoading)
-          LoginPage.page(),
-        if (appStateManager.isUserNamesSetUp && !appStateManager.isLoading)
-          HomePage.page(navigatorKey),
+        if (appStateManager.isLoggedIn) HomePage.page(navigatorKey),
+        if (!appStateManager.isUserNamesSetUp) LoginPage.page(),
       ],
       onPopPage: (route, result) {
         if (!(route.didPop(result))) {
           return false;
         }
+        if (route.settings.name == Routes.setUp) {
+          appStateManager.setUpUserNames(true);
+        }
+
         return true;
       },
     );
+  }
+
+  @override
+  Future<bool> popRoute() {
+    // TODO: implement popRoute
+    if (appStateManager.isLoggedIn && !appStateManager.isUserNamesSetUp) {
+      return Future.value(true);
+    }
+    return Future.value(false);
   }
 
   @override

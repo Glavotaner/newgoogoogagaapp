@@ -16,11 +16,12 @@ class AppStateManager extends ChangeNotifier {
 
   setUpUserNames(bool setUp, [Map<String, User>? users]) {
     if (users != null) {
-      users.forEach((key, value) {
-        _usersData[key] = value;
+      users.forEach((user, data) {
+        _usersData[user] = data;
       });
     }
     _userNamesSetUp = setUp;
+    _loggedIn = true;
     notifyListeners();
   }
 
