@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/routes.dart';
+import 'package:googoogagaapp/screens/loading.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -27,13 +28,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-          child: Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [CircularProgressIndicator(), Text('Checking user data...')],
-      )),
-    );
+    return LoadingScreen(message: 'Checking user data...');
   }
 }

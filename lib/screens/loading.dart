@@ -22,7 +22,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     if (widget.message?.isNotEmpty ?? false) {
       pageData.add(Text(
         widget.message!,
-        style: TextStyle(fontSize: 24),
+        style: Theme.of(context).textTheme.headline2,
       ));
     }
     return Scaffold(

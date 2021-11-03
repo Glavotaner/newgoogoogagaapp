@@ -4,25 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:googoogagaapp/models/user.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
-import 'package:googoogagaapp/utils/app_state_manager.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
-import 'package:provider/provider.dart';
 
 Future setUpMessaging(BuildContext context) async {
-  await Future.delayed(Duration(seconds: 1));
+  await Future.delayed(Duration.zero);
   await Firebase.initializeApp();
+  await FirebaseMessaging.instance.getInitialMessage();
   await Future.wait([_setUpNotificationChannel(), _setUpMessaging(context)]);
   _refreshTokens(context);
-  Provider.of<AppStateManager>(context, listen: false).initializeMessaging();
 }
 
 Future _refreshTokens(BuildContext context) async {
-  final userData = await getUserData(user: 'me');
+  final userData = await getUserData(user: User.me);
   if (!userData.hasToken) {
-    _setFCMToken(context: context, userData: userData);
+    await _setFCMToken(context: context, userData: userData);
   }
-  final babyUserData = await getUserData(user: 'baby');
+  final babyUserData = await getUserData(user: User.baby);
   if (!babyUserData.hasToken) {
     refreshBabyToken(context);
   }
@@ -30,7 +28,7 @@ Future _refreshTokens(BuildContext context) async {
 }
 
 Future refreshBabyToken([BuildContext? context, GlobalKey? navKey]) async {
-  final myUser = await getUserData(context: context, user: 'me');
+  final myUser = await getUserData(context: context, user: User.me);
   await FirebaseMessaging.instance.subscribeToTopic('tokens');
   sendDataMessage(topic: 'tokens', data: {
     'token': myUser.token,
@@ -48,6 +46,7 @@ Future _setUpMessaging(BuildContext context) async {
   FirebaseMessaging.onMessageOpenedApp.listen((message) {
     processMessage(context, message);
   });
+  return Future.value(true);
 }
 
 Future _setUpNotificationChannel() async {
@@ -72,7 +71,7 @@ Future _setFCMToken(
   final messaging = FirebaseMessaging.instance;
   final token = await messaging.getToken();
   if (token?.isNotEmpty ?? false) {
-    setUserData(context, 'me', userData..token = token);
+    setUserData(context, User.me, userData..token = token);
   } else {
     showErrorSnackbar(context, 'Token error!');
     throw ErrorDescription('Token error!');

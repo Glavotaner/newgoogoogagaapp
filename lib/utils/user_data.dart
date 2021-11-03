@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/user.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/app_state_manager.dart';
+import 'package:googoogagaapp/utils/users_state_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -24,20 +25,21 @@ Future<User> getUserData({BuildContext? context, required String user}) async {
 Future setUserData(BuildContext context, String name, User userData) async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sharedPreferences.setString(name.toString(), jsonEncode(userData.toJson()));
-  Provider.of<AppStateManager>(context, listen: false)
+  Provider.of<UsersStateManager>(context, listen: false)
       .setUpUserNames(true, {name: userData});
 }
 
 Future<void> checkUsernamesSetUp(BuildContext context) async {
-  await Future.delayed(Duration.zero);
-  final provider = Provider.of<AppStateManager>(context, listen: false);
-  final meData = await _checkUserExists('me');
-  final babyData = await _checkUserExists('baby');
-  if (meData != null && babyData != null && !provider.isinitialized) {
-    provider.setUpUserNames(true, {'me': meData, 'baby': babyData});
-    return provider.logIn();
+  await Future.delayed(Duration(seconds: 1));
+  final state = Provider.of<AppStateManager>(context, listen: false);
+  final users = Provider.of<UsersStateManager>(context, listen: false);
+  final meData = await _checkUserExists(User.me);
+  final babyData = await _checkUserExists(User.baby);
+  if (meData != null && babyData != null && !state.isLoggedIn) {
+    users.setUpUserNames(true, {User.me: meData, User.baby: babyData});
+    return state.logIn();
   }
-  provider.finishLoading();
+  state.finishLoading();
 }
 
 Future<User?> _checkUserExists(String user) async {

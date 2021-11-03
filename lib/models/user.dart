@@ -2,6 +2,9 @@ class User {
   String userName;
   String? token;
 
+  static String me = 'me';
+  static String baby = 'baby';
+
   User({required this.userName, this.token});
 
   User.fromJson(Map<String, dynamic> json)

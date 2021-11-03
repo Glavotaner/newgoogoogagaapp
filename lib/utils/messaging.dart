@@ -4,9 +4,10 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
+import 'package:googoogagaapp/models/user.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
-import 'package:googoogagaapp/utils/app_state_manager.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
+import 'package:googoogagaapp/utils/users_state_manager.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,7 +18,7 @@ Future<Map<String, dynamic>> getFCMData() async {
 
 Future sendKiss(BuildContext context, KissType kissType,
     {Map<String, dynamic>? data}) async {
-  final babyData = await getUserData(user: 'baby');
+  final babyData = await getUserData(user: User.baby);
   if (!babyData.hasToken) {
     showErrorSnackbar(context, 'Baby token missing!');
     throw ErrorDescription('Token missing');
@@ -57,7 +58,7 @@ processMessage(BuildContext context, RemoteMessage message) async {
 
 Future processMessageInBg(RemoteMessage remoteMessage) async {
   if (remoteMessage.data.containsKey('tokenRequest')) {
-    final babyData = await getUserData(user: 'baby');
+    final babyData = await getUserData(user: User.baby);
     if (babyData.userName == remoteMessage.data['username']) {
       return _saveMessageInBg(remoteMessage, 'request');
     }
@@ -79,16 +80,16 @@ Future processBgMessages(BuildContext context) async {
       showConfirmSnackbar(context, 'Saved babba token!');
     }
     if (request != null) {
-      final userData = await getUserData(user: 'me');
+      final userData = await getUserData(user: User.me);
       final RemoteMessage remoteMessage = jsonDecode(request);
       token ??= remoteMessage.data['token'];
       sendDataMessage(token: token, data: {'token': userData.token});
       showConfirmSnackbar(context, 'Sending token to babby!');
     }
-    final babyData = await getUserData(user: 'baby');
-    setUserData(context, 'baby', babyData..token = token);
-    Provider.of<AppStateManager>(context, listen: false)
-        .setUpUserNames(true, {'baby': babyData..token = token});
+    final babyData = await getUserData(user: User.baby);
+    setUserData(context, User.baby, babyData..token = token);
+    Provider.of<UsersStateManager>(context, listen: false)
+        .setUpUserNames(true, {User.baby: babyData..token = token});
     _clearBgMessages(sharedPreferences);
   }
 }
@@ -100,17 +101,17 @@ _clearBgMessages(SharedPreferences sharedPreferences) async {
 
 _processTokenMessage(
     {required BuildContext context, required Map<String, dynamic> data}) async {
-  final babyData = await getUserData(user: 'baby');
+  final babyData = await getUserData(user: User.baby);
   if (data.containsKey('tokenRequest')) {
     if (data['username'] == babyData.userName) {
-      final userData = await getUserData(user: 'me');
+      final userData = await getUserData(user: User.me);
       sendDataMessage(token: data['token'], data: {'token': userData.token});
       showConfirmSnackbar(context, 'Sending token to babby!');
-      setUserData(context, 'baby', babyData..token = data['token']);
+      setUserData(context, User.baby, babyData..token = data['token']);
     }
   } else if (data.containsKey('token')) {
     await Future.delayed(Duration(seconds: 2));
-    setUserData(context, 'baby', babyData..token = data['token']);
+    setUserData(context, User.baby, babyData..token = data['token']);
     FirebaseMessaging.instance.unsubscribeFromTopic('tokens');
     showConfirmSnackbar(context, 'Saved babba token!');
   }
@@ -125,7 +126,7 @@ Future _processData(BuildContext context,
 Future _saveMessageInBg(RemoteMessage remoteMessage, String key) async {
   final SharedPreferences sharedPreferences =
       await SharedPreferences.getInstance();
-  sharedPreferences.setString(key, jsonEncode(remoteMessage.toString()));
+  sharedPreferences.setString(key, _encodeMessage(remoteMessage));
 }
 
 Future<Response> _sendMessage(
@@ -147,4 +148,12 @@ Future<Response> _sendMessage(
         'Authorization': 'key=$serverKey'
       },
       body: jsonEncode(requestBody));
+}
+
+String _encodeMessage(RemoteMessage remoteMessage) {
+  return jsonEncode({
+    'from': remoteMessage.from,
+    'data': remoteMessage.data,
+    'notification': remoteMessage.notification
+  });
 }

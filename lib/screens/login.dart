@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/routes.dart';
 import 'package:googoogagaapp/models/user.dart';
+import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/app_state_manager.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
+import 'package:googoogagaapp/utils/users_state_manager.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -23,8 +25,8 @@ class _LoginPageState extends State<LoginPage> {
   late Map<String, User?> _usersData;
 
   final Map<String, TextEditingController> _controllers = {
-    'me': TextEditingController(),
-    'baby': TextEditingController(),
+    User.me: TextEditingController(),
+    User.baby: TextEditingController(),
   };
 
   @override
@@ -38,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    _usersData = context.read<AppStateManager>().usersData;
+    _usersData = context.read<UsersStateManager>().usersData;
   }
 
   @override
@@ -73,8 +75,8 @@ class _LoginPageState extends State<LoginPage> {
               textAlign: TextAlign.center,
             ),
           ),
-          _input('me', 'Your username here'),
-          _input('baby', 'Your baby username here'),
+          _input(User.me, 'Your username here'),
+          _input(User.baby, 'Your baby username here'),
           Padding(
               padding: EdgeInsets.symmetric(vertical: 10.0),
               child: SizedBox(
@@ -114,27 +116,17 @@ class _LoginPageState extends State<LoginPage> {
 
   Future _saveData(Map<String, User?> usersData) async {
     if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('saving da data'),
-          duration: Duration(seconds: 2),
-          backgroundColor: Colors.greenAccent));
-      final List<Future> futures = [];
-      final Map<String, User> users = {};
-      for (var element in _controllers.keys) {
-        users[element] = User(
-            userName: _controllers[element]!.text,
-            token: usersData[element]?.token);
-        futures.add(setUserData(context, element, users[element]!));
-      }
-      await Future.wait(futures);
-      final provider = Provider.of<AppStateManager>(context, listen: false);
-      provider.setUpUserNames(true, users);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('fix your mistakes then we can talk'),
-        duration: Duration(seconds: 3),
-        backgroundColor: Colors.red,
-      ));
+      showConfirmSnackbar(context, 'saving da data');
+      await Future.wait(_controllers.keys.map((user) {
+        return setUserData(
+            context,
+            user,
+            User(
+                userName: _controllers[user]!.text,
+                token: usersData[user]?.token));
+      }).toList());
+      return Provider.of<AppStateManager>(context, listen: false).logIn();
     }
+    return showErrorSnackbar(context, 'fix your errors then we can talk');
   }
 }

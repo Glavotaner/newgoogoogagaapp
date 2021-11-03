@@ -1,12 +1,11 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/components/request_input.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/models/routes.dart';
 import 'package:googoogagaapp/screens/loading.dart';
-import 'package:googoogagaapp/utils/app_state_manager.dart';
 import 'package:googoogagaapp/utils/initialization.dart';
 import 'package:googoogagaapp/components/scaffold.dart';
-import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   final GlobalKey<NavigatorState> navKey;
@@ -30,25 +29,21 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    WidgetsFlutterBinding.ensureInitialized();
     _setUpMessaging = setUpMessaging(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppStateManager>(
-        builder: (context, appStateManager, child) {
-      return FutureBuilder(
-          future: _setUpMessaging,
-          builder: (BuildContext context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return pages();
-            }
-            return LoadingScreen(
-              message: 'Setting up messaging...',
-            );
-          });
-    });
+    return FutureBuilder(
+        future: _setUpMessaging,
+        builder: (BuildContext context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return pages();
+          }
+          return LoadingScreen(
+            message: 'Setting up messaging...',
+          );
+        });
   }
 
   Widget homePage() {

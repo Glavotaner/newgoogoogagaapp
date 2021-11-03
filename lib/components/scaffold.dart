@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:googoogagaapp/models/user.dart';
 import 'package:googoogagaapp/utils/app_state_manager.dart';
 import 'package:googoogagaapp/utils/initialization.dart';
+import 'package:googoogagaapp/utils/users_state_manager.dart';
 import 'package:provider/provider.dart';
 
 class ScaffoldPage extends StatefulWidget {
@@ -15,7 +17,7 @@ class _ScaffoldPageState extends State<ScaffoldPage> {
   @override
   Widget build(BuildContext context) {
     bool _refreshDisabled =
-        context.watch<AppStateManager>().usersData['me']?.token == null;
+        context.watch<UsersStateManager>().usersData[User.me]?.token == null;
     return Scaffold(
       appBar: AppBar(
           actions: [
@@ -23,17 +25,19 @@ class _ScaffoldPageState extends State<ScaffoldPage> {
                 color: Theme.of(context).hintColor,
                 onPressed: () =>
                     Provider.of<AppStateManager>(context, listen: false)
-                        .setUpUserNames(false),
+                        .enterUsersSetUp(true),
                 icon: Icon(Icons.people)),
             IconButton(
                 color: Colors.redAccent,
                 onPressed:
                     _refreshDisabled ? null : () => refreshBabyToken(context),
-                icon: Icon(
-                    context.watch<AppStateManager>().usersData['baby']?.token !=
-                            null
-                        ? Icons.favorite
-                        : Icons.favorite_border))
+                icon: Icon(context
+                            .watch<UsersStateManager>()
+                            .usersData[User.baby]
+                            ?.token !=
+                        null
+                    ? Icons.favorite
+                    : Icons.favorite_border))
           ],
           title: const Text('Googoo Gaga App'),
           bottomOpacity: 0,
