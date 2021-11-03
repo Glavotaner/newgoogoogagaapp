@@ -2,26 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/routes.dart';
 import 'package:googoogagaapp/screens/home.dart';
 import 'package:googoogagaapp/screens/splash.dart';
-import 'package:googoogagaapp/utils/app_state_manager.dart';
+import 'package:googoogagaapp/providers/app_state_manager.dart';
 import 'package:googoogagaapp/screens/login.dart';
-import 'package:googoogagaapp/utils/users_state_manager.dart';
+import 'package:googoogagaapp/providers/users_manager.dart';
 
 class AppRouter extends RouterDelegate
     with ChangeNotifier, PopNavigatorRouterDelegateMixin {
   @override
   final GlobalKey<NavigatorState> navigatorKey;
   final AppStateManager appStateManager;
-  final UsersStateManager usersStateManager;
-  AppRouter({required this.appStateManager, required this.usersStateManager})
+  final UsersManager usersManager;
+  AppRouter({required this.appStateManager, required this.usersManager})
       : navigatorKey = GlobalKey<NavigatorState>() {
     appStateManager.addListener(notifyListeners);
-    usersStateManager.addListener(notifyListeners);
+    usersManager.addListener(notifyListeners);
   }
 
   @override
   void dispose() {
     appStateManager.removeListener(notifyListeners);
-    usersStateManager.removeListener(notifyListeners);
+    usersManager.removeListener(notifyListeners);
     super.dispose();
   }
 

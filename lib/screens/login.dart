@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/routes.dart';
 import 'package:googoogagaapp/models/user.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
-import 'package:googoogagaapp/utils/app_state_manager.dart';
+import 'package:googoogagaapp/providers/app_state_manager.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
-import 'package:googoogagaapp/utils/users_state_manager.dart';
+import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -40,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    _usersData = context.read<UsersStateManager>().usersData;
+    _usersData = context.read<UsersManager>().usersData;
   }
 
   @override

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/user.dart';
 
-class UsersStateManager extends ChangeNotifier {
+class UsersManager extends ChangeNotifier {
   final Map<String, User?> _usersData = {};
 
   Map<String, User?> get usersData => _usersData;

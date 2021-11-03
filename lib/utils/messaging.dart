@@ -7,7 +7,7 @@ import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/models/user.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
-import 'package:googoogagaapp/utils/users_state_manager.dart';
+import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -88,7 +88,7 @@ Future processBgMessages(BuildContext context) async {
     }
     final babyData = await getUserData(user: User.baby);
     setUserData(context, User.baby, babyData..token = token);
-    Provider.of<UsersStateManager>(context, listen: false)
+    Provider.of<UsersManager>(context, listen: false)
         .setUpUserNames(true, {User.baby: babyData..token = token});
     _clearBgMessages(sharedPreferences);
   }

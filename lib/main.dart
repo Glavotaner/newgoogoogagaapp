@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/screens/app_router.dart';
-import 'package:googoogagaapp/utils/app_state_manager.dart';
-import 'package:googoogagaapp/utils/users_state_manager.dart';
+import 'package:googoogagaapp/providers/app_state_manager.dart';
+import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -19,13 +19,12 @@ class GoogooGagaApp extends StatefulWidget {
 class _GoogooGagaAppState extends State<GoogooGagaApp> {
   late AppRouter _appRouter;
   final _appStateManager = AppStateManager();
-  final _usersStateManager = UsersStateManager();
+  final _usersManager = UsersManager();
 
   @override
   void initState() {
     _appRouter = AppRouter(
-        appStateManager: _appStateManager,
-        usersStateManager: _usersStateManager);
+        appStateManager: _appStateManager, usersManager: _usersManager);
     super.initState();
   }
 
@@ -34,7 +33,7 @@ class _GoogooGagaAppState extends State<GoogooGagaApp> {
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(create: (context) => _appStateManager),
-          ChangeNotifierProvider(create: (context) => _usersStateManager),
+          ChangeNotifierProvider(create: (context) => _usersManager),
         ],
         child: MaterialApp(
             home: Router(

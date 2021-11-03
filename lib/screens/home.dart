@@ -1,4 +1,3 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/components/request_input.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';

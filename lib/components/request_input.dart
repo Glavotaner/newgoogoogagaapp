@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:googoogagaapp/utils/app_state_manager.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
-import 'package:googoogagaapp/utils/users_state_manager.dart';
+import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:provider/provider.dart';
 
 class KissRequest extends StatefulWidget {
@@ -31,7 +30,7 @@ class _KissRequestState extends State<KissRequest> {
   @override
   Widget build(BuildContext context) {
     bool _disableButton = false;
-    context.watch<UsersStateManager>().usersData.forEach((key, value) {
+    context.watch<UsersManager>().usersData.forEach((key, value) {
       if (value?.token == null) {
         _disableButton = true;
       }
