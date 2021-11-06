@@ -3,6 +3,7 @@ import 'package:googoogagaapp/components/request_input.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/models/routes.dart';
 import 'package:googoogagaapp/screens/loading.dart';
+import 'package:googoogagaapp/screens/unread.dart';
 import 'package:googoogagaapp/utils/initialization.dart';
 import 'package:googoogagaapp/components/scaffold.dart';
 
@@ -37,7 +38,17 @@ class _HomePageState extends State<HomePage> {
         future: _setUpMessaging,
         builder: (BuildContext context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return pages();
+            final _pageView = PageView(
+              scrollDirection: Axis.vertical,
+              children: [
+                _homePage,
+                PageView(
+                  scrollDirection: Axis.horizontal,
+                  children: buildKissTypes(),
+                )
+              ],
+            );
+            return ScaffoldPage(pages: [_pageView, KissArchive()]);
           }
           return LoadingScreen(
             message: 'Setting up messaging...',
@@ -45,32 +56,16 @@ class _HomePageState extends State<HomePage> {
         });
   }
 
-  Widget homePage() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Placeholder(),
-          ),
+  final Widget _homePage = Column(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    children: [
+      Expanded(
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Placeholder(),
         ),
-        KissRequest()
-      ],
-    );
-  }
-
-  Widget pages() {
-    return ScaffoldPage(
-        body: PageView(
-      scrollDirection: Axis.vertical,
-      children: [
-        homePage(),
-        PageView(
-          scrollDirection: Axis.horizontal,
-          children: buildKissTypes(),
-        )
-      ],
-    ));
-  }
+      ),
+      KissRequest()
+    ],
+  );
 }

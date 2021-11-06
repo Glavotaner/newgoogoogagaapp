@@ -6,14 +6,22 @@ import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:provider/provider.dart';
 
 class ScaffoldPage extends StatefulWidget {
-  const ScaffoldPage({Key? key, this.body}) : super(key: key);
-  final Widget? body;
+  const ScaffoldPage({Key? key, required this.pages}) : super(key: key);
+  final List<Widget> pages;
 
   @override
   _ScaffoldPageState createState() => _ScaffoldPageState();
 }
 
 class _ScaffoldPageState extends State<ScaffoldPage> {
+  int _selectedTab = 0;
+
+  _selectTab(int tabIndex) {
+    setState(() {
+      _selectedTab = tabIndex;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     bool _refreshDisabled =
@@ -40,13 +48,19 @@ class _ScaffoldPageState extends State<ScaffoldPage> {
           title: const Text('Googoo Gaga App'),
           bottomOpacity: 0,
           centerTitle: true),
-      bottomNavigationBar: BottomNavigationBar(items: [
-        BottomNavigationBarItem(icon: Icon(Icons.send), label: 'Send kiss'),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.archive_sharp), label: 'Kiss archive')
-      ]),
+      bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _selectedTab,
+          selectedFontSize: 16.0,
+          showSelectedLabels: true,
+          showUnselectedLabels: false,
+          onTap: _selectTab,
+          items: [
+            BottomNavigationBarItem(icon: Icon(Icons.send), label: 'Send kiss'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.archive_sharp), label: 'Kiss archive')
+          ]),
       backgroundColor: Colors.white,
-      body: widget.body ?? const Placeholder(),
+      body: widget.pages[_selectedTab],
     );
   }
 }

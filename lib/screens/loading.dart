@@ -17,7 +17,7 @@ class LoadingScreen extends StatelessWidget {
     if (message?.isNotEmpty ?? false) {
       pageData.add(Text(
         message!,
-        style: Theme.of(context).textTheme.headline4,
+        style: Theme.of(context).textTheme.headline6,
       ));
     }
     return Scaffold(
