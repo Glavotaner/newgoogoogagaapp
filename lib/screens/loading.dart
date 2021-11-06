@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class LoadingScreen extends StatefulWidget {
+class LoadingScreen extends StatelessWidget {
   LoadingScreen({Key? key, this.message}) : super(key: key);
   final String? message;
 
@@ -12,17 +12,12 @@ class LoadingScreen extends StatefulWidget {
   }
 
   @override
-  State<LoadingScreen> createState() => _LoadingScreenState();
-}
-
-class _LoadingScreenState extends State<LoadingScreen> {
-  @override
   Widget build(BuildContext context) {
     final List<Widget> pageData = [const CircularProgressIndicator()];
-    if (widget.message?.isNotEmpty ?? false) {
+    if (message?.isNotEmpty ?? false) {
       pageData.add(Text(
-        widget.message!,
-        style: Theme.of(context).textTheme.headline2,
+        message!,
+        style: Theme.of(context).textTheme.headline4,
       ));
     }
     return Scaffold(

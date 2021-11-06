@@ -57,6 +57,9 @@ processMessage(BuildContext context, RemoteMessage message) async {
 }
 
 Future processMessageInBg(RemoteMessage remoteMessage) async {
+  if (remoteMessage.notification != null) {
+    return _saveToArchive(remoteMessage);
+  }
   if (remoteMessage.data.containsKey('tokenRequest')) {
     final babyData = await getUserData(user: User.baby);
     if (babyData.userName == remoteMessage.data['username']) {
@@ -127,6 +130,15 @@ Future _saveMessageInBg(RemoteMessage remoteMessage, String key) async {
   final SharedPreferences sharedPreferences =
       await SharedPreferences.getInstance();
   sharedPreferences.setString(key, _encodeMessage(remoteMessage));
+}
+
+Future _saveToArchive(RemoteMessage remoteMessage) async {
+  final SharedPreferences sharedPreferences =
+      await SharedPreferences.getInstance();
+  var currentList = sharedPreferences.getStringList('messages') ?? [];
+  var additionalList = [_encodeMessage(remoteMessage)];
+  additionalList.addAll(currentList);
+  sharedPreferences.setStringList('messages', additionalList);
 }
 
 Future<Response> _sendMessage(

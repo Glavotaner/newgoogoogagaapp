@@ -52,6 +52,8 @@ class AppRouter extends RouterDelegate
   Future<bool> popRoute() {
     // TODO: implement popRoute
     if (appStateManager.isLoggedIn && !appStateManager.isUserNamesSetUp) {
+      appStateManager.enterUsersSetUp(false);
+      //notifyListeners();
       return Future.value(true);
     }
     return Future.value(false);
