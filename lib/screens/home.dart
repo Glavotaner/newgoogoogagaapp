@@ -28,7 +28,16 @@ class _HomePageState extends State<HomePage> {
           if (snapshot.connectionState == ConnectionState.done) {
             return PageView(
               scrollDirection: Axis.vertical,
-              children: [_homePage, KissSelectionScreen()],
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: _homePage,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: KissSelectionScreen(),
+                )
+              ],
             );
           }
           return LoadingScreen(
@@ -43,7 +52,7 @@ class _HomePageState extends State<HomePage> {
       Expanded(
         child: Padding(
           padding: const EdgeInsets.all(15.0),
-          child: Placeholder(),
+          child: Image(image: AssetImage('assets/request.png')),
         ),
       ),
       KissRequest()

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/message.dart';
 import 'package:googoogagaapp/providers/archive_manager.dart';
+import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,4 +17,10 @@ Future<List<Message>?> getArchive(BuildContext context) async {
   final archive = Provider.of<ArchiveManager>(context, listen: false);
   archive.updateMessages(messages);
   archive.initialize();
+}
+
+Future clearArchive(BuildContext context) async {
+  (await SharedPreferences.getInstance()).remove('messages');
+  Provider.of<ArchiveManager>(context, listen: false).updateMessages([]);
+  showConfirmSnackbar(context, 'Archive cleared!');
 }

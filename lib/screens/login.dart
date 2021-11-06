@@ -71,12 +71,12 @@ class _LoginPageState extends State<LoginPage> {
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Text(
               'Please put in some usernames please thank you',
-              style: TextStyle(fontSize: 24),
+              style: Theme.of(context).textTheme.headline5,
               textAlign: TextAlign.center,
             ),
           ),
-          _input(User.me, 'Your username here'),
-          _input(User.baby, 'Your baby username here'),
+          _input(User.me),
+          _input(User.baby),
           Padding(
               padding: EdgeInsets.symmetric(vertical: 10.0),
               child: SizedBox(
@@ -94,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _input(String controllerKey, String hint) {
+  Widget _input(String controllerKey) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 50),
       child: TextFormField(
@@ -110,7 +110,9 @@ class _LoginPageState extends State<LoginPage> {
           },
           textAlign: TextAlign.center,
           autovalidateMode: AutovalidateMode.onUserInteraction,
-          decoration: InputDecoration(hintText: hint)),
+          decoration: InputDecoration(
+              label: Text(
+                  controllerKey == 'me' ? 'My username' : 'Baby username'))),
     );
   }
 

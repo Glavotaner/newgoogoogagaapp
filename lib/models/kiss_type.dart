@@ -24,7 +24,7 @@ class KissType {
         body: 'wahwahweewah you got BIG kiss',
         title: 'Big kiss',
         confirmMessage: 'you send big kiss!',
-        assetPath: 'assets/bigKiss.jpg'),
+        assetPath: 'assets/bigKiss.png'),
     KissType(
         body: 'hello boss, you got boss baby kiss',
         title: 'Boss baby kiss',

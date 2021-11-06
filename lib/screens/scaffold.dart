@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/routes.dart';
 import 'package:googoogagaapp/models/user.dart';
 import 'package:googoogagaapp/providers/app_state_manager.dart';
+import 'package:googoogagaapp/providers/archive_manager.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:googoogagaapp/screens/home.dart';
 import 'package:googoogagaapp/screens/unread.dart';
+import 'package:googoogagaapp/utils/archive.dart';
 import 'package:googoogagaapp/utils/initialization.dart';
 import 'package:provider/provider.dart';
 
@@ -40,9 +42,20 @@ class _ScaffoldScreenState extends State<ScaffoldScreen> {
 
     return Scaffold(
       appBar: AppBar(
+          leading: _selectedTab == 1
+              ? Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: IconButton(
+                    color: Theme.of(context).cardColor,
+                    onPressed: () => clearArchive(context),
+                    icon: Icon(Icons.delete_forever),
+                    alignment: Alignment.centerLeft,
+                  ),
+                )
+              : null,
           actions: [
             IconButton(
-                color: Theme.of(context).hintColor,
+                color: Theme.of(context).cardColor,
                 onPressed: () =>
                     Provider.of<AppStateManager>(context, listen: false)
                         .enterUsersSetUp(true),

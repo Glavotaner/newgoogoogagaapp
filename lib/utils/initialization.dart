@@ -8,7 +8,7 @@ import 'package:googoogagaapp/utils/messaging.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
 
 Future setUpMessaging(BuildContext context) async {
-  await Future.delayed(Duration(milliseconds: 500));
+  await Future.delayed(Duration(seconds: 1));
   await Firebase.initializeApp();
   await FirebaseMessaging.instance.getInitialMessage();
   await Future.wait([_setUpNotificationChannel(), _setUpMessaging(context)]);

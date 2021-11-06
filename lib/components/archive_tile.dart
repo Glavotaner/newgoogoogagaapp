@@ -11,12 +11,14 @@ class ArchiveTile extends StatelessWidget {
     final textColumn = [
       if (message.title != null)
         Text(message.title!, style: theme.textTheme.headline5),
-      Text(message.body!, style: theme.textTheme.headline6),
+      Padding(
+        padding: const EdgeInsets.only(top: 5.0),
+        child: Text(message.body!, style: theme.textTheme.headline6),
+      ),
     ];
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: Container(
-        alignment: Alignment.centerLeft,
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start, children: textColumn),
       ),
