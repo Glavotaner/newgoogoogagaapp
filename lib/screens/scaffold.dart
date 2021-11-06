@@ -43,17 +43,6 @@ class _ScaffoldScreenState extends State<ScaffoldScreen> {
           _selectedTab == 1 && archiveManager.messages.isNotEmpty;
       return Scaffold(
         appBar: AppBar(
-            leading: _showClearArchiveIcon
-                ? Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: IconButton(
-                      color: Theme.of(context).cardColor,
-                      onPressed: () => clearArchive(context),
-                      icon: Icon(Icons.delete_forever),
-                      alignment: Alignment.centerLeft,
-                    ),
-                  )
-                : null,
             actions: [
               IconButton(
                   color: Theme.of(context).cardColor,
@@ -88,6 +77,13 @@ class _ScaffoldScreenState extends State<ScaffoldScreen> {
           index: _selectedTab,
           children: widget.pages,
         ),
+        floatingActionButton: _showClearArchiveIcon
+            ? FloatingActionButton(
+                onPressed: () => clearArchive(context),
+                backgroundColor: Colors.redAccent,
+                child: Icon(Icons.delete_forever))
+            : null,
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       );
     });
   }
