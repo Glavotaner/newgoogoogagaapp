@@ -8,7 +8,7 @@ import 'package:googoogagaapp/utils/messaging.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
 
 Future setUpMessaging(BuildContext context) async {
-  await Future.delayed(Duration.zero);
+  await Future.delayed(Duration(milliseconds: 500));
   await Firebase.initializeApp();
   await FirebaseMessaging.instance.getInitialMessage();
   await Future.wait([_setUpNotificationChannel(), _setUpMessaging(context)]);
@@ -46,7 +46,6 @@ Future _setUpMessaging(BuildContext context) async {
   FirebaseMessaging.onMessageOpenedApp.listen((message) {
     processMessage(context, message);
   });
-  return Future.value(true);
 }
 
 Future _setUpNotificationChannel() async {

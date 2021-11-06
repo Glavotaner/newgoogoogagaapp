@@ -4,7 +4,9 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
+import 'package:googoogagaapp/models/message.dart';
 import 'package:googoogagaapp/models/user.dart';
+import 'package:googoogagaapp/providers/archive_manager.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
@@ -47,6 +49,7 @@ processMessage(BuildContext context, RemoteMessage message) async {
     _processData(context, data: message.data);
   }
   if (message.notification != null) {
+    _saveToArchive(message, context);
     final notification = message.notification;
     showAlert(
         context: context,
@@ -122,23 +125,38 @@ _processTokenMessage(
 
 Future _processData(BuildContext context,
     {required Map<String, dynamic> data}) async {
-  // TODO implement process data
   _processTokenMessage(context: context, data: data);
 }
 
 Future _saveMessageInBg(RemoteMessage remoteMessage, String key) async {
   final SharedPreferences sharedPreferences =
       await SharedPreferences.getInstance();
-  sharedPreferences.setString(key, _encodeMessage(remoteMessage));
+  sharedPreferences.setString(key, _encodeMessage(remoteMessage).toString());
 }
 
-Future _saveToArchive(RemoteMessage remoteMessage) async {
-  final SharedPreferences sharedPreferences =
-      await SharedPreferences.getInstance();
-  var currentList = sharedPreferences.getStringList('messages') ?? [];
-  var additionalList = [_encodeMessage(remoteMessage)];
-  additionalList.addAll(currentList);
-  sharedPreferences.setStringList('messages', additionalList);
+Future _saveToArchive(RemoteMessage remoteMessage,
+    [BuildContext? context]) async {
+  if (!remoteMessage.from!.contains('tokens')) {
+    final SharedPreferences sharedPreferences =
+        await SharedPreferences.getInstance();
+    var currentList = sharedPreferences.getStringList('messages') ?? [];
+    final stringMessage = Message(
+            data: remoteMessage.data,
+            title: remoteMessage.notification?.title,
+            body: remoteMessage.notification?.body)
+        .toString();
+    var additionalList = [stringMessage];
+    additionalList.addAll(currentList);
+    sharedPreferences.setStringList('messages', additionalList);
+    if (context != null) {
+      final archive = Provider.of<ArchiveManager>(context, listen: false);
+      if (archive.isInitialized) {
+        archive.updateMessages(additionalList
+            .map((message) => Message.fromJson(jsonDecode(message)))
+            .toList());
+      }
+    }
+  }
 }
 
 Future<Response> _sendMessage(
@@ -162,10 +180,9 @@ Future<Response> _sendMessage(
       body: jsonEncode(requestBody));
 }
 
-String _encodeMessage(RemoteMessage remoteMessage) {
-  return jsonEncode({
-    'from': remoteMessage.from,
-    'data': remoteMessage.data,
-    'notification': remoteMessage.notification
-  });
+Message _encodeMessage(RemoteMessage remoteMessage) {
+  return Message(
+      data: remoteMessage.data,
+      title: remoteMessage.notification?.title,
+      body: remoteMessage.notification?.body);
 }

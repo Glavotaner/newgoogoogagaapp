@@ -1,12 +1,19 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:googoogagaapp/models/message.dart';
+import 'package:googoogagaapp/providers/archive_manager.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Future<List<Map<String, dynamic>>?> getArchive() async {
-  await Future.delayed(Duration(milliseconds: 500));
+Future<List<Message>?> getArchive(BuildContext context) async {
   final sharedPreferences = await SharedPreferences.getInstance();
-  return sharedPreferences
-      .getStringList('messages')
-      ?.map((message) => jsonDecode(message) as Map<String, dynamic>)
-      .toList();
+  final messages = sharedPreferences
+          .getStringList('messages')
+          ?.map((message) => Message.fromJson(jsonDecode(message)))
+          .toList() ??
+      [];
+  final archive = Provider.of<ArchiveManager>(context, listen: false);
+  archive.updateMessages(messages);
+  archive.initialize();
 }

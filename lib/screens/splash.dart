@@ -27,15 +27,18 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Image(image: AssetImage('assets/splash.png')),
-        Text(
-          'Hello you big baby',
-          style: Theme.of(context).textTheme.headline5,
-        )
-      ],
+    return Material(
+      color: Theme.of(context).cardColor,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Image(image: AssetImage('assets/splash.png')),
+          Text(
+            'Hello you big baby',
+            style: Theme.of(context).textTheme.headline5,
+          )
+        ],
+      ),
     );
   }
 }

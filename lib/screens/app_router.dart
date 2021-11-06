@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/routes.dart';
-import 'package:googoogagaapp/screens/home.dart';
+import 'package:googoogagaapp/providers/archive_manager.dart';
+import 'package:googoogagaapp/screens/scaffold.dart';
 import 'package:googoogagaapp/screens/splash.dart';
 import 'package:googoogagaapp/providers/app_state_manager.dart';
 import 'package:googoogagaapp/screens/login.dart';
@@ -12,7 +13,11 @@ class AppRouter extends RouterDelegate
   final GlobalKey<NavigatorState> navigatorKey;
   final AppStateManager appStateManager;
   final UsersManager usersManager;
-  AppRouter({required this.appStateManager, required this.usersManager})
+  final ArchiveManager archiveManager;
+  AppRouter(
+      {required this.appStateManager,
+      required this.usersManager,
+      required this.archiveManager})
       : navigatorKey = GlobalKey<NavigatorState>() {
     appStateManager.addListener(notifyListeners);
     usersManager.addListener(notifyListeners);
@@ -31,7 +36,7 @@ class AppRouter extends RouterDelegate
       key: navigatorKey,
       pages: [
         if (appStateManager.isLoading) SplashScreen.page(),
-        if (appStateManager.isLoggedIn) HomePage.page(navigatorKey),
+        if (appStateManager.isLoggedIn) ScaffoldScreen.page(),
         if (!appStateManager.isUserNamesSetUp && !appStateManager.isLoading)
           LoginPage.page(),
       ],
@@ -42,7 +47,6 @@ class AppRouter extends RouterDelegate
         if (route.settings.name == Routes.setUp) {
           appStateManager.enterUsersSetUp(false);
         }
-
         return true;
       },
     );
@@ -50,15 +54,13 @@ class AppRouter extends RouterDelegate
 
   @override
   Future<bool> popRoute() {
-    // TODO: implement popRoute
     if (appStateManager.isLoggedIn && !appStateManager.isUserNamesSetUp) {
       appStateManager.enterUsersSetUp(false);
-      //notifyListeners();
       return Future.value(true);
     }
     return Future.value(false);
   }
 
   @override
-  Future<void> setNewRoutePath(configuration) async => null;
+  Future<void> setNewRoutePath(configuration) async => Future.value();
 }

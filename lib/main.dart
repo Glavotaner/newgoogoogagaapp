@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:googoogagaapp/providers/archive_manager.dart';
 import 'package:googoogagaapp/screens/app_router.dart';
 import 'package:googoogagaapp/providers/app_state_manager.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
@@ -20,11 +21,14 @@ class _GoogooGagaAppState extends State<GoogooGagaApp> {
   late AppRouter _appRouter;
   final _appStateManager = AppStateManager();
   final _usersManager = UsersManager();
+  final _archiveManager = ArchiveManager();
 
   @override
   void initState() {
     _appRouter = AppRouter(
-        appStateManager: _appStateManager, usersManager: _usersManager);
+        appStateManager: _appStateManager,
+        usersManager: _usersManager,
+        archiveManager: _archiveManager);
     super.initState();
   }
 
@@ -34,6 +38,7 @@ class _GoogooGagaAppState extends State<GoogooGagaApp> {
         providers: [
           ChangeNotifierProvider(create: (context) => _appStateManager),
           ChangeNotifierProvider(create: (context) => _usersManager),
+          ChangeNotifierProvider(create: (context) => _archiveManager),
         ],
         child: MaterialApp(
             home: Router(

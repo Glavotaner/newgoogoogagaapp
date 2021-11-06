@@ -1,19 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:googoogagaapp/models/routes.dart';
 import 'package:googoogagaapp/models/user.dart';
 import 'package:googoogagaapp/providers/app_state_manager.dart';
-import 'package:googoogagaapp/utils/initialization.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
+import 'package:googoogagaapp/screens/home.dart';
+import 'package:googoogagaapp/screens/unread.dart';
+import 'package:googoogagaapp/utils/initialization.dart';
 import 'package:provider/provider.dart';
 
-class ScaffoldPage extends StatefulWidget {
-  const ScaffoldPage({Key? key, required this.pages}) : super(key: key);
-  final List<Widget> pages;
+class ScaffoldScreen extends StatefulWidget {
+  final List<Widget> pages = [HomePage(), KissArchive()];
+  ScaffoldScreen({Key? key}) : super(key: key);
+
+  static MaterialPage page() {
+    return MaterialPage(
+      name: Routes.home,
+      key: ValueKey(Routes.home),
+      child: ScaffoldScreen(),
+    );
+  }
 
   @override
-  _ScaffoldPageState createState() => _ScaffoldPageState();
+  _ScaffoldScreenState createState() => _ScaffoldScreenState();
 }
 
-class _ScaffoldPageState extends State<ScaffoldPage> {
+class _ScaffoldScreenState extends State<ScaffoldScreen> {
   int _selectedTab = 0;
 
   _selectTab(int tabIndex) {
@@ -26,6 +37,7 @@ class _ScaffoldPageState extends State<ScaffoldPage> {
   Widget build(BuildContext context) {
     bool _refreshDisabled =
         context.watch<UsersManager>().usersData[User.me]?.token == null;
+
     return Scaffold(
       appBar: AppBar(
           actions: [
@@ -60,7 +72,10 @@ class _ScaffoldPageState extends State<ScaffoldPage> {
                 icon: Icon(Icons.archive_sharp), label: 'Kiss archive')
           ]),
       backgroundColor: Colors.white,
-      body: widget.pages[_selectedTab],
+      body: IndexedStack(
+        index: _selectedTab,
+        children: widget.pages,
+      ),
     );
   }
 }
