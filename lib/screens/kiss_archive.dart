@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/message.dart';
-import 'package:googoogagaapp/components/archive_list.dart';
+import 'package:googoogagaapp/components/archive/archive_list.dart';
 import 'package:googoogagaapp/components/loading.dart';
 import 'package:googoogagaapp/utils/archive.dart';
 
-class KissArchive extends StatefulWidget {
-  const KissArchive({Key? key}) : super(key: key);
+class KissArchiveScreen extends StatefulWidget {
+  const KissArchiveScreen({Key? key}) : super(key: key);
 
   @override
-  _KissArchiveState createState() => _KissArchiveState();
+  _KissArchiveScreenState createState() => _KissArchiveScreenState();
 }
 
-class _KissArchiveState extends State<KissArchive> {
+class _KissArchiveScreenState extends State<KissArchiveScreen> {
   late Future<List<Message>?> _getArchive;
 
   @override

@@ -4,7 +4,7 @@ import 'package:googoogagaapp/providers/archive_manager.dart';
 import 'package:googoogagaapp/screens/scaffold.dart';
 import 'package:googoogagaapp/screens/splash.dart';
 import 'package:googoogagaapp/providers/app_state_manager.dart';
-import 'package:googoogagaapp/screens/login.dart';
+import 'package:googoogagaapp/screens/set_up.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 
 class AppRouter extends RouterDelegate
@@ -38,7 +38,7 @@ class AppRouter extends RouterDelegate
         if (appStateManager.isLoading) SplashScreen.page(),
         if (appStateManager.isLoggedIn) ScaffoldScreen.page(),
         if (!appStateManager.isUserNamesSetUp && !appStateManager.isLoading)
-          LoginPage.page(),
+          SetUpScreen.page(),
       ],
       onPopPage: (route, result) {
         if (!(route.didPop(result))) {

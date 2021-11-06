@@ -7,20 +7,20 @@ import 'package:googoogagaapp/utils/user_data.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:provider/provider.dart';
 
-class LoginPage extends StatefulWidget {
+class SetUpScreen extends StatefulWidget {
   final Map<String, User?>? usersData;
-  LoginPage({Key? key, this.usersData}) : super(key: key);
+  SetUpScreen({Key? key, this.usersData}) : super(key: key);
 
   static MaterialPage page() {
     return MaterialPage(
-        name: Routes.setUp, key: ValueKey(Routes.setUp), child: LoginPage());
+        name: Routes.setUp, key: ValueKey(Routes.setUp), child: SetUpScreen());
   }
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _SetUpScreenState createState() => _SetUpScreenState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SetUpScreenState extends State<SetUpScreen> {
   final _formKey = GlobalKey<FormState>();
   late Map<String, User?> _usersData;
 
@@ -53,9 +53,8 @@ class _LoginPageState extends State<LoginPage> {
         ),
         body: _form(_usersData),
       );
-    } else {
-      return Scaffold(body: _form(_usersData));
     }
+    return Scaffold(body: _form(_usersData));
   }
 
   Widget _form(Map<String, User?> usersData) {

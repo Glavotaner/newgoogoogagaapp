@@ -5,13 +5,13 @@ import 'package:googoogagaapp/providers/app_state_manager.dart';
 import 'package:googoogagaapp/providers/archive_manager.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:googoogagaapp/screens/home.dart';
-import 'package:googoogagaapp/screens/unread.dart';
+import 'package:googoogagaapp/screens/kiss_archive.dart';
 import 'package:googoogagaapp/utils/archive.dart';
 import 'package:googoogagaapp/utils/initialization.dart';
 import 'package:provider/provider.dart';
 
 class ScaffoldScreen extends StatefulWidget {
-  final List<Widget> pages = [HomePage(), KissArchive()];
+  final List<Widget> pages = [HomeScreen(), KissArchiveScreen()];
   ScaffoldScreen({Key? key}) : super(key: key);
 
   static MaterialPage page() {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:googoogagaapp/components/archive_tile.dart';
+import 'package:googoogagaapp/components/archive/archive_tile.dart';
 import 'package:googoogagaapp/components/no_data.dart';
 import 'package:googoogagaapp/models/message.dart';
 import 'package:googoogagaapp/providers/archive_manager.dart';

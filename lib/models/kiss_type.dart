@@ -1,4 +1,4 @@
-import 'package:googoogagaapp/components/kiss_type.dart';
+import 'package:googoogagaapp/components/kiss_selection/kiss_type.dart';
 
 class KissType {
   String body;
