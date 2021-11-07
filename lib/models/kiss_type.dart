@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:googoogagaapp/components/kiss_selection/kiss_type.dart';
+import 'package:googoogagaapp/components/kiss_selection/quick_kiss.dart';
 
 class KissType {
   String body;
@@ -33,12 +35,14 @@ class KissType {
   ];
 }
 
-List<KissTypeWidget> buildKissTypes(bool? disabled) {
-  return KissType.kissTypes
-      .where((kissType) => kissType.assetPath?.isNotEmpty ?? false)
-      .map((kissType) => KissTypeWidget(
-            kissType,
-            disabled: disabled ?? false,
-          ))
-      .toList();
+List<Widget> buildKissTypes(bool? disabled) {
+  final List<Widget> widgets = [];
+  final _disabled = disabled ?? false;
+  for (KissType kissType in KissType.kissTypes) {
+    if (kissType.assetPath?.isNotEmpty ?? false) {
+      widgets.add(KissTypeWidget(kissType, disabled: _disabled));
+    }
+  }
+  widgets.add(QuickKiss(disabled: disabled ?? false));
+  return widgets;
 }

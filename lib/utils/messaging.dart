@@ -24,10 +24,6 @@ Future<Map<String, dynamic>> getFCMData() async {
 Future sendKiss(BuildContext context, KissType kissType,
     {Map<String, dynamic>? data}) async {
   final babyData = await getUserData(user: User.baby);
-  if (!babyData.hasToken) {
-    showErrorSnackbar(context, 'Baby token missing!');
-    throw ErrorDescription('Token missing');
-  }
   await _sendMessage(
       token: babyData.token,
       notification: {
@@ -36,6 +32,20 @@ Future sendKiss(BuildContext context, KissType kissType,
         'tag': 'kiss'
       },
       collapseKey: 'kiss');
+}
+
+Future sendQuickKiss(BuildContext context, double duration) async {
+  await _sendMessage(
+      token: Provider.of<UsersManager>(context, listen: false)
+          .usersData[User.baby]!
+          .token,
+      notification: {
+        'title': 'Quick kiss',
+        'body': 'You gotted an quick kiss!'
+      },
+      data: {
+        'duration': duration
+      });
 }
 
 Future sendRequest(BuildContext context, String message) async {
