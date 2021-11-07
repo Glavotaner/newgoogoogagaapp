@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
-import 'package:googoogagaapp/providers/users_manager.dart';
-import 'package:provider/provider.dart';
 
 class KissTypeWidget extends StatefulWidget {
-  KissTypeWidget(this.kissType, {Key? key}) : super(key: key);
+  final bool disabled;
+  KissTypeWidget(this.kissType, {Key? key, this.disabled = false})
+      : super(key: key);
   final KissType kissType;
 
   @override
@@ -15,13 +15,6 @@ class KissTypeWidget extends StatefulWidget {
 class _KissTypeWidgetState extends State<KissTypeWidget> {
   @override
   Widget build(BuildContext context) {
-    bool _disable = false;
-    context.watch<UsersManager>().usersData.forEach((key, value) {
-      if (value?.token == null) {
-        _disable = true;
-      }
-      print(_disable);
-    });
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Card(
@@ -49,7 +42,7 @@ class _KissTypeWidgetState extends State<KissTypeWidget> {
                               .copyWith(color: Colors.black87))),
                 ],
               ),
-              if (!_disable)
+              if (!widget.disabled)
                 Material(
                   color: Colors.transparent,
                   child: InkWell(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
+import 'package:googoogagaapp/utils/user_data.dart';
 import 'package:provider/provider.dart';
 
 class KissRequest extends StatefulWidget {
@@ -29,12 +30,6 @@ class _KissRequestState extends State<KissRequest> {
 
   @override
   Widget build(BuildContext context) {
-    bool _disableButton = false;
-    context.watch<UsersManager>().usersData.forEach((key, value) {
-      if (value?.token == null) {
-        _disableButton = true;
-      }
-    });
     return Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -49,12 +44,18 @@ class _KissRequestState extends State<KissRequest> {
           ),
           Padding(
               padding: EdgeInsets.symmetric(vertical: 5.0),
-              child: ElevatedButton.icon(
-                  onPressed:
-                      _disableButton ? null : () => _sendRequest(context),
-                  onLongPress: null,
-                  icon: Icon(Icons.send_sharp),
-                  label: Text('Send request', style: TextStyle(fontSize: 16))))
+              child: Consumer<UsersManager>(
+                builder: (context, usersManager, child) {
+                  final bool _disabled =
+                      checkAnyTokenMissing(usersManager.usersData);
+                  return ElevatedButton.icon(
+                      onPressed: _disabled ? null : () => _sendRequest(context),
+                      onLongPress: null,
+                      icon: Icon(Icons.send_sharp),
+                      label:
+                          Text('Send request', style: TextStyle(fontSize: 16)));
+                },
+              ))
         ],
       ),
     );

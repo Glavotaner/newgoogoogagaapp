@@ -33,9 +33,12 @@ class KissType {
   ];
 }
 
-List<KissTypeWidget> buildKissTypes() {
+List<KissTypeWidget> buildKissTypes(bool? disabled) {
   return KissType.kissTypes
       .where((kissType) => kissType.assetPath?.isNotEmpty ?? false)
-      .map((kissType) => KissTypeWidget(kissType))
+      .map((kissType) => KissTypeWidget(
+            kissType,
+            disabled: disabled ?? false,
+          ))
       .toList();
 }

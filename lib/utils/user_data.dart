@@ -42,6 +42,15 @@ Future<void> checkUsernamesSetUp(BuildContext context) async {
   state.finishLoading();
 }
 
+bool checkAnyTokenMissing(Map<String, User?> usersData) {
+  for (User? data in usersData.values) {
+    if (data?.token == null) {
+      return true;
+    }
+  }
+  return false;
+}
+
 Future<User?> _checkUserExists(String user) async {
   try {
     return await getUserData(user: user);

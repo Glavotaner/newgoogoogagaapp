@@ -28,16 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (snapshot.connectionState == ConnectionState.done) {
             return PageView(
               scrollDirection: Axis.vertical,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: _homePage,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: KissSelectionScreen(),
-                )
-              ],
+              children: [_homePage, KissSelectionScreen()],
             );
           }
           return LoadingScreen(

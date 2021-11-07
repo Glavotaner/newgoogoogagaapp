@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/providers/archive_manager.dart';
-import 'package:googoogagaapp/screens/app_router.dart';
+import 'package:googoogagaapp/app_router.dart';
 import 'package:googoogagaapp/providers/app_state_manager.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:provider/provider.dart';
