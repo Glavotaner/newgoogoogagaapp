@@ -35,18 +35,10 @@ class _ScaffoldScreenState extends State<ScaffoldScreen> {
     });
   }
 
-  _takePhoto(BuildContext context) {
-    Provider.of<AppStateManager>(context, listen: false).takingPhoto(true);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          leading: IconButton(
-            onPressed: _takePhoto(context),
-            icon: Icon(Icons.camera),
-          ),
           actions: [
             IconButton(
                 color: Theme.of(context).cardColor,

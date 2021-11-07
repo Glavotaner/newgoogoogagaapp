@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/routes.dart';
 import 'package:googoogagaapp/providers/archive_manager.dart';
-import 'package:googoogagaapp/screens/camera.dart';
 import 'package:googoogagaapp/screens/scaffold.dart';
 import 'package:googoogagaapp/screens/splash.dart';
 import 'package:googoogagaapp/providers/app_state_manager.dart';
@@ -38,7 +37,6 @@ class AppRouter extends RouterDelegate
       pages: [
         if (appStateManager.isLoading) SplashScreen.page(),
         if (appStateManager.isLoggedIn) ScaffoldScreen.page(),
-        if (appStateManager.isTakingPhoto) CameraScreen.page(),
         if (!appStateManager.isUserNamesSetUp && !appStateManager.isLoading)
           SetUpScreen.page(),
       ],
@@ -59,9 +57,6 @@ class AppRouter extends RouterDelegate
     if (appStateManager.isLoggedIn) {
       if (!appStateManager.isUserNamesSetUp) {
         return appStateManager.leaveUserNamesSetup();
-      }
-      if (!appStateManager.isTakingPhoto) {
-        return appStateManager.takingPhoto(false);
       }
     }
     return Future.value(false);

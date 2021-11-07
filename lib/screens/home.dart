@@ -37,9 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ]);
           }
-          return LoadingScreen(
-            message: 'Setting up messaging...',
-          );
+          return LoadingScreen('Setting up messaging...');
         });
   }
 

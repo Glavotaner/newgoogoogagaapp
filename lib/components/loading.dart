@@ -1,15 +1,8 @@
 import 'package:flutter/material.dart';
 
 class LoadingScreen extends StatelessWidget {
-  LoadingScreen({Key? key, this.message}) : super(key: key);
   final String? message;
-
-  static MaterialPage page() {
-    return MaterialPage(
-        child: LoadingScreen(),
-        name: 'LoadingScreen',
-        key: ValueKey('LoadingScreen'));
-  }
+  const LoadingScreen(this.message, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
