@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:googoogagaapp/components/home/swipe_hint.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
@@ -11,9 +12,16 @@ class KissSelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<UsersManager>(builder: (context, users, child) {
       final disabled = checkAnyTokenMissing(users.usersData);
-      return PageView(
-        scrollDirection: Axis.horizontal,
-        children: buildKissTypes(disabled),
+      return Column(
+        children: [
+          SwipeHint(opacity: 1, page: 1),
+          Expanded(
+            child: PageView(
+              scrollDirection: Axis.horizontal,
+              children: buildKissTypes(disabled),
+            ),
+          ),
+        ],
       );
     });
   }

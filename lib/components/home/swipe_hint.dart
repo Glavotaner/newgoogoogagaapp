@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 class SwipeHint extends StatelessWidget {
   final double opacity;
   final int page;
+  static final List<String> _hints = [
+    'swipe oop to select kifs to gib to babba',
+    'swipe down to ascccc for an kiss maybe'
+  ];
   const SwipeHint({Key? key, required this.opacity, required this.page})
       : super(key: key);
 
@@ -14,13 +18,11 @@ class SwipeHint extends StatelessWidget {
       child: AnimatedCrossFade(
           firstChild: Align(
             alignment: Alignment.bottomCenter,
-            child: _buildHintRow('swipe oop to select kifs to git to babba',
-                Icons.arrow_downward_rounded),
+            child: _buildHintRow(_hints[0], Icons.arrow_downward_rounded),
           ),
           secondChild: Align(
             alignment: Alignment.topCenter,
-            child: _buildHintRow('swipe down to ascccc for an kiss maybe',
-                Icons.arrow_upward_rounded),
+            child: _buildHintRow(_hints[1], Icons.arrow_upward_rounded),
           ),
           duration: const Duration(milliseconds: 50),
           crossFadeState:

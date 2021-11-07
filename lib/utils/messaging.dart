@@ -6,18 +6,21 @@ import 'package:flutter/services.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/models/message.dart';
 import 'package:googoogagaapp/models/user.dart';
-import 'package:googoogagaapp/providers/archive_manager.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
+import 'package:googoogagaapp/utils/archive.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Get FCM data from assets.
+/// Used for sending messages.
 Future<Map<String, dynamic>> getFCMData() async {
   return jsonDecode((await rootBundle.loadString('assets/fcm.json')))['data'];
 }
 
+/// Send kiss.
 Future sendKiss(BuildContext context, KissType kissType,
     {Map<String, dynamic>? data}) async {
   final babyData = await getUserData(user: User.baby);
@@ -27,8 +30,12 @@ Future sendKiss(BuildContext context, KissType kissType,
   }
   await _sendMessage(
       token: babyData.token,
-      notification: {'title': kissType.title, 'body': kissType.body});
-  showConfirmSnackbar(context, kissType.confirmMessage);
+      notification: {
+        'title': kissType.title,
+        'body': kissType.body,
+        'tag': 'kiss'
+      },
+      collapseKey: 'kiss');
 }
 
 Future sendRequest(BuildContext context, String message) async {
@@ -49,7 +56,7 @@ processMessage(BuildContext context, RemoteMessage message) async {
     _processData(context, data: message.data);
   }
   if (message.notification != null) {
-    _saveToArchive(message, context);
+    saveToArchive(message, context);
     final notification = message.notification;
     showAlert(
         context: context,
@@ -61,7 +68,7 @@ processMessage(BuildContext context, RemoteMessage message) async {
 
 Future processMessageInBg(RemoteMessage remoteMessage) async {
   if (remoteMessage.notification != null) {
-    return _saveToArchive(remoteMessage);
+    return saveToArchive(remoteMessage);
   }
   if (remoteMessage.data.containsKey('tokenRequest')) {
     final babyData = await getUserData(user: User.baby);
@@ -131,39 +138,16 @@ Future _processData(BuildContext context,
 Future _saveMessageInBg(RemoteMessage remoteMessage, String key) async {
   final SharedPreferences sharedPreferences =
       await SharedPreferences.getInstance();
-  sharedPreferences.setString(key, _encodeMessage(remoteMessage).toString());
-}
-
-Future _saveToArchive(RemoteMessage remoteMessage,
-    [BuildContext? context]) async {
-  if (!remoteMessage.from!.contains('tokens')) {
-    final SharedPreferences sharedPreferences =
-        await SharedPreferences.getInstance();
-    var currentList = sharedPreferences.getStringList('messages') ?? [];
-    final stringMessage = Message(
-            data: remoteMessage.data,
-            title: remoteMessage.notification?.title,
-            body: remoteMessage.notification?.body)
-        .toString();
-    var additionalList = [stringMessage];
-    additionalList.addAll(currentList);
-    sharedPreferences.setStringList('messages', additionalList);
-    if (context != null) {
-      final archive = Provider.of<ArchiveManager>(context, listen: false);
-      if (archive.isInitialized) {
-        archive.updateMessages(additionalList
-            .map((message) => Message.fromJson(jsonDecode(message)))
-            .toList());
-      }
-    }
-  }
+  sharedPreferences.setString(
+      key, Message.fromRemote(remoteMessage).toString());
 }
 
 Future<Response> _sendMessage(
     {String? token,
     String? topic,
     Map<String, String>? notification,
-    Map<String, dynamic>? data}) async {
+    Map<String, dynamic>? data,
+    String? collapseKey}) async {
   final fcmData = await getFCMData();
   Map<String, dynamic> requestBody = {
     "project_id": fcmData['projectId'],
@@ -171,6 +155,7 @@ Future<Response> _sendMessage(
   };
   requestBody['notification'] = notification;
   requestBody['data'] = data;
+  requestBody['collapse_key'] = collapseKey;
   final serverKey = fcmData['serverKey'];
   return await post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
       headers: {
@@ -178,11 +163,4 @@ Future<Response> _sendMessage(
         'Authorization': 'key=$serverKey'
       },
       body: jsonEncode(requestBody));
-}
-
-Message _encodeMessage(RemoteMessage remoteMessage) {
-  return Message(
-      data: remoteMessage.data,
-      title: remoteMessage.notification?.title,
-      body: remoteMessage.notification?.body);
 }

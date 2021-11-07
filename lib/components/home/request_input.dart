@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
@@ -15,11 +16,20 @@ class KissRequest extends StatefulWidget {
 class _KissRequestState extends State<KissRequest> {
   final _textController = TextEditingController();
   static const _placeholder = 'I am babby and I ask for kiss';
+  bool _snackbarShown = false;
 
-  _sendRequest(BuildContext context) {
+  _sendRequest(BuildContext context) async {
     sendRequest(context,
         _textController.text.isNotEmpty ? _textController.text : _placeholder);
     _textController.clear();
+    if (!_snackbarShown) {
+      try {
+        _snackbarShown = true;
+        await showConfirmSnackbar(context, 'request sendeddedd').closed;
+      } finally {
+        _snackbarShown = false;
+      }
+    }
   }
 
   @override

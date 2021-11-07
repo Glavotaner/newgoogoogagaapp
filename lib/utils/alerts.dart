@@ -27,8 +27,9 @@ Future showAlert(
   timer = null;
 }
 
-showConfirmSnackbar(BuildContext context, String message) {
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showConfirmSnackbar(
+    BuildContext context, String message) {
+  return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     content: Text(message),
     duration: Duration(seconds: 2),
     backgroundColor: Theme.of(context).colorScheme.primary,
