@@ -3,6 +3,7 @@ import 'package:googoogagaapp/models/routes.dart';
 import 'package:googoogagaapp/models/user.dart';
 import 'package:googoogagaapp/providers/app_state_manager.dart';
 import 'package:googoogagaapp/providers/archive_manager.dart';
+import 'package:googoogagaapp/providers/quick_kiss_manager.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:googoogagaapp/screens/home.dart';
 import 'package:googoogagaapp/screens/kiss_archive.dart';
@@ -27,6 +28,7 @@ class ScaffoldScreen extends StatefulWidget {
 }
 
 class _ScaffoldScreenState extends State<ScaffoldScreen> {
+  final _quickKissManager = QuickKissManager();
   int _selectedTab = 0;
 
   _selectTab(int tabIndex) {
@@ -37,59 +39,77 @@ class _ScaffoldScreenState extends State<ScaffoldScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          actions: [
-            IconButton(
-                color: Theme.of(context).cardColor,
-                onPressed: () =>
-                    Provider.of<AppStateManager>(context, listen: false)
-                        .setUpUserNames(),
-                icon: Icon(Icons.people)),
-            Consumer<UsersManager>(
-              builder: (context, usersManager, child) {
-                return IconButton(
-                    color: Colors.redAccent,
-                    onPressed: usersManager.usersData[User.me]?.token == null
-                        ? null
-                        : () => refreshBabyToken(context),
-                    icon: Icon(usersManager.usersData[User.baby]?.token == null
-                        ? Icons.favorite_border
-                        : Icons.favorite));
-              },
-            )
-          ],
-          title: const Text('Googoo Gaga App'),
-          bottomOpacity: 0,
-          centerTitle: true),
-      bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _selectedTab,
-          selectedFontSize: 16.0,
-          showSelectedLabels: true,
-          showUnselectedLabels: false,
-          onTap: _selectTab,
-          items: [
-            BottomNavigationBarItem(icon: Icon(Icons.send), label: 'Send kiss'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.archive_sharp), label: 'Kiss archive')
-          ]),
-      backgroundColor: Colors.white,
-      body: IndexedStack(
-        index: _selectedTab,
-        children: widget.pages,
-      ),
-      floatingActionButton: Consumer<ArchiveManager>(
-        builder: (context, archive, child) {
-          return Visibility(
-            visible: _selectedTab == 1 && archive.messages.isNotEmpty,
-            child: FloatingActionButton(
-                onPressed: () => clearArchive(context),
-                backgroundColor: Colors.redAccent,
-                child: Icon(Icons.delete_forever)),
-          );
-        },
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-    );
+    return ChangeNotifierProvider(
+        create: (context) => _quickKissManager,
+        child: Scaffold(
+          appBar: AppBar(
+              leading: Consumer<QuickKissManager>(
+                  builder: (context, kissManager, child) {
+                return Visibility(
+                  visible: kissManager.minutesLeft > 0,
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: CircularProgressIndicator(
+                        color: Colors.white,
+                        value: kissManager.minutesLeft /
+                            kissManager.duration.inMinutes),
+                  ),
+                );
+              }),
+              actions: [
+                IconButton(
+                    color: Theme.of(context).cardColor,
+                    onPressed: () =>
+                        Provider.of<AppStateManager>(context, listen: false)
+                            .setUpUserNames(),
+                    icon: Icon(Icons.people)),
+                Consumer<UsersManager>(
+                  builder: (context, usersManager, child) {
+                    return IconButton(
+                        color: Colors.redAccent,
+                        onPressed:
+                            usersManager.usersData[User.me]?.token == null
+                                ? null
+                                : () => refreshBabyToken(context),
+                        icon: Icon(
+                            usersManager.usersData[User.baby]?.token == null
+                                ? Icons.favorite_border
+                                : Icons.favorite));
+                  },
+                )
+              ],
+              title: const Text('Googoo Gaga App'),
+              bottomOpacity: 0,
+              centerTitle: true),
+          bottomNavigationBar: BottomNavigationBar(
+              currentIndex: _selectedTab,
+              selectedFontSize: 16.0,
+              showSelectedLabels: true,
+              showUnselectedLabels: false,
+              onTap: _selectTab,
+              items: [
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.send), label: 'Send kiss'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.archive_sharp), label: 'Kiss archive')
+              ]),
+          backgroundColor: Colors.white,
+          body: IndexedStack(
+            index: _selectedTab,
+            children: widget.pages,
+          ),
+          floatingActionButton: Consumer<ArchiveManager>(
+            builder: (context, archive, child) {
+              return Visibility(
+                visible: _selectedTab == 1 && archive.messages.isNotEmpty,
+                child: FloatingActionButton(
+                    onPressed: () => clearArchive(context),
+                    backgroundColor: Colors.redAccent,
+                    child: Icon(Icons.delete_forever)),
+              );
+            },
+          ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        ));
   }
 }

@@ -15,9 +15,9 @@ class QuickKissManager extends ChangeNotifier {
     _receiveTime = timeReceived;
     final difference = DateTime.now().difference(timeReceived);
     if (!difference.isNegative) {
-      _duration = difference;
-      if (_duration.inMinutes > kissDuration) {
-        _minutesLeft = _duration.inMinutes - kissDuration;
+      if (difference.inMinutes < kissDuration) {
+        _duration = Duration(minutes: kissDuration);
+        _minutesLeft = kissDuration - _duration.inMinutes;
         return startTimer();
       }
     }
@@ -25,7 +25,8 @@ class QuickKissManager extends ChangeNotifier {
   }
 
   startTimer() {
-    Timer.periodic(Duration(minutes: 1), _updateTimer);
+    notifyListeners();
+    Timer.periodic(Duration(seconds: 5), _updateTimer);
   }
 
   clearTimer() {
