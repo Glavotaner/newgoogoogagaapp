@@ -2,22 +2,21 @@ import 'package:flutter/material.dart';
 
 class AppStateManager extends ChangeNotifier {
   bool _userNamesSetUp = false;
-  bool _initialized = false;
   bool _loading = true;
   bool _loggedIn = false;
 
   bool get isUserNamesSetUp => _userNamesSetUp;
-  bool get isInitialized => _initialized;
   bool get isLoading => _loading;
   bool get isLoggedIn => _loggedIn;
 
-  enterUsersSetUp(bool setUp) {
-    _userNamesSetUp = !setUp;
+  setUpUserNames() {
+    _userNamesSetUp = false;
     notifyListeners();
   }
 
-  initializeMessaging() {
-    _initialized = true;
+  leaveUserNamesSetup() {
+    _userNamesSetUp = true;
+    notifyListeners();
   }
 
   finishLoading() {

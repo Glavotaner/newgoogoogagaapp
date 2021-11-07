@@ -26,7 +26,7 @@ Future setUserData(BuildContext context, String name, User userData) async {
   final sharedPreferences = await SharedPreferences.getInstance();
   sharedPreferences.setString(name.toString(), jsonEncode(userData.toJson()));
   Provider.of<UsersManager>(context, listen: false)
-      .setUpUserNames(true, {name: userData});
+      .updateUpUserNames(true, {name: userData});
 }
 
 Future<void> checkUsernamesSetUp(BuildContext context) async {
@@ -36,7 +36,7 @@ Future<void> checkUsernamesSetUp(BuildContext context) async {
   final meData = await _checkUserExists(User.me);
   final babyData = await _checkUserExists(User.baby);
   if (meData != null && babyData != null && !state.isLoggedIn) {
-    users.setUpUserNames(true, {User.me: meData, User.baby: babyData});
+    users.updateUpUserNames(true, {User.me: meData, User.baby: babyData});
     return state.logIn();
   }
   state.finishLoading();

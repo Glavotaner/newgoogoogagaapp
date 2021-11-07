@@ -45,7 +45,7 @@ class AppRouter extends RouterDelegate
           return false;
         }
         if (route.settings.name == Routes.setUp) {
-          appStateManager.enterUsersSetUp(false);
+          appStateManager.leaveUserNamesSetup();
         }
         return true;
       },
@@ -55,7 +55,7 @@ class AppRouter extends RouterDelegate
   @override
   Future<bool> popRoute() {
     if (appStateManager.isLoggedIn && !appStateManager.isUserNamesSetUp) {
-      appStateManager.enterUsersSetUp(false);
+      appStateManager.leaveUserNamesSetup();
       return Future.value(true);
     }
     return Future.value(false);

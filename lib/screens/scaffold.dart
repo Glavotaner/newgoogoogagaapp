@@ -44,7 +44,7 @@ class _ScaffoldScreenState extends State<ScaffoldScreen> {
                 color: Theme.of(context).cardColor,
                 onPressed: () =>
                     Provider.of<AppStateManager>(context, listen: false)
-                        .enterUsersSetUp(true),
+                        .setUpUserNames(),
                 icon: Icon(Icons.people)),
             Consumer<UsersManager>(
               builder: (context, usersManager, child) {

@@ -95,7 +95,7 @@ Future processBgMessages(BuildContext context) async {
     final babyData = await getUserData(user: User.baby);
     setUserData(context, User.baby, babyData..token = token);
     Provider.of<UsersManager>(context, listen: false)
-        .setUpUserNames(true, {User.baby: babyData..token = token});
+        .updateUpUserNames(true, {User.baby: babyData..token = token});
     _clearBgMessages(sharedPreferences);
   }
 }
