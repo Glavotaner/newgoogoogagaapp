@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:googoogagaapp/models/message.dart';
 import 'package:googoogagaapp/components/archive/archive_list.dart';
 import 'package:googoogagaapp/components/loading.dart';
 import 'package:googoogagaapp/utils/archive.dart';
@@ -12,7 +11,7 @@ class KissArchiveScreen extends StatefulWidget {
 }
 
 class _KissArchiveScreenState extends State<KissArchiveScreen> {
-  late Future<List<Message>?> _getArchive;
+  late Future<void> _getArchive;
 
   @override
   void initState() {
@@ -24,7 +23,7 @@ class _KissArchiveScreenState extends State<KissArchiveScreen> {
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: _getArchive,
-      builder: (context, AsyncSnapshot<List<Message>?> snapshot) {
+      builder: (context, AsyncSnapshot<void> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return KissArchiveList();
         }

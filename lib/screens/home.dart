@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/components/home/request_input.dart';
-import 'package:googoogagaapp/components/home/swipe_hint.dart';
 import 'package:googoogagaapp/components/kiss_selection/kiss_selection.dart';
 import 'package:googoogagaapp/components/loading.dart';
 import 'package:googoogagaapp/utils/initialization.dart';
@@ -29,13 +28,10 @@ class _HomeScreenState extends State<HomeScreen> {
         future: _setUpMessaging,
         builder: (BuildContext context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return Stack(children: [
-              SwipeHint(opacity: opacity, page: selectedPage),
-              PageView(
-                scrollDirection: Axis.vertical,
-                children: [_homePage, KissSelectionScreen()],
-              ),
-            ]);
+            return PageView(
+              scrollDirection: Axis.vertical,
+              children: [_homePage, KissSelectionScreen()],
+            );
           }
           return LoadingScreen('Setting up messaging...');
         });

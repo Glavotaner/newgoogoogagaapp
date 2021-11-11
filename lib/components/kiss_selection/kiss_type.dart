@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
-import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
 
 class KissTypeWidget extends StatefulWidget {
@@ -14,18 +13,8 @@ class KissTypeWidget extends StatefulWidget {
 }
 
 class _KissTypeWidgetState extends State<KissTypeWidget> {
-  bool _snackbarShown = false;
   _sendKiss() async {
     sendKiss(context, widget.kissType);
-    if (!_snackbarShown) {
-      try {
-        _snackbarShown = true;
-        await showConfirmSnackbar(context, widget.kissType.confirmMessage)
-            .closed;
-      } finally {
-        _snackbarShown = false;
-      }
-    }
   }
 
   @override
@@ -62,7 +51,7 @@ class _KissTypeWidgetState extends State<KissTypeWidget> {
                   color: Colors.transparent,
                   child: InkWell(
                     splashColor: Colors.pink[50]!.withAlpha(175),
-                    onTap: () => _sendKiss(),
+                    onTap: _sendKiss,
                   ),
                 ),
             ],

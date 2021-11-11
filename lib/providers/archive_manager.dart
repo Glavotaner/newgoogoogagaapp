@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/message.dart';
 
 class ArchiveManager extends ChangeNotifier {
-  List<Message> _messages = [];
+  List<MessageModel> _messages = [];
   bool _initialized = false;
-  List<Message> get messages => _messages;
+  List<MessageModel> get messages => _messages;
   bool get isInitialized => _initialized;
 
-  updateMessages(List<Message> messages) {
+  updateMessages(List<MessageModel> messages) {
     _messages = messages;
     notifyListeners();
   }

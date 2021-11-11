@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
 
 class QuickKiss extends StatefulWidget {
@@ -12,17 +11,8 @@ class QuickKiss extends StatefulWidget {
 
 class _QuickKissState extends State<QuickKiss> {
   double _sliderValue = 10.0;
-  bool _snackbarShown = false;
   _sendKiss(double duration) async {
     sendQuickKiss(context, duration);
-    if (!_snackbarShown) {
-      try {
-        _snackbarShown = true;
-        await showConfirmSnackbar(context, 'you sented quick kiss!').closed;
-      } finally {
-        _snackbarShown = false;
-      }
-    }
   }
 
   @override

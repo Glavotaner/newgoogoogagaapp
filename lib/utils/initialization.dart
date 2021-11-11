@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:googoogagaapp/models/message.dart';
 import 'package:googoogagaapp/models/user.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
@@ -30,21 +31,20 @@ Future _refreshTokens(BuildContext context) async {
 Future refreshBabyToken([BuildContext? context, GlobalKey? navKey]) async {
   final myUser = await getUserData(context: context, user: User.me);
   await FirebaseMessaging.instance.subscribeToTopic('tokens');
-  sendDataMessage(topic: 'tokens', data: {
-    'token': myUser.token,
-    'tokenRequest': true,
-    'username': myUser.userName
-  });
+  sendDataMessage(
+      topic: 'tokens',
+      data: MessageData(
+          token: myUser.token, tokenRequest: true, userName: myUser.userName));
   showConfirmSnackbar(context!, 'Refreshing!');
 }
 
 Future _setUpMessaging(BuildContext context) async {
   FirebaseMessaging.onMessage.listen((message) {
-    processMessage(context, message);
+    processMessage(context, MessageModel.fromRemote(message));
   });
   FirebaseMessaging.onBackgroundMessage(processMessageInBg);
   FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    processMessage(context, message);
+    processMessage(context, MessageModel.fromRemote(message));
   });
 }
 

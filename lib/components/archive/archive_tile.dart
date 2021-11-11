@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/message.dart';
 
 class ArchiveTile extends StatelessWidget {
-  final Message message;
+  final MessageModel message;
   const ArchiveTile(this.message, {Key? key}) : super(key: key);
 
   @override

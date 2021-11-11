@@ -13,5 +13,5 @@ class User {
 
   Map<String, dynamic> toJson() => {'userName': userName, 'token': token};
 
-  bool get hasToken => token?.isNotEmpty ?? false;
+  bool get hasToken => (token ?? '').isNotEmpty;
 }

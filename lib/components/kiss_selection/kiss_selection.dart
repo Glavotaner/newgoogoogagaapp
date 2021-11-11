@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:googoogagaapp/components/home/swipe_hint.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
@@ -14,7 +13,6 @@ class KissSelectionScreen extends StatelessWidget {
       final disabled = checkAnyTokenMissing(users.usersData);
       return Column(
         children: [
-          SwipeHint(opacity: 1, page: 1),
           Expanded(
             child: PageView(
               scrollDirection: Axis.horizontal,

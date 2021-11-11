@@ -6,10 +6,12 @@ class QuickKissManager extends ChangeNotifier {
   DateTime? _receiveTime;
   Duration _duration = Duration(seconds: 0);
   int _minutesLeft = 0;
+  String? _messageId;
 
   Duration get duration => _duration;
   DateTime? get receiveTime => _receiveTime;
   int get minutesLeft => _minutesLeft;
+  String? get messageId => _messageId;
 
   getTimer(DateTime timeReceived, int kissDuration) {
     _receiveTime = timeReceived;
@@ -29,7 +31,7 @@ class QuickKissManager extends ChangeNotifier {
     Timer.periodic(Duration(seconds: 5), _updateTimer);
   }
 
-  clearTimer() {
+  clearTimer() async {
     _receiveTime = null;
     _duration = Duration(seconds: 0);
     _minutesLeft = 0;

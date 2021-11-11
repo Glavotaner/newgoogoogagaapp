@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/models/message.dart';
 import 'package:googoogagaapp/models/user.dart';
+import 'package:googoogagaapp/providers/app_state_manager.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/archive.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
@@ -32,61 +33,55 @@ Future sendKiss(BuildContext context, KissType kissType,
         'tag': 'kiss'
       },
       collapseKey: 'kiss');
+  final provider = Provider.of<AppStateManager>(context, listen: false);
+  if (!provider.snackbarExists) {
+    provider.setSnackbarExists(true);
+    showConfirmSnackbar(context, kissType.confirmMessage)
+        .closed
+        .then((_) => provider.setSnackbarExists(false));
+  }
 }
 
 Future sendQuickKiss(BuildContext context, double duration) async {
-  await _sendMessage(
-      token: Provider.of<UsersManager>(context, listen: false)
-          .usersData[User.baby]!
-          .token,
-      notification: {
-        'title': 'Quick kiss',
-        'body': 'You gotted an quick kiss!'
-      },
-      data: {
-        'duration': duration
-      });
+  final kissType = KissType.quickKiss;
+  await sendKiss(context, kissType);
 }
 
 Future sendRequest(BuildContext context, String message) async {
-  final kissType = KissType(
-      body: message,
-      title: 'Kiss request',
-      confirmMessage: 'request sendededed');
-  sendKiss(context, kissType);
+  sendKiss(context, KissType.kissRequest..body = message);
 }
 
 Future sendDataMessage(
-    {String? token, String? topic, required Map<String, dynamic> data}) async {
+    {String? token, String? topic, required MessageData data}) async {
   return await _sendMessage(token: token, topic: topic, data: data);
 }
 
-processMessage(BuildContext context, RemoteMessage message) async {
-  if (message.data.keys.isNotEmpty) {
+processMessage(BuildContext context, MessageModel message) async {
+  if (message.hasData) {
     _processData(context, data: message.data);
   }
-  if (message.notification != null) {
+  if (message.isNotification) {
     saveToArchive(message, context);
-    final notification = message.notification;
     showAlert(
         context: context,
-        body: notification!.body!,
-        title: notification.title,
+        body: message.body!,
+        title: message.title,
         duration: 5);
   }
 }
 
 Future processMessageInBg(RemoteMessage remoteMessage) async {
-  if (remoteMessage.notification != null) {
-    return saveToArchive(remoteMessage);
+  MessageModel message = MessageModel.fromRemote(remoteMessage);
+  if (message.isNotification) {
+    return saveToArchive(message);
   }
-  if (remoteMessage.data.containsKey('tokenRequest')) {
+  if (message.isTokenRequest) {
     final babyData = await getUserData(user: User.baby);
-    if (babyData.userName == remoteMessage.data['username']) {
-      return _saveMessageInBg(remoteMessage, 'request');
+    if (babyData.userName == message.data.userName) {
+      return _saveMessageInBg(message, 'request');
     }
-  } else if (remoteMessage.data.containsKey('token')) {
-    _saveMessageInBg(remoteMessage, 'response');
+  } else if (message.data.token != null) {
+    _saveMessageInBg(message, 'response');
   }
 }
 
@@ -97,16 +92,18 @@ Future processBgMessages(BuildContext context) async {
   if (response != null || request != null) {
     String? token;
     if (response != null) {
-      final RemoteMessage remoteMessage = jsonDecode(response);
-      token = remoteMessage.data['token'];
+      final MessageModel responseMessage =
+          MessageModel.fromJson(jsonDecode(response));
+      token = responseMessage.data.token;
       FirebaseMessaging.instance.unsubscribeFromTopic('tokens');
       showConfirmSnackbar(context, 'Saved babba token!');
     }
     if (request != null) {
       final userData = await getUserData(user: User.me);
-      final RemoteMessage remoteMessage = jsonDecode(request);
-      token ??= remoteMessage.data['token'];
-      sendDataMessage(token: token, data: {'token': userData.token});
+      final MessageModel requestMessage =
+          MessageModel.fromJson(jsonDecode(request));
+      token ??= requestMessage.data.token;
+      sendDataMessage(token: token, data: MessageData(token: userData.token));
       showConfirmSnackbar(context, 'Sending token to babby!');
     }
     final babyData = await getUserData(user: User.baby);
@@ -123,40 +120,41 @@ _clearBgMessages(SharedPreferences sharedPreferences) async {
 }
 
 _processTokenMessage(
-    {required BuildContext context, required Map<String, dynamic> data}) async {
+    {required BuildContext context, required MessageData data}) async {
   final babyData = await getUserData(user: User.baby);
-  if (data.containsKey('tokenRequest')) {
-    if (data['username'] == babyData.userName) {
+  if (data.tokenRequest != null) {
+    if (data.userName == babyData.userName) {
       final userData = await getUserData(user: User.me);
-      sendDataMessage(token: data['token'], data: {'token': userData.token});
+      sendDataMessage(
+          token: data.token, data: MessageData(token: userData.token));
       showConfirmSnackbar(context, 'Sending token to babby!');
-      setUserData(context, User.baby, babyData..token = data['token']);
+      setUserData(context, User.baby, babyData..token = data.token);
     }
-  } else if (data.containsKey('token')) {
+  } else if (data.token != null) {
     await Future.delayed(Duration(seconds: 2));
-    setUserData(context, User.baby, babyData..token = data['token']);
+    setUserData(context, User.baby, babyData..token = data.token);
     FirebaseMessaging.instance.unsubscribeFromTopic('tokens');
     showConfirmSnackbar(context, 'Saved babba token!');
   }
 }
 
-Future _processData(BuildContext context,
-    {required Map<String, dynamic> data}) async {
-  _processTokenMessage(context: context, data: data);
+Future _processData(BuildContext context, {required MessageData data}) async {
+  if (data.tokenRequest == true || data.token != null) {
+    _processTokenMessage(context: context, data: data);
+  }
 }
 
-Future _saveMessageInBg(RemoteMessage remoteMessage, String key) async {
+Future _saveMessageInBg(MessageModel message, String key) async {
   final SharedPreferences sharedPreferences =
       await SharedPreferences.getInstance();
-  sharedPreferences.setString(
-      key, Message.fromRemote(remoteMessage).toString());
+  sharedPreferences.setString(key, message.toString());
 }
 
 Future<Response> _sendMessage(
     {String? token,
     String? topic,
     Map<String, String>? notification,
-    Map<String, dynamic>? data,
+    MessageData? data,
     String? collapseKey}) async {
   final fcmData = await getFCMData();
   Map<String, dynamic> requestBody = {
@@ -164,7 +162,7 @@ Future<Response> _sendMessage(
     "to": token ?? '/topics/$topic'
   };
   requestBody['notification'] = notification;
-  requestBody['data'] = data;
+  requestBody['data'] = data?.toJson();
   requestBody['collapse_key'] = collapseKey;
   final serverKey = fcmData['serverKey'];
   return await post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
