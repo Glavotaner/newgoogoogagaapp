@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:googoogagaapp/models/message.dart';
 import 'package:googoogagaapp/models/user.dart';
+import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
+import 'package:provider/provider.dart';
 
 Future setUpMessaging(BuildContext context) async {
   await Future.delayed(Duration(seconds: 1));
@@ -17,11 +19,12 @@ Future setUpMessaging(BuildContext context) async {
 }
 
 Future _refreshTokens(BuildContext context) async {
-  final userData = await getUserData(user: User.me);
+  final users = Provider.of<UsersManager>(context, listen: false);
+  final userData = users.usersData[User.me]!;
   if (!userData.hasToken) {
     await _setFCMToken(context: context, userData: userData);
   }
-  final babyUserData = await getUserData(user: User.baby);
+  final babyUserData = users.usersData[User.baby]!;
   if (!babyUserData.hasToken) {
     refreshBabyToken(context);
   }
@@ -29,7 +32,9 @@ Future _refreshTokens(BuildContext context) async {
 }
 
 Future refreshBabyToken([BuildContext? context, GlobalKey? navKey]) async {
-  final myUser = await getUserData(context: context, user: User.me);
+  final myUser = context == null
+      ? await getUserData(user: User.me)
+      : Provider.of<UsersManager>(context, listen: false).usersData[User.me]!;
   await FirebaseMessaging.instance.subscribeToTopic('tokens');
   sendDataMessage(
       topic: 'tokens',

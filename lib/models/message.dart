@@ -31,7 +31,7 @@ class MessageModel {
 
   @override
   String toString() {
-    return '{ "messageId": "$messageId" "title": "$title", "body": "$body", "data": ${jsonEncode(data.toJson())} }';
+    return '{ "messageId": "$messageId", "title": "$title", "body": "$body", "data": ${jsonEncode(data.toJson())} }';
   }
 
   Map<String, dynamic> toJson() => {
@@ -58,21 +58,26 @@ class MessageData {
 
   MessageData.fromRemote(RemoteMessage remoteMessage) {
     final data = remoteMessage.data;
-    if (data.isNotEmpty) {
-      receiveTime = DateTime.tryParse(data['receiveTime']);
-      token = data['token'];
-      userName = data['userName'];
-      tokenRequest = data['tokenRequest'];
-      kissType =
-          data['kissType'] != null ? KissType.fromJson(data['kissType']) : null;
-    }
+    receiveTime = data['receiveTime'] != null
+        ? DateTime.tryParse(data['receiveTime'])
+        : null;
+    token = data['token'];
+    userName = data['userName'];
+    tokenRequest =
+        data['tokenRequest'] != null ? jsonDecode(data['tokenRequest']) : null;
+    kissType =
+        data['kissType'] != null ? KissType.fromJson(data['kissType']) : null;
   }
 
   MessageData.fromJson(Map<String, dynamic> json)
-      : receiveTime = DateTime.tryParse(json['receiveTime']),
+      : receiveTime = json['receiveTime'] != null
+            ? DateTime.tryParse(json['receiveTime'])
+            : null,
         userName = json['userName'],
         token = json['token'],
-        tokenRequest = json['tokenRequest'],
+        tokenRequest = json['tokenRequest'] != null
+            ? jsonDecode(json['tokenRequest'])
+            : null,
         kissType = json['kissType'] != null
             ? KissType.fromJson(json['kissType'])
             : null;

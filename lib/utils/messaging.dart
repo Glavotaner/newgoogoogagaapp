@@ -24,15 +24,12 @@ Future<Map<String, dynamic>> getFCMData() async {
 /// Send kiss.
 Future sendKiss(BuildContext context, KissType kissType,
     {Map<String, dynamic>? data}) async {
-  final babyData = await getUserData(user: User.baby);
-  await _sendMessage(
-      token: babyData.token,
-      notification: {
-        'title': kissType.title,
-        'body': kissType.body,
-        'tag': 'kiss'
-      },
-      collapseKey: 'kiss');
+  final babyData =
+      Provider.of<UsersManager>(context, listen: false).usersData[User.baby]!;
+  await _sendMessage(token: babyData.token, notification: {
+    'title': kissType.title,
+    'body': kissType.body,
+  });
   final provider = Provider.of<AppStateManager>(context, listen: false);
   if (!provider.snackbarExists) {
     provider.setSnackbarExists(true);
@@ -43,8 +40,7 @@ Future sendKiss(BuildContext context, KissType kissType,
 }
 
 Future sendQuickKiss(BuildContext context, double duration) async {
-  final kissType = KissType.quickKiss;
-  await sendKiss(context, kissType);
+  await sendKiss(context, KissType.quickKiss, data: {'duration': duration});
 }
 
 Future sendRequest(BuildContext context, String message) async {
@@ -90,6 +86,7 @@ Future processBgMessages(BuildContext context) async {
   final request = sharedPreferences.getString('request');
   final response = sharedPreferences.getString('response');
   if (response != null || request != null) {
+    final users = Provider.of<UsersManager>(context, listen: false);
     String? token;
     if (response != null) {
       final MessageModel responseMessage =
@@ -99,17 +96,16 @@ Future processBgMessages(BuildContext context) async {
       showConfirmSnackbar(context, 'Saved babba token!');
     }
     if (request != null) {
-      final userData = await getUserData(user: User.me);
+      final userData = users.usersData[User.me]!;
       final MessageModel requestMessage =
           MessageModel.fromJson(jsonDecode(request));
       token ??= requestMessage.data.token;
       sendDataMessage(token: token, data: MessageData(token: userData.token));
       showConfirmSnackbar(context, 'Sending token to babby!');
     }
-    final babyData = await getUserData(user: User.baby);
+    final babyData = users.usersData[User.baby]!;
     setUserData(context, User.baby, babyData..token = token);
-    Provider.of<UsersManager>(context, listen: false)
-        .updateUpUserNames(true, {User.baby: babyData..token = token});
+    users.updateUpUserNames(true, {User.baby: babyData..token = token});
     _clearBgMessages(sharedPreferences);
   }
 }
@@ -121,18 +117,18 @@ _clearBgMessages(SharedPreferences sharedPreferences) async {
 
 _processTokenMessage(
     {required BuildContext context, required MessageData data}) async {
-  final babyData = await getUserData(user: User.baby);
+  final users = Provider.of<UsersManager>(context, listen: false).usersData;
+  final babyData = users[User.baby]!;
+  setUserData(context, User.baby, babyData..token = data.token);
   if (data.tokenRequest != null) {
     if (data.userName == babyData.userName) {
-      final userData = await getUserData(user: User.me);
+      final userData = users[User.me]!;
       sendDataMessage(
           token: data.token, data: MessageData(token: userData.token));
       showConfirmSnackbar(context, 'Sending token to babby!');
-      setUserData(context, User.baby, babyData..token = data.token);
     }
   } else if (data.token != null) {
     await Future.delayed(Duration(seconds: 2));
-    setUserData(context, User.baby, babyData..token = data.token);
     FirebaseMessaging.instance.unsubscribeFromTopic('tokens');
     showConfirmSnackbar(context, 'Saved babba token!');
   }

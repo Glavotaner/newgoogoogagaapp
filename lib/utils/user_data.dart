@@ -43,8 +43,8 @@ Future<void> checkUsernamesSetUp(BuildContext context) async {
 }
 
 bool checkAnyTokenMissing(Map<String, User?> usersData) {
-  for (User? data in usersData.values) {
-    if (data?.token == null) {
+  for (User? user in usersData.values) {
+    if (user?.token == null) {
       return true;
     }
   }
