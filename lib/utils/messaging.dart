@@ -107,16 +107,16 @@ _processTokenMessage(
     {required BuildContext context, required MessageData data}) async {
   final users = Provider.of<UsersManager>(context, listen: false).usersData;
   final babyData = users[User.baby]!;
-  setUserData(context, User.baby, babyData..token = data.token);
   if (data.tokenRequest != null) {
     if (data.userName == babyData.userName) {
+      setUserData(context, User.baby, babyData..token = data.token);
       final userData = users[User.me]!;
       sendDataMessage(
           token: data.token, data: MessageData(token: userData.token));
       showConfirmSnackbar(context, 'Sending token to babby!');
     }
   } else if (data.token != null) {
-    await Future.delayed(Duration(seconds: 2));
+    setUserData(context, User.baby, babyData..token = data.token);
     FirebaseMessaging.instance.unsubscribeFromTopic('tokens');
     showConfirmSnackbar(context, 'Saved babba token!');
   }

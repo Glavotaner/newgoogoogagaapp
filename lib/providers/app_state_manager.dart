@@ -17,7 +17,6 @@ class AppStateManager extends ChangeNotifier {
   bool get isUserNamesSetUp => _isUserNamesSetUp;
   bool get isLoggedIn => _isLoggedIn;
 
-
   setUpUserNames() {
     _isUserNamesSetUp = false;
     notifyListeners();
@@ -48,7 +47,7 @@ class AppStateManager extends ChangeNotifier {
 
   Future<bool> leaveApp(BuildContext context) {
     if (_backPressTimestamp == null) {
-      Timer(Duration(seconds: 3), () => _backPressTimestamp = null);
+      Timer(Duration(seconds: 2), () => _backPressTimestamp = null);
       _backPressTimestamp = DateTime.now();
       showErrorSnackbar(context, 'Tap back button again to leave app');
       return Future.value(true);
