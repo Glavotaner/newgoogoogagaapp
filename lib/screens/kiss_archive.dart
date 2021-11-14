@@ -27,6 +27,7 @@ class _KissArchiveScreenState extends State<KissArchiveScreen> {
         if (snapshot.connectionState == ConnectionState.done) {
           return KissArchiveList();
         }
+        // TODO instead of this, incorporate init in splash page
         return LoadingScreen(message: 'Loading messages...');
       },
     );

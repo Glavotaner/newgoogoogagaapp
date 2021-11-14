@@ -35,10 +35,10 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [HomePage(), KissSelectionScreen()],
             );
           }
+          // TODO instead of this, incorporate init in splash page
           return LoadingScreen(message: 'Setting up messaging...');
         });
   }
-
 }
 
 class HomePage extends StatelessWidget {
@@ -61,4 +61,3 @@ class HomePage extends StatelessWidget {
         ));
   }
 }
-

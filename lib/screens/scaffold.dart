@@ -54,6 +54,7 @@ class _ScaffoldScreenState extends State<ScaffoldScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // TODO add swipe hint
     return ChangeNotifierProvider(
         create: (context) => _quickKissManager,
         child: Scaffold(
@@ -83,6 +84,7 @@ class _ScaffoldScreenState extends State<ScaffoldScreen> {
           icon: Icon(Icons.people)),
       Consumer<UsersManager>(
         builder: (context, usersManager, child) {
+          // TODO animate scanning for token
           return IconButton(
               color: Colors.redAccent,
               onPressed: usersManager.usersData[User.me]?.token == null
@@ -139,6 +141,7 @@ class _ScaffoldScreenState extends State<ScaffoldScreen> {
   Widget _clearArchiveButton(BuildContext context) {
     return Consumer<ArchiveManager>(
       builder: (context, archive, child) {
+        // TODO animate click
         return Visibility(
           visible: _selectedTab == 1 && archive.messages.isNotEmpty,
           child: FloatingActionButton(
