@@ -3,6 +3,7 @@ import 'package:googoogagaapp/providers/archive_manager.dart';
 import 'package:googoogagaapp/app_router.dart';
 import 'package:googoogagaapp/providers/app_state_manager.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
+import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -29,6 +30,9 @@ class _GoogooGagaAppState extends State<GoogooGagaApp> {
         appStateManager: _appStateManager,
         usersManager: _usersManager,
         archiveManager: _archiveManager);
+    FlutterError.onError = (FlutterErrorDetails details) {
+      showErrorSnackbar(context, details.exceptionAsString());
+    };
     super.initState();
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:googoogagaapp/components/home/request_input.dart';
 import 'package:googoogagaapp/components/kiss_selection/kiss_selection.dart';
 import 'package:googoogagaapp/components/loading.dart';
+import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/initialization.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -19,7 +20,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _setUpMessaging = setUpMessaging(context);
+    _setUpMessaging = setUpMessaging(context)
+        .catchError((error) => showErrorSnackbar(context, error));
   }
 
   @override
@@ -30,25 +32,33 @@ class _HomeScreenState extends State<HomeScreen> {
           if (snapshot.connectionState == ConnectionState.done) {
             return PageView(
               scrollDirection: Axis.vertical,
-              children: [_homePage, KissSelectionScreen()],
+              children: [HomePage(), KissSelectionScreen()],
             );
           }
-          return LoadingScreen('Setting up messaging...');
+          return LoadingScreen(message: 'Setting up messaging...');
         });
   }
 
-  final Widget _homePage = Padding(
-      padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Image(image: AssetImage('assets/request.png')),
-            ),
-          ),
-          KissRequest(),
-        ],
-      ));
 }
+
+class HomePage extends StatelessWidget {
+  const HomePage({Key? key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Image(image: AssetImage('assets/request.png')),
+              ),
+            ),
+            KissRequest(),
+          ],
+        ));
+  }
+}
+

@@ -19,7 +19,7 @@ class KissArchiveList extends StatelessWidget {
               },
             );
           }
-          return NoDataWidget();
+          return NoDataScreen(message: 'There is nofing here!');
         },
         selector: (buildContext, archiveProvider) => archiveProvider.messages);
   }

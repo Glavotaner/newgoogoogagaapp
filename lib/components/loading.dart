@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 class LoadingScreen extends StatelessWidget {
   final String? message;
-  const LoadingScreen(this.message, {Key? key}) : super(key: key);
-
+  const LoadingScreen({Key? key, this.message = 'Loading'}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     final List<Widget> pageData = [const CircularProgressIndicator()];

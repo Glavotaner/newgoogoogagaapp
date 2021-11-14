@@ -27,6 +27,7 @@ class AppRouter extends RouterDelegate
   void dispose() {
     appStateManager.removeListener(notifyListeners);
     usersManager.removeListener(notifyListeners);
+    archiveManager.removeListener(notifyListeners);
     super.dispose();
   }
 
@@ -54,12 +55,13 @@ class AppRouter extends RouterDelegate
 
   @override
   Future<bool> popRoute() {
+    final context = navigatorKey.currentContext;
     if (appStateManager.isLoggedIn) {
       if (!appStateManager.isUserNamesSetUp) {
         return appStateManager.leaveUserNamesSetup();
       }
     }
-    return Future.value(false);
+    return appStateManager.leaveApp(context!);
   }
 
   @override

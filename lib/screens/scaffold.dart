@@ -36,7 +36,8 @@ class _ScaffoldScreenState extends State<ScaffoldScreen> {
   bool _showingSnackbar = false;
 
   sendKissBack(BuildContext context) {
-    sendKiss(context, KissType.kissBack);
+    sendKiss(context, KissType.kissBack)
+        .catchError((error) => showErrorSnackbar(context, error));
     if (!_showingSnackbar) {
       _showingSnackbar = true;
       showConfirmSnackbar(context, KissType.kissBack.confirmMessage)
@@ -86,7 +87,8 @@ class _ScaffoldScreenState extends State<ScaffoldScreen> {
               color: Colors.redAccent,
               onPressed: usersManager.usersData[User.me]?.token == null
                   ? null
-                  : () => refreshBabyToken(context),
+                  : () => refreshBabyToken(context)
+                      .catchError((error) => showErrorSnackbar(context, error)),
               icon: Icon(usersManager.usersData[User.baby]?.token == null
                   ? Icons.favorite_border
                   : Icons.favorite));
@@ -140,7 +142,8 @@ class _ScaffoldScreenState extends State<ScaffoldScreen> {
         return Visibility(
           visible: _selectedTab == 1 && archive.messages.isNotEmpty,
           child: FloatingActionButton(
-              onPressed: () => clearArchive(context),
+              onPressed: () => clearArchive(context)
+                  .catchError((error) => showErrorSnackbar(context, error)),
               backgroundColor: Colors.redAccent,
               child: Icon(Icons.delete_forever)),
         );

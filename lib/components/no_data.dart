@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-class NoDataWidget extends StatelessWidget {
-  const NoDataWidget({Key? key, this.message}) : super(key: key);
+class NoDataScreen extends StatelessWidget {
   final String? message;
+  const NoDataScreen({Key? key, this.message = 'There is no data here!'})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -15,8 +16,7 @@ class NoDataWidget extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 15.0),
-            child: Text(message ?? 'There is nofing here!',
-                style: Theme.of(context).textTheme.headline6),
+            child: Text(message!, style: Theme.of(context).textTheme.headline6),
           )
         ],
       ),

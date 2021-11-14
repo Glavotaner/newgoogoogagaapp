@@ -6,10 +6,13 @@ import 'package:googoogagaapp/models/message.dart';
 import 'package:googoogagaapp/models/user.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
+import 'package:googoogagaapp/utils/fcm.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
 import 'package:provider/provider.dart';
 
+/// Initializes Firebase, sets up notifications channel for foreground notifications,
+/// sets up message handlers, sets up user token, if missing, requests baby token, if missing.
 Future setUpMessaging(BuildContext context) async {
   await Future.delayed(Duration(seconds: 1));
   await Firebase.initializeApp();
@@ -18,6 +21,23 @@ Future setUpMessaging(BuildContext context) async {
   _refreshTokens(context);
 }
 
+/// Sends a token request to the tokens topic.
+/// If [context] is available, shows a confirmation snackbar.
+Future refreshBabyToken([BuildContext? context]) async {
+  final myUser = context == null
+      ? await getUserData(user: User.me)
+      : Provider.of<UsersManager>(context, listen: false).usersData[User.me]!;
+  await FirebaseMessaging.instance.subscribeToTopic('tokens');
+  sendDataMessage(
+      topic: 'tokens',
+      data: MessageData(
+          token: myUser.token, tokenRequest: true, userName: myUser.userName));
+  showConfirmSnackbar(context!, 'Refreshing!');
+}
+
+
+/// Gets user token from FCM, if missing, calls [refreshBabyToken] to request baby token, if missing.
+/// Processes messages acquired while app was in background. They can contain token request and responses.
 Future _refreshTokens(BuildContext context) async {
   final users = Provider.of<UsersManager>(context, listen: false);
   final userData = users.usersData[User.me]!;
@@ -31,18 +51,7 @@ Future _refreshTokens(BuildContext context) async {
   processBgMessages(context);
 }
 
-Future refreshBabyToken([BuildContext? context, GlobalKey? navKey]) async {
-  final myUser = context == null
-      ? await getUserData(user: User.me)
-      : Provider.of<UsersManager>(context, listen: false).usersData[User.me]!;
-  await FirebaseMessaging.instance.subscribeToTopic('tokens');
-  sendDataMessage(
-      topic: 'tokens',
-      data: MessageData(
-          token: myUser.token, tokenRequest: true, userName: myUser.userName));
-  showConfirmSnackbar(context!, 'Refreshing!');
-}
-
+/// Sets up Firebase messaging handlers.
 Future _setUpMessaging(BuildContext context) async {
   FirebaseMessaging.onMessage.listen((message) {
     processMessage(context, MessageModel.fromRemote(message));
@@ -53,6 +62,7 @@ Future _setUpMessaging(BuildContext context) async {
   });
 }
 
+/// Sets up high importance notification channel to enable foreground notifications.
 Future _setUpNotificationChannel() async {
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
     'high_importance_channel',
@@ -70,6 +80,7 @@ Future _setUpNotificationChannel() async {
       ?.createNotificationChannel(channel);
 }
 
+/// Gets device token from FCM and sets it as the user's token.
 Future _setFCMToken(
     {required BuildContext context, required User userData}) async {
   final messaging = FirebaseMessaging.instance;

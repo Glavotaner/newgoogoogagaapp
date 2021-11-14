@@ -12,7 +12,7 @@ Future showAlert(
     List<TextButton>? actions}) async {
   final provider = Provider.of<AppStateManager>(context, listen: false);
   if (!provider.alertExists) {
-    provider.setAlertExists(true);
+    provider.alertExists = true;
     Timer? timer;
     await showDialog(
         context: context,
@@ -30,7 +30,7 @@ Future showAlert(
         });
     timer?.cancel();
     timer = null;
-    provider.setAlertExists(false);
+    provider.alertExists = false;
   }
 }
 

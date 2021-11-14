@@ -1,46 +1,58 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:googoogagaapp/utils/alerts.dart';
 
 class AppStateManager extends ChangeNotifier {
-  bool _userNamesSetUp = false;
-  bool _loading = true;
-  bool _loggedIn = false;
-  bool _snackbarExists = false;
-  bool _alertExists = false;
+  bool snackbarExists = false;
+  bool alertExists = false;
 
-  bool get isUserNamesSetUp => _userNamesSetUp;
-  bool get isLoading => _loading;
-  bool get isLoggedIn => _loggedIn;
-  bool get snackbarExists => _snackbarExists;
-  bool get alertExists => _alertExists;
+  bool _isUserNamesSetUp = false;
+  bool _isLoading = true;
+  bool _isLoggedIn = false;
 
-  setSnackbarExists(bool exists) => _snackbarExists = exists;
-  setAlertExists(bool exists) => _alertExists = exists;
+  DateTime? _backPressTimestamp;
+
+  bool get isLoading => _isLoading;
+  bool get isUserNamesSetUp => _isUserNamesSetUp;
+  bool get isLoggedIn => _isLoggedIn;
+
 
   setUpUserNames() {
-    _userNamesSetUp = false;
+    _isUserNamesSetUp = false;
     notifyListeners();
   }
 
-  leaveUserNamesSetup() {
-    _userNamesSetUp = true;
+  Future<bool> leaveUserNamesSetup() {
+    _isUserNamesSetUp = true;
     notifyListeners();
     return Future.value(true);
   }
 
   finishLoading() {
-    _loading = false;
+    _isLoading = false;
     notifyListeners();
   }
 
   logIn() {
-    _userNamesSetUp = true;
-    _loggedIn = true;
-    _loading = false;
+    _isUserNamesSetUp = true;
+    _isLoggedIn = true;
+    _isLoading = false;
     notifyListeners();
   }
 
   logOut() {
-    _loggedIn = false;
+    _isLoggedIn = false;
     notifyListeners();
+  }
+
+  Future<bool> leaveApp(BuildContext context) {
+    if (_backPressTimestamp == null) {
+      Timer(Duration(seconds: 3), () => _backPressTimestamp = null);
+      _backPressTimestamp = DateTime.now();
+      showErrorSnackbar(context, 'Tap back button again to leave app');
+      return Future.value(true);
+    }
+    return Future.value(false);
   }
 }

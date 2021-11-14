@@ -3,16 +3,13 @@ import 'package:googoogagaapp/models/message.dart';
 
 class ArchiveManager extends ChangeNotifier {
   List<MessageModel> _messages = [];
-  bool _initialized = false;
+  bool isInitialized = false;
+
   List<MessageModel> get messages => _messages;
-  bool get isInitialized => _initialized;
 
   updateMessages(List<MessageModel> messages) {
     _messages = messages;
     notifyListeners();
   }
 
-  initialize() {
-    _initialized = true;
-  }
 }

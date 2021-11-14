@@ -6,7 +6,7 @@ class UsersManager extends ChangeNotifier {
 
   Map<String, User?> get usersData => _usersData;
 
-  updateUpUserNames(bool setUp, [Map<String, User>? users]) {
+  updateUserNames(bool setUp, [Map<String, User>? users]) {
     if (users != null) {
       users.forEach((user, data) {
         _usersData[user] = data;
