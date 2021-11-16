@@ -9,6 +9,7 @@ import 'package:googoogagaapp/providers/app_state_manager.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/archive.dart';
 import 'package:googoogagaapp/utils/fcm.dart';
+import 'package:googoogagaapp/utils/initialization.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:provider/provider.dart';
@@ -94,6 +95,7 @@ Future processBgMessages(BuildContext context) async {
     final babyData = users.usersData[User.baby]!;
     setUserData(context, User.baby, babyData..token = token);
     users.updateUserNames(true, {User.baby: babyData..token = token});
+    clearSearchingForToken(sharedPreferences, context);
     _clearBgMessages(sharedPreferences);
   }
 }
@@ -118,6 +120,7 @@ _processTokenMessage(
   } else if (data.token != null) {
     setUserData(context, User.baby, babyData..token = data.token);
     FirebaseMessaging.instance.unsubscribeFromTopic('tokens');
+    clearSearchingForToken((await SharedPreferences.getInstance()), context);
     showConfirmSnackbar(context, 'Saved babba token!');
   }
 }

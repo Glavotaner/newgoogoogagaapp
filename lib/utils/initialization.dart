@@ -10,6 +10,7 @@ import 'package:googoogagaapp/utils/fcm.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Initializes Firebase, sets up notifications channel for foreground notifications,
 /// sets up message handlers, sets up user token, if missing, requests baby token, if missing.
@@ -24,17 +25,26 @@ Future setUpMessaging(BuildContext context) async {
 /// Sends a token request to the tokens topic.
 /// If [context] is available, shows a confirmation snackbar.
 Future refreshBabyToken([BuildContext? context]) async {
+  final users = context != null
+      ? Provider.of<UsersManager>(context, listen: false)
+      : null;
   final myUser = context == null
       ? await getUserData(user: User.me)
-      : Provider.of<UsersManager>(context, listen: false).usersData[User.me]!;
+      : users!.usersData[User.me]!;
   await FirebaseMessaging.instance.subscribeToTopic('tokens');
   sendDataMessage(
       topic: 'tokens',
       data: MessageData(
           token: myUser.token, tokenRequest: true, userName: myUser.userName));
-  showConfirmSnackbar(context!, 'Refreshing!');
+  final SharedPreferences sharedPreferences =
+      await SharedPreferences.getInstance();
+  if (!_checkIsWaitingForToken(sharedPreferences)) {
+    if (context != null) {
+      showConfirmSnackbar(context, 'Refreshing!');
+    }
+  }
+  _setSearchingForToken(sharedPreferences, context);
 }
-
 
 /// Gets user token from FCM, if missing, calls [refreshBabyToken] to request baby token, if missing.
 /// Processes messages acquired while app was in background. They can contain token request and responses.
@@ -90,5 +100,25 @@ Future _setFCMToken(
   } else {
     showErrorSnackbar(context, 'Token error!');
     throw ErrorDescription('Token error!');
+  }
+}
+
+bool _checkIsWaitingForToken(SharedPreferences sharedPreferences) {
+  return sharedPreferences.getBool(User.searchingForToken) ?? false;
+}
+
+Future _setSearchingForToken(SharedPreferences sharedPreferences,
+    [BuildContext? context]) async {
+  await sharedPreferences.setBool(User.searchingForToken, true);
+  if (context != null) {
+    Provider.of<UsersManager>(context, listen: false).startSearchingForToken();
+  }
+}
+
+Future clearSearchingForToken(SharedPreferences sharedPreferences,
+    [BuildContext? context]) async {
+  await sharedPreferences.setBool(User.searchingForToken, false);
+  if (context != null) {
+    Provider.of<UsersManager>(context, listen: false).stopSearchingForToken();
   }
 }

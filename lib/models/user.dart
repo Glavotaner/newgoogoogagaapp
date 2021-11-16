@@ -4,6 +4,7 @@ class User {
 
   static String me = 'me';
   static String baby = 'baby';
+  static String searchingForToken = 'searchingForToken';
 
   User({required this.userName, this.token});
 
