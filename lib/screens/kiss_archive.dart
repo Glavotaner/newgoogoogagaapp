@@ -10,23 +10,13 @@ class KissArchiveScreen extends StatefulWidget {
   _KissArchiveScreenState createState() => _KissArchiveScreenState();
 }
 
-class _KissArchiveScreenState extends State<KissArchiveScreen>
-    with WidgetsBindingObserver {
+class _KissArchiveScreenState extends State<KissArchiveScreen> {
   late Future<void> _getArchive;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addObserver(this);
     _getArchive = getArchive(context);
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.resumed) {
-      getArchive(context);
-    }
   }
 
   @override

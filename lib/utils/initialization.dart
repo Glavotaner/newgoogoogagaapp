@@ -2,12 +2,16 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/models/message.dart';
 import 'package:googoogagaapp/models/user.dart';
+import 'package:googoogagaapp/providers/app_state_manager.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/fcm.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
+import 'package:googoogagaapp/utils/quick_kiss.dart';
+import 'package:googoogagaapp/utils/tokens.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -38,12 +42,12 @@ Future refreshBabyToken([BuildContext? context]) async {
           token: myUser.token, tokenRequest: true, userName: myUser.userName));
   final SharedPreferences sharedPreferences =
       await SharedPreferences.getInstance();
-  if (!_checkIsWaitingForToken(sharedPreferences)) {
+  if (!checkIsWaitingForToken(sharedPreferences)) {
     if (context != null) {
       showConfirmSnackbar(context, 'Refreshing!');
     }
   }
-  _setSearchingForToken(sharedPreferences, context);
+  setSearchingForToken(sharedPreferences, context);
 }
 
 /// Gets user token from FCM, if missing, calls [refreshBabyToken] to request baby token, if missing.
@@ -58,17 +62,32 @@ Future _refreshTokens(BuildContext context) async {
   if (!babyUserData.hasToken) {
     refreshBabyToken(context);
   }
-  processBgMessages(context);
+  processBackgroundMessages(context);
 }
 
 /// Sets up Firebase messaging handlers.
 Future _setUpMessaging(BuildContext context) async {
   FirebaseMessaging.onMessage.listen((message) {
-    processMessage(context, MessageModel.fromRemote(message));
+    final remoteMessage = MessageModel.fromRemote(message);
+    if (remoteMessage.data.kissType != null) {
+      final KissType kissType = remoteMessage.data.kissType!;
+      if (kissType == KissType.quickKiss) {
+        showQuickKissAlert(context);
+      }
+    } else {
+      processMessageInForeground(context, MessageModel.fromRemote(message));
+    }
   });
-  FirebaseMessaging.onBackgroundMessage(processMessageInBg);
+  FirebaseMessaging.onBackgroundMessage(processMessageInBackground);
   FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    processMessage(context, MessageModel.fromRemote(message));
+    final remoteMessage = MessageModel.fromRemote(message);
+    processMessageInForeground(context, remoteMessage);
+    if (remoteMessage.data.kissType != null) {
+      final KissType kissType = remoteMessage.data.kissType!;
+      if (kissType == KissType.quickKiss) {
+        processTappedQuickKiss(context, remoteMessage);
+      }
+    }
   });
 }
 
@@ -100,25 +119,5 @@ Future _setFCMToken(
   } else {
     showErrorSnackbar(context, 'Token error!');
     throw ErrorDescription('Token error!');
-  }
-}
-
-bool _checkIsWaitingForToken(SharedPreferences sharedPreferences) {
-  return sharedPreferences.getBool(User.searchingForToken) ?? false;
-}
-
-Future _setSearchingForToken(SharedPreferences sharedPreferences,
-    [BuildContext? context]) async {
-  await sharedPreferences.setBool(User.searchingForToken, true);
-  if (context != null) {
-    Provider.of<UsersManager>(context, listen: false).startSearchingForToken();
-  }
-}
-
-Future clearSearchingForToken(SharedPreferences sharedPreferences,
-    [BuildContext? context]) async {
-  await sharedPreferences.setBool(User.searchingForToken, false);
-  if (context != null) {
-    Provider.of<UsersManager>(context, listen: false).stopSearchingForToken();
   }
 }

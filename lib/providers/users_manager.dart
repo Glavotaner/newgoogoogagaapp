@@ -8,11 +8,9 @@ class UsersManager extends ChangeNotifier {
   Map<String, User?> get usersData => _usersData;
   bool get isWaitingForToken => _isWaitingForToken;
 
-  updateUserNames(bool setUp, [Map<String, User>? users]) {
-    if (users != null) {
-      users.forEach((user, data) {
-        _usersData[user] = data;
-      });
+  updateUserNames(Map<String, User> users) {
+    for (var user in users.entries) {
+      _usersData[user.key] = user.value;
     }
     notifyListeners();
   }

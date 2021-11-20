@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class User {
   String userName;
   String? token;
@@ -13,6 +15,9 @@ class User {
         token = json['token'];
 
   Map<String, dynamic> toJson() => {'userName': userName, 'token': token};
+
+  @override
+  String toString() => jsonEncode(toJson());
 
   bool get hasToken => (token ?? '').isNotEmpty;
 }

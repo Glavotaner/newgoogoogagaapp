@@ -4,7 +4,6 @@ import 'package:googoogagaapp/models/routes.dart';
 import 'package:googoogagaapp/models/user.dart';
 import 'package:googoogagaapp/providers/app_state_manager.dart';
 import 'package:googoogagaapp/providers/archive_manager.dart';
-import 'package:googoogagaapp/providers/quick_kiss_manager.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:googoogagaapp/screens/home.dart';
 import 'package:googoogagaapp/screens/kiss_archive.dart';
@@ -12,6 +11,7 @@ import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/archive.dart';
 import 'package:googoogagaapp/utils/initialization.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
+import 'package:googoogagaapp/utils/state.dart';
 import 'package:provider/provider.dart';
 
 class ScaffoldScreen extends StatefulWidget {
@@ -30,8 +30,8 @@ class ScaffoldScreen extends StatefulWidget {
   _ScaffoldScreenState createState() => _ScaffoldScreenState();
 }
 
-class _ScaffoldScreenState extends State<ScaffoldScreen> {
-  final _quickKissManager = QuickKissManager();
+class _ScaffoldScreenState extends State<ScaffoldScreen>
+    with WidgetsBindingObserver {
   int _selectedTab = 0;
   bool _showingSnackbar = false;
 
@@ -53,26 +53,37 @@ class _ScaffoldScreenState extends State<ScaffoldScreen> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      refreshOnAppResumed(context);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addObserver(this);
+  }
+
+  @override
   Widget build(BuildContext context) {
     // TODO add swipe hint
-    return ChangeNotifierProvider(
-        create: (context) => _quickKissManager,
-        child: Scaffold(
-          appBar: AppBar(
-              leading: _kissTimer(context),
-              actions: _appBarButtons(context),
-              title: const Text('Googoo Gaga App'),
-              bottomOpacity: 0,
-              centerTitle: true),
-          bottomNavigationBar: _navBar(context),
-          backgroundColor: Colors.white,
-          body: IndexedStack(
-            index: _selectedTab,
-            children: widget.pages,
-          ),
-          floatingActionButton: _clearArchiveButton(context),
-          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        ));
+    return Scaffold(
+      appBar: AppBar(
+          actions: _appBarButtons(context),
+          title: const Text('Googoo Gaga App'),
+          bottomOpacity: 0,
+          centerTitle: true),
+      bottomNavigationBar: _navBar(context),
+      backgroundColor: Colors.white,
+      body: IndexedStack(
+        index: _selectedTab,
+        children: widget.pages,
+      ),
+      floatingActionButton: _clearArchiveButton(context),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
   }
 
   List<Widget> _appBarButtons(BuildContext context) {
@@ -97,31 +108,6 @@ class _ScaffoldScreenState extends State<ScaffoldScreen> {
         },
       )
     ];
-  }
-
-  Widget _kissTimer(BuildContext context) {
-    return Consumer<QuickKissManager>(builder: (context, kissManager, child) {
-      return Visibility(
-        visible: kissManager.minutesLeft > 0,
-        child: Padding(
-          padding: const EdgeInsets.all(13.0),
-          child: Material(
-            child: InkWell(
-              onTap: () => sendKissBack(context),
-              child: Stack(
-                children: [
-                  Text(kissManager.minutesLeft.toString()),
-                  CircularProgressIndicator(
-                      color: Colors.white,
-                      value: kissManager.minutesLeft /
-                          kissManager.duration.inMinutes)
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-    });
   }
 
   Widget _navBar(BuildContext context) {

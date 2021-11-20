@@ -9,6 +9,10 @@ class MessageModel {
   final String? body;
   final MessageData data;
 
+  static final tokenRequest = 'request';
+  static final tokenResponse = 'response';
+  static final quickKiss = 'quickKiss';
+
   bool get hasData => data.toJson().values.any((value) => value != null);
   bool get isNotification =>
       (title ?? '').isNotEmpty || (body ?? '').isNotEmpty;
@@ -30,9 +34,7 @@ class MessageModel {
         data = MessageData.fromJson(json['data']);
 
   @override
-  String toString() {
-    return '{ "messageId": "$messageId", "title": "$title", "body": "$body", "data": ${jsonEncode(data.toJson())} }';
-  }
+  String toString() => jsonEncode(toJson());
 
   Map<String, dynamic> toJson() => {
         'messageId': messageId,
@@ -65,8 +67,9 @@ class MessageData {
     userName = data['userName'];
     tokenRequest =
         data['tokenRequest'] != null ? jsonDecode(data['tokenRequest']) : null;
-    kissType =
-        data['kissType'] != null ? KissType.fromJson(data['kissType']) : null;
+    kissType = data['kissType'] != null
+        ? KissType.fromJson(jsonDecode(data['kissType']))
+        : null;
   }
 
   MessageData.fromJson(Map<String, dynamic> json)
@@ -90,3 +93,5 @@ class MessageData {
         'kissType': kissType?.toJson()
       };
 }
+
+typedef Messages = List<MessageModel>;

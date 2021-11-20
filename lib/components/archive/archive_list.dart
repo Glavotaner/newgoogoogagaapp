@@ -9,7 +9,7 @@ class KissArchiveList extends StatelessWidget {
   const KissArchiveList({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Selector<ArchiveManager, List<MessageModel>>(
+    return Selector<ArchiveManager, Messages>(
         builder: (context, archive, child) {
           if (archive.isNotEmpty) {
             return ListView.builder(

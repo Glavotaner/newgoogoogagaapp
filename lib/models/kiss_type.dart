@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/components/kiss_selection/kiss_type.dart';
 import 'package:googoogagaapp/components/kiss_selection/quick_kiss.dart';
@@ -8,25 +10,35 @@ class KissType {
   String confirmMessage;
   String? assetPath;
   DateTime? timeReceived;
+  KissTypeData? kissData;
 
   KissType(
       {required this.body,
       required this.title,
       required this.confirmMessage,
       this.assetPath,
-      this.timeReceived});
+      this.timeReceived,
+      this.kissData});
+
+  bool get isQuickKiss => this == KissType.quickKiss;
 
   Map<String, dynamic> toJson() => {
         'body': body,
         'title': title,
         'confirmMessage': confirmMessage,
-        'assetPath': assetPath
+        'assetPath': assetPath,
+        'kissData': kissData?.toJson(),
       };
+
+  @override
+  String toString() => jsonEncode(toJson());
+
   KissType.fromJson(Map<String, dynamic> json)
       : body = json['body'],
         title = json['title'],
         confirmMessage = json['confirmMessage'],
-        assetPath = json['assetPath'];
+        assetPath = json['assetPath'],
+        kissData = KissTypeData.fromJson(json['kissData'] ?? '{}');
 
   static final List<KissType> kissTypes = [
     KissType(
@@ -60,6 +72,25 @@ class KissType {
       body: 'Request',
       title: 'Kiss request',
       confirmMessage: 'you asscc for kiss');
+
+  @override
+  bool operator ==(Object other) =>
+      other is KissType &&
+      other.runtimeType == runtimeType &&
+      other.title == title;
+
+  @override
+  int get hashCode => title.hashCode;
+}
+
+class KissTypeData {
+  int? quickKissDuration;
+  KissTypeData({this.quickKissDuration});
+
+  KissTypeData.fromJson(Map<String, dynamic> json)
+      : quickKissDuration = json['quickKissDuration'];
+
+  Map<String, dynamic> toJson() => {'quickKissDuration': quickKissDuration};
 }
 
 List<Widget> buildKissTypes(bool? disabled) {

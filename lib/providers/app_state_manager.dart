@@ -10,12 +10,14 @@ class AppStateManager extends ChangeNotifier {
   bool _isUserNamesSetUp = false;
   bool _isLoading = true;
   bool _isLoggedIn = false;
+  bool _isHandlingTap = false;
 
   DateTime? _backPressTimestamp;
 
   bool get isLoading => _isLoading;
   bool get isUserNamesSetUp => _isUserNamesSetUp;
   bool get isLoggedIn => _isLoggedIn;
+  bool get isHandlingTap => _isHandlingTap;
 
   setUpUserNames() {
     _isUserNamesSetUp = false;
@@ -43,6 +45,10 @@ class AppStateManager extends ChangeNotifier {
   logOut() {
     _isLoggedIn = false;
     notifyListeners();
+  }
+
+  handleQuickKissTap(bool handle) {
+    _isHandlingTap = handle;
   }
 
   Future<bool> leaveApp(BuildContext context) {

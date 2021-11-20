@@ -119,16 +119,17 @@ class _SetUpScreenState extends State<SetUpScreen> {
   Future _saveData(Map<String, User?> usersData) async {
     if (_formKey.currentState!.validate()) {
       showConfirmSnackbar(context, 'saving da data');
-      await Future.wait(_controllers.keys.map((user) {
-        return setUserData(
+      final List<Future> userDataSetup = [];
+      for (var user in _controllers.entries) {
+        userDataSetup.add(setUserData(
             context,
-            user,
+            user.key,
             User(
-                userName: _controllers[user]!.text,
-                token: usersData[user]?.token));
-      }).toList());
+                userName: user.value.text, token: usersData[user.key]?.token)));
+      }
+      await Future.wait(userDataSetup);
       return Provider.of<AppStateManager>(context, listen: false).logIn();
     }
-    return showErrorSnackbar(context, 'fix your errors then we can talk');
+    showErrorSnackbar(context, 'fix your errors then we can talk');
   }
 }

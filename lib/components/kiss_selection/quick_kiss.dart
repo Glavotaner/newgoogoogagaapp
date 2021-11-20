@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:googoogagaapp/utils/messaging.dart';
+import 'package:googoogagaapp/utils/quick_kiss.dart';
 
 class QuickKiss extends StatefulWidget {
   final bool disabled;
@@ -36,11 +36,11 @@ class _QuickKissState extends State<QuickKiss> {
                   ),
                   Slider(
                     thumbColor: Colors.redAccent,
-                    label: '$_sliderValue.toString() mins',
+                    label: '${_sliderValue.toInt()} mins',
                     value: _sliderValue,
                     min: 10,
                     max: 60,
-                    divisions: 6,
+                    divisions: 5,
                     onChanged: (slider) => setState(() {
                       _sliderValue = slider;
                     }),
@@ -52,7 +52,7 @@ class _QuickKissState extends State<QuickKiss> {
                           style: Theme.of(context)
                               .textTheme
                               .headline6!
-                              .copyWith(color: Colors.black87))),
+                              .copyWith(color: Colors.black54))),
                 ],
               ),
             ],
