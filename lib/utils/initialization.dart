@@ -5,7 +5,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/models/message.dart';
 import 'package:googoogagaapp/models/user.dart';
-import 'package:googoogagaapp/providers/app_state_manager.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/fcm.dart';
@@ -62,31 +61,31 @@ Future _refreshTokens(BuildContext context) async {
   if (!babyUserData.hasToken) {
     refreshBabyToken(context);
   }
-  processBackgroundMessages(context);
+  processBackgroundMessages(context, (await SharedPreferences.getInstance()));
 }
 
 /// Sets up Firebase messaging handlers.
 Future _setUpMessaging(BuildContext context) async {
+  // foreground listener
   FirebaseMessaging.onMessage.listen((message) {
     final remoteMessage = MessageModel.fromRemote(message);
-    if (remoteMessage.data.kissType != null) {
-      final KissType kissType = remoteMessage.data.kissType!;
-      if (kissType == KissType.quickKiss) {
-        showQuickKissAlert(context);
-      }
+    if (remoteMessage.data.kissType == KissType.quickKiss) {
+      showQuickKissAlert(context, remoteMessage.data.kissType!);
     } else {
       processMessageInForeground(context, MessageModel.fromRemote(message));
     }
   });
+
+  // background listener
   FirebaseMessaging.onBackgroundMessage(processMessageInBackground);
+
+  // tap listener
   FirebaseMessaging.onMessageOpenedApp.listen((message) {
     final remoteMessage = MessageModel.fromRemote(message);
-    processMessageInForeground(context, remoteMessage);
-    if (remoteMessage.data.kissType != null) {
-      final KissType kissType = remoteMessage.data.kissType!;
-      if (kissType == KissType.quickKiss) {
-        processTappedQuickKiss(context, remoteMessage);
-      }
+    if (remoteMessage.data.kissType == KissType.quickKiss) {
+      processTappedQuickKiss(context, remoteMessage);
+    } else {
+      processMessageInForeground(context, remoteMessage);
     }
   });
 }

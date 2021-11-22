@@ -1,6 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:googoogagaapp/components/quick_kiss_alert.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/models/message.dart';
 import 'package:googoogagaapp/providers/app_state_manager.dart';
@@ -16,39 +15,37 @@ Future sendQuickKiss(BuildContext context, double duration) async {
         ..kissData = KissTypeData(quickKissDuration: duration.toInt()));
 }
 
-Future<void> saveQuickKissInBg(MessageModel message) async {
-  final sharedPreferences = await SharedPreferences.getInstance();
+Future<void> saveQuickKissInBg(
+    MessageModel message, SharedPreferences sharedPreferences) async {
   final kissesQueue = sharedPreferences.getStringList(MessageModel.quickKiss);
-  await sharedPreferences.setStringList(
+  sharedPreferences.setStringList(
       MessageModel.quickKiss, [message.toString(), ...?kissesQueue]);
 }
 
 Future processBgQuickKisses(BuildContext context, Messages kisses) async {
-  final Messages validKisses = kisses.where(quickKissIsValid).toList();
+  final List<Map> validKisses = KissType.validQuickKisses(kisses);
+  Map? kiss;
   while (validKisses.isNotEmpty) {
-    validKisses.removeAt(0);
-    _updateQuickKisses(validKisses);
-    await showQuickKissAlert(context);
+    if (kiss != null) {
+      await Future.delayed(Duration(milliseconds: 500));
+    }
+    kiss = validKisses.removeAt(0);
+    MessageModel message = kiss['message'];
+    var quickKiss = message.data.kissType!
+      ..kissData!.quickKissDuration = kiss['timeLeft'];
+    _updateQuickKisses(
+        validKisses.map((e) => e['message'] as MessageModel).toList());
+    await showQuickKissAlert(context, quickKiss);
   }
+
   _clearQuickKisses();
 }
 
-Future<dynamic> showQuickKissAlert(BuildContext context) async {
+Future<dynamic> showQuickKissAlert(
+    BuildContext context, KissType quickKiss) async {
   return showDialog(
       context: context,
-      builder: (BuildContext diagContext) {
-        return AlertDialog(
-          title: Text(KissType.quickKiss.title),
-          content: Text(KissType.quickKiss.body),
-          actionsAlignment: MainAxisAlignment.center,
-          actions: [
-            TextButton.icon(
-                onPressed: () => _sendKissBack(context, diagContext),
-                icon: Icon(Icons.favorite),
-                label: Text('send kiss baccc'))
-          ],
-        );
-      });
+      builder: (_) => QuickKissAlert(quickKiss, parentContext: context));
 }
 
 Future processTappedQuickKiss(
@@ -58,12 +55,12 @@ Future processTappedQuickKiss(
     appState.handleQuickKissTap(true);
     final kissesData = await _getMessageById(kissMessage.messageId);
     if (kissesData != null) {
-      final kissInStorage = kissesData['message'];
+      final MessageModel? kissInStorage = kissesData['message'];
       if (kissInStorage != null) {
         if (quickKissIsValid(kissInStorage)) {
           return Future.wait([
             _updateQuickKisses(kissesData['messages']),
-            showQuickKissAlert(context)
+            showQuickKissAlert(context, kissInStorage.data.kissType!)
           ]);
         }
       }
@@ -87,17 +84,12 @@ _clearQuickKisses() async {
   sharedPreferences.remove(MessageModel.quickKiss);
 }
 
-_sendKissBack(BuildContext context, BuildContext diagContext) {
-  sendKiss(context, KissType.kissBack);
-  Navigator.of(diagContext, rootNavigator: true).pop(true);
-}
-
 Future<Map<String, dynamic>?> _getMessageById(String messageId) async {
   final sharedPreferences = await SharedPreferences.getInstance();
+  await sharedPreferences.reload();
   final kisses = sharedPreferences.getStringList(MessageModel.quickKiss);
   if (kisses != null) {
-    final Messages kissMessages =
-        kisses.map((e) => MessageModel.fromJson(jsonDecode(e))).toList();
+    final Messages kissMessages = kisses.map(MessageModel.fromString).toList();
     final messageIndex =
         kissMessages.indexWhere((element) => element.messageId == messageId);
     if (messageIndex > -1) {

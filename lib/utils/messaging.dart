@@ -48,7 +48,7 @@ Future<void> processMessageInForeground(
     _processData(context, data: message.data);
   }
   if (message.isNotification) {
-    saveToArchive(message, context);
+    saveToArchive(message, (await SharedPreferences.getInstance()));
     showAlert(
         context: context,
         body: message.body!,
@@ -59,57 +59,56 @@ Future<void> processMessageInForeground(
 
 Future<void> processMessageInBackground(RemoteMessage remoteMessage) async {
   MessageModel message = MessageModel.fromRemote(remoteMessage);
+  final sharedPreferences = await SharedPreferences.getInstance();
   if (message.isNotification) {
-    return saveToArchive(message);
+    await saveToArchive(message, sharedPreferences);
   }
   if (message.isTokenRequest) {
     final babyData = await getUserData(user: User.baby);
     if (babyData.userName == message.data.userName) {
-      return _saveMessageInBg(message, MessageModel.tokenRequest);
+      return _saveMessageInBg(
+          message, MessageModel.tokenRequest, sharedPreferences);
     }
   } else if (message.data.token != null) {
-    return _saveMessageInBg(message, MessageModel.tokenResponse);
+    return _saveMessageInBg(
+        message, MessageModel.tokenResponse, sharedPreferences);
   }
   if (message.data.kissType != null) {
     final KissType kissType = message.data.kissType!;
     if (kissType == KissType.quickKiss) {
-      saveQuickKissInBg(message..data.receiveTime = DateTime.now());
+      saveQuickKissInBg(
+          message..data.receiveTime = DateTime.now(), sharedPreferences);
     }
   }
 }
 
 /// Processes messages acquired while app was in background.
-Future processBackgroundMessages(BuildContext context) async {
-  final sharedPreferences = await SharedPreferences.getInstance();
+Future processBackgroundMessages(
+    BuildContext context, SharedPreferences sharedPreferences) async {
   final messages = _getBgMessages(sharedPreferences);
   if (messages[MessageModel.tokenResponse] != null ||
       messages[MessageModel.tokenRequest] != null) {
     final users = Provider.of<UsersManager>(context, listen: false);
     late String token;
 
-    /// if message is token response, save token to shared prefs,
-    /// show confirm snackbar
+    // if message is token response, save token to shared prefs,
+    // show confirm snackbar
     if (messages[MessageModel.tokenResponse] != null) {
-      token = processBgTokenResponse(
-          context,
-          MessageModel.fromJson(
-              jsonDecode(messages[MessageModel.tokenResponse]!)));
+      token = processBgTokenResponse(context,
+          MessageModel.fromString(messages[MessageModel.tokenResponse]!));
     }
 
-    /// if message is token request, save received token,
-    /// send your token
+    // if message is token request, save received token,
+    // send your token
     if (messages[MessageModel.tokenRequest] != null) {
-      token = processBgTokenRequest(
-          context,
-          MessageModel.fromJson(
-              jsonDecode(messages[MessageModel.tokenRequest]!)),
-          users);
+      token = processBgTokenRequest(context,
+          MessageModel.fromString(messages[MessageModel.tokenRequest]!), users);
     }
     saveReceivedToken(context, token, users, sharedPreferences);
   }
 
-  /// if there are quick kisses, filter valid ones, alert user for
-  /// kiss back
+  // if there are quick kisses, filter valid ones, alert user for
+  // kiss back
   if (!Provider.of<AppStateManager>(context, listen: false).isHandlingTap) {
     if (messages[MessageModel.quickKiss] != null) {
       final quickKisses = messages[MessageModel.quickKiss];
@@ -132,12 +131,11 @@ Map<String, dynamic> _getBgMessages(SharedPreferences sharedPreferences) {
       sharedPreferences.getStringList(MessageModel.quickKiss);
   return {
     MessageModel.tokenRequest:
-        request != null ? MessageModel.fromJson(jsonDecode(request)) : null,
+        request != null ? MessageModel.fromString(request) : null,
     MessageModel.tokenResponse:
-        response != null ? MessageModel.fromJson(jsonDecode(response)) : null,
-    MessageModel.quickKiss: quickKisses
-        ?.map((kiss) => MessageModel.fromJson(jsonDecode(kiss)))
-        .toList()
+        response != null ? MessageModel.fromString(response) : null,
+    MessageModel.quickKiss:
+        quickKisses?.map((kiss) => MessageModel.fromString(kiss)).toList()
   };
 }
 
@@ -147,8 +145,7 @@ Future _processData(BuildContext context, {required MessageData data}) async {
   }
 }
 
-Future _saveMessageInBg(MessageModel message, String key) async {
-  final SharedPreferences sharedPreferences =
-      await SharedPreferences.getInstance();
+Future _saveMessageInBg(MessageModel message, String key,
+    SharedPreferences sharedPreferences) async {
   sharedPreferences.setString(key, message.toString());
 }

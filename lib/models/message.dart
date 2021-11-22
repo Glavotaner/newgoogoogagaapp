@@ -33,6 +33,9 @@ class MessageModel {
         body = json['body'],
         data = MessageData.fromJson(json['data']);
 
+  static MessageModel fromString(String string) =>
+      MessageModel.fromJson(jsonDecode(string));
+
   @override
   String toString() => jsonEncode(toJson());
 

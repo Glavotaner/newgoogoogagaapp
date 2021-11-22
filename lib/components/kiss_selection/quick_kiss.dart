@@ -17,46 +17,44 @@ class _QuickKissState extends State<QuickKiss> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
-      child: Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-          elevation: 5,
-          child: Stack(
+    return Card(
+      margin: EdgeInsets.only(left: 20.0, right: 20.0, top: 40.0, bottom: 20.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+      elevation: 3,
+      child: Stack(
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Placeholder(),
-                    ),
-                  ),
-                  Slider(
-                    thumbColor: Colors.redAccent,
-                    label: '${_sliderValue.toInt()} mins',
-                    value: _sliderValue,
-                    min: 10,
-                    max: 60,
-                    divisions: 5,
-                    onChanged: (slider) => setState(() {
-                      _sliderValue = slider;
-                    }),
-                    onChangeEnd: widget.disabled ? null : _sendKiss,
-                  ),
-                  Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Text('Quick kiss',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headline6!
-                              .copyWith(color: Colors.black54))),
-                ],
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Placeholder(),
+                ),
               ),
+              Slider(
+                thumbColor: Colors.redAccent,
+                label: '${_sliderValue.toInt()} mins',
+                value: _sliderValue,
+                min: 10,
+                max: 60,
+                divisions: 5,
+                onChanged: (slider) => setState(() {
+                  _sliderValue = slider;
+                }),
+                onChangeEnd: widget.disabled ? null : _sendKiss,
+              ),
+              Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Text('Quick kiss',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headline6!
+                          .copyWith(color: Colors.black54))),
             ],
-          )),
+          ),
+        ],
+      ),
     );
   }
 }

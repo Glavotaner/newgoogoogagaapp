@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/components/kiss_selection/kiss_type.dart';
 import 'package:googoogagaapp/components/kiss_selection/quick_kiss.dart';
+import 'package:googoogagaapp/models/message.dart';
 
 class KissType {
   String body;
@@ -28,6 +29,7 @@ class KissType {
         'confirmMessage': confirmMessage,
         'assetPath': assetPath,
         'kissData': kissData?.toJson(),
+        'timeReceived': timeReceived?.toIso8601String()
       };
 
   @override
@@ -38,6 +40,9 @@ class KissType {
         title = json['title'],
         confirmMessage = json['confirmMessage'],
         assetPath = json['assetPath'],
+        timeReceived = json['timeReceived'] != null
+            ? DateTime.tryParse(json['timeReceived'])
+            : null,
         kissData = KissTypeData.fromJson(json['kissData'] ?? '{}');
 
   static final List<KissType> kissTypes = [
@@ -81,6 +86,21 @@ class KissType {
 
   @override
   int get hashCode => title.hashCode;
+
+  static List<Map> validQuickKisses(Messages kisses) {
+    final validKisses = <Map>[];
+    final now = DateTime.now();
+    for (MessageModel kiss in kisses) {
+      final timeReceived = kiss.data.receiveTime!;
+      final int timePast = now.difference(timeReceived).inMinutes;
+      final timeLeft =
+          kiss.data.kissType!.kissData!.quickKissDuration! - timePast;
+      if (timeLeft > 0) {
+        validKisses.insert(0, {'timeLeft': timeLeft, 'message': kiss});
+      }
+    }
+    return validKisses;
+  }
 }
 
 class KissTypeData {

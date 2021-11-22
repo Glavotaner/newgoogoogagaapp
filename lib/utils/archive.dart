@@ -9,32 +9,29 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Saves a notifications message to shared preferences.
 ///
 /// Saves [message] to shared preferences. If [context] is available, app is in the foreground and archive list is updated.
-Future saveToArchive(MessageModel message, [BuildContext? context]) async {
-  if (!message.isTokenRequest) {
-    final SharedPreferences sharedPreferences =
-        await SharedPreferences.getInstance();
-    var currentList = sharedPreferences.getStringList('messages') ?? [];
-    final stringMessage = message.toString();
-    var additionalList = [stringMessage];
-    additionalList.addAll(currentList);
-    sharedPreferences.setStringList('messages', additionalList);
-    if (context != null) {
-      final archive = Provider.of<ArchiveManager>(context, listen: false);
-      if (archive.isInitialized) {
-        archive.updateMessages(additionalList
-            .map((message) => MessageModel.fromJson(jsonDecode(message)))
-            .toList());
-      }
+Future saveToArchive(MessageModel message, SharedPreferences sharedPreferences,
+    [BuildContext? context]) async {
+  var currentList = sharedPreferences.getStringList('messages') ?? [];
+  final stringMessage = message.toString();
+  var additionalList = [stringMessage];
+  additionalList.addAll(currentList);
+  sharedPreferences.setStringList('messages', additionalList);
+  if (context != null) {
+    final archive = Provider.of<ArchiveManager>(context, listen: false);
+    if (archive.isInitialized) {
+      archive
+          .updateMessages(additionalList.map(MessageModel.fromString).toList());
     }
   }
 }
 
 /// Gets archived messages from shared preferences. Sets the archive list.
-Future<void> getArchive(BuildContext context) async {
-  final sharedPreferences = await SharedPreferences.getInstance();
+Future<void> getArchive(BuildContext context,
+    [SharedPreferences? sharedPreferences]) async {
+  sharedPreferences ??= await SharedPreferences.getInstance();
   final messages = sharedPreferences
           .getStringList('messages')
-          ?.map((message) => MessageModel.fromJson(jsonDecode(message)))
+          ?.map(MessageModel.fromString)
           .toList() ??
       [];
   final archive = Provider.of<ArchiveManager>(context, listen: false);
