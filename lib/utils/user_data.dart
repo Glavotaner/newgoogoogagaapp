@@ -32,7 +32,7 @@ Future<void> checkUsernamesSetUp(BuildContext context) async {
 
 /// Checks whether any user in [usersData] is missing a token.
 /// This is used to toggle the ability to send messages, or request tokens.
-bool checkAnyTokenMissing(NullableUsersData usersData) {
+bool anyTokenMissing(NullableUsersData usersData) {
   return usersData.values.any((user) {
     if (user != null) {
       return !user.hasToken;

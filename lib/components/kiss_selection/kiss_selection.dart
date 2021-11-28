@@ -10,7 +10,7 @@ class KissSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<UsersManager>(builder: (context, users, child) {
-      final disabled = checkAnyTokenMissing(users.usersData);
+      final disabled = anyTokenMissing(users.usersData);
       return Column(
         children: [
           Expanded(

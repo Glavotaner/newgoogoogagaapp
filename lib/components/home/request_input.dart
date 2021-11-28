@@ -47,7 +47,7 @@ class _KissRequestState extends State<KissRequest> {
               child: Consumer<UsersManager>(
                 builder: (context, usersManager, child) {
                   final bool _disabled =
-                      checkAnyTokenMissing(usersManager.usersData);
+                      anyTokenMissing(usersManager.usersData);
                   return ElevatedButton.icon(
                       onPressed: _disabled ? null : () => _sendRequest(context),
                       onLongPress: null,
