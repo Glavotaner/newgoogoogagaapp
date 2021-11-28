@@ -28,7 +28,7 @@ String processBgTokenResponse(BuildContext context, Message response) {
 Future<void> saveReceivedToken(BuildContext context, String token,
     UsersManager manager, sharedPreferences) async {
   final babyData = manager.usersData[User.baby]!;
-  setUserData(context, User.baby, babyData..token = token);
+  updateUserData(context, User.baby, babyData..token = token);
   manager.updateUserNames({User.baby: babyData..token = token});
   clearSearchingForToken(sharedPreferences, context);
   clearTokenMessages(sharedPreferences);
@@ -40,14 +40,14 @@ processTokenMessage(
   final babyData = users[User.baby]!;
   if (data.tokenRequest != null) {
     if (data.userName == babyData.userName) {
-      setUserData(context, User.baby, babyData..token = data.token);
+      updateUserData(context, User.baby, babyData..token = data.token);
       final userData = users[User.me]!;
       sendDataMessage(
           token: data.token, data: MessageData(token: userData.token));
       showConfirmSnackbar(context, 'Sending token to babby!');
     }
   } else if (data.token != null) {
-    setUserData(context, User.baby, babyData..token = data.token);
+    updateUserData(context, User.baby, babyData..token = data.token);
     FirebaseMessaging.instance.unsubscribeFromTopic('tokens');
     clearSearchingForToken((await SharedPreferences.getInstance()), context);
     showConfirmSnackbar(context, 'Saved babba token!');

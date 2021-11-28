@@ -8,7 +8,7 @@ class UsersManager extends ChangeNotifier {
   NullableUsersData get usersData => _usersData;
   bool get isWaitingForToken => _isWaitingForToken;
 
-  updateUserNames(NullableUsersData users) {
+  Future<void> updateUserNames(NullableUsersData users) async {
     for (var user in users.entries) {
       _usersData[user.key] = user.value;
     }

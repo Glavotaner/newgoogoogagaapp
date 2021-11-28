@@ -6,10 +6,17 @@ import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:provider/provider.dart';
 
 /// Sets [userData] for user [name] in shared preferences. Updates user data in user manager provider.
-Future setUserData(BuildContext context, String name, User userData) async {
+Future updateUserData(BuildContext context, String name, User userData) async {
   await updateUser(name, userData);
   Provider.of<UsersManager>(context, listen: false)
       .updateUserNames({name: userData});
+}
+
+Future<dynamic> updateAllUsers(BuildContext context, UsersData users) async {
+  return Future.wait([
+    updateUsers(users[User.me]!, users[User.baby]!),
+    Provider.of<UsersManager>(context, listen: false).updateUserNames(users)
+  ]);
 }
 
 /// Checks if any user's data is null. If so, navigates to users set up page.

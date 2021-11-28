@@ -98,7 +98,7 @@ Future _setFCMToken(
   final messaging = FirebaseMessaging.instance;
   final token = await messaging.getToken();
   if (token?.isNotEmpty ?? false) {
-    setUserData(context, User.me, userData..token = token);
+    updateUserData(context, User.me, userData..token = token);
   } else {
     showErrorSnackbar(context, 'Token error!');
     throw ErrorDescription('Token error!');
