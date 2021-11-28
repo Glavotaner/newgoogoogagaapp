@@ -2,8 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:googoogagaapp/models/message.dart';
-import 'package:googoogagaapp/models/user.dart';
+import 'package:googoogagaapp/models/message/message.dart';
+import 'package:googoogagaapp/models/user/user.dart';
+import 'package:googoogagaapp/models/user/user_repo.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/fcm.dart';
@@ -30,9 +31,8 @@ Future refreshBabyToken([BuildContext? context]) async {
   final users = context != null
       ? Provider.of<UsersManager>(context, listen: false)
       : null;
-  final myUser = context == null
-      ? await getUserData(user: User.me)
-      : users!.usersData[User.me]!;
+  final myUser =
+      context == null ? await getUser(User.me) : users!.usersData[User.me]!;
   await FirebaseMessaging.instance.subscribeToTopic('tokens');
   sendDataMessage(
       topic: 'tokens',

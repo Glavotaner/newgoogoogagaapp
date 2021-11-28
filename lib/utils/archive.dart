@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:googoogagaapp/models/message.dart';
+import 'package:googoogagaapp/models/message/message.dart';
 import 'package:googoogagaapp/providers/archive_manager.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:provider/provider.dart';

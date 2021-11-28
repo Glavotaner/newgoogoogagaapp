@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:googoogagaapp/models/user.dart';
+import 'package:googoogagaapp/models/user/user.dart';
 
 class UsersManager extends ChangeNotifier {
-  final Map<String, User?> _usersData = {};
+  final NullableUsersData _usersData = {};
   bool _isWaitingForToken = false;
 
-  Map<String, User?> get usersData => _usersData;
+  NullableUsersData get usersData => _usersData;
   bool get isWaitingForToken => _isWaitingForToken;
 
-  updateUserNames(Map<String, User> users) {
+  updateUserNames(NullableUsersData users) {
     for (var user in users.entries) {
       _usersData[user.key] = user.value;
     }

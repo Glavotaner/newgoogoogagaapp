@@ -14,6 +14,8 @@ class User {
       : userName = json['userName'],
         token = json['token'];
 
+  static User fromString(String userString) => jsonDecode(userString);
+
   Map<String, dynamic> toJson() => {'userName': userName, 'token': token};
 
   @override
@@ -21,3 +23,6 @@ class User {
 
   bool get hasToken => (token ?? '').isNotEmpty;
 }
+
+typedef UsersData = Map<String, User>;
+typedef NullableUsersData = Map<String, User?>;

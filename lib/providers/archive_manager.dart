@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:googoogagaapp/models/message.dart';
+import 'package:googoogagaapp/models/message/message.dart';
 
 class ArchiveManager extends ChangeNotifier {
   Messages _messages = [];

@@ -1,8 +1,9 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
-import 'package:googoogagaapp/models/message.dart';
-import 'package:googoogagaapp/models/user.dart';
+import 'package:googoogagaapp/models/message/message.dart';
+import 'package:googoogagaapp/models/user/user.dart';
+import 'package:googoogagaapp/models/user/user_repo.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/archive.dart';
 import 'package:googoogagaapp/utils/quick_kiss.dart';
@@ -27,7 +28,7 @@ Future<void> onBackgroundMessage(RemoteMessage remoteMessage) async {
     await saveToArchive(message, sharedPreferences);
   }
   if (message.isTokenRequest) {
-    final babyData = await getUserData(user: User.baby);
+    final babyData = await getUser(User.baby);
     if (babyData.userName == message.data.userName) {
       return _saveMessage(message, Message.tokenRequest, sharedPreferences);
     }

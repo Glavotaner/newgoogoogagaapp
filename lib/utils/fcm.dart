@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:googoogagaapp/models/message.dart';
+import 'package:googoogagaapp/models/message/message.dart';
 import 'package:http/http.dart';
 
 /// Get FCM data from assets.

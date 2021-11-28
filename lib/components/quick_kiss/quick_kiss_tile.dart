@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:googoogagaapp/models/message.dart';
+import 'package:googoogagaapp/models/message/message.dart';
 
 class QuickKissTile extends StatelessWidget {
   final Message quickKiss;

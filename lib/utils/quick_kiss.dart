@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:googoogagaapp/components/quick_kiss/quick_kiss_alert.dart';
 import 'package:googoogagaapp/components/quick_kiss/quick_kiss_list.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
-import 'package:googoogagaapp/models/message.dart';
+import 'package:googoogagaapp/models/message/message.dart';
 import 'package:googoogagaapp/providers/app_state_manager.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/messaging.dart';

@@ -1,7 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:googoogagaapp/models/message.dart';
-import 'package:googoogagaapp/models/user.dart';
+import 'package:googoogagaapp/models/message/message.dart';
+import 'package:googoogagaapp/models/user/user.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/fcm.dart';

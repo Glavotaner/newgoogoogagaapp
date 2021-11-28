@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/components/loading.dart';
 import 'package:googoogagaapp/components/quick_kiss/quick_kiss_tile.dart';
-import 'package:googoogagaapp/models/message.dart';
+import 'package:googoogagaapp/models/message/message.dart';
 import 'package:googoogagaapp/utils/quick_kiss.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

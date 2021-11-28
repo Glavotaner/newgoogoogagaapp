@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/components/kiss_selection/kiss_type.dart';
 import 'package:googoogagaapp/components/quick_kiss/quick_kiss.dart';
-import 'package:googoogagaapp/models/message.dart';
+import 'package:googoogagaapp/models/message/message.dart';
 
 class KissType {
   String body;

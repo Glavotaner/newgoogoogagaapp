@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/routes.dart';
-import 'package:googoogagaapp/models/user.dart';
+import 'package:googoogagaapp/models/user/user.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/providers/app_state_manager.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
@@ -8,7 +8,7 @@ import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:provider/provider.dart';
 
 class SetUpScreen extends StatefulWidget {
-  final Map<String, User?>? usersData;
+  final NullableUsersData? usersData;
   SetUpScreen({Key? key, this.usersData}) : super(key: key);
 
   static MaterialPage page() {
@@ -22,7 +22,7 @@ class SetUpScreen extends StatefulWidget {
 
 class _SetUpScreenState extends State<SetUpScreen> {
   final _formKey = GlobalKey<FormState>();
-  late Map<String, User?> _usersData;
+  late NullableUsersData _usersData;
 
   final Map<String, TextEditingController> _controllers = {
     User.me: TextEditingController(),
@@ -57,7 +57,7 @@ class _SetUpScreenState extends State<SetUpScreen> {
     return Scaffold(body: _form(_usersData));
   }
 
-  Widget _form(Map<String, User?> usersData) {
+  Widget _form(NullableUsersData usersData) {
     _controllers.forEach((key, value) {
       _controllers[key]?.text = usersData[key]?.userName ?? '';
     });
@@ -116,7 +116,7 @@ class _SetUpScreenState extends State<SetUpScreen> {
   }
 
   // TODO implement updating usernames
-  Future _saveData(Map<String, User?> usersData) async {
+  Future _saveData(NullableUsersData usersData) async {
     if (_formKey.currentState!.validate()) {
       showConfirmSnackbar(context, 'saving da data');
       final List<Future> userDataSetup = [];

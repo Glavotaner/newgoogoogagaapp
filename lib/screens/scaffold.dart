@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/models/routes.dart';
-import 'package:googoogagaapp/models/user.dart';
+import 'package:googoogagaapp/models/user/user.dart';
 import 'package:googoogagaapp/providers/app_state_manager.dart';
 import 'package:googoogagaapp/providers/archive_manager.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
