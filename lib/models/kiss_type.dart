@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/components/kiss_selection/kiss_type.dart';
-import 'package:googoogagaapp/components/kiss_selection/quick_kiss.dart';
+import 'package:googoogagaapp/components/quick_kiss/quick_kiss.dart';
 import 'package:googoogagaapp/models/message.dart';
 
 class KissType {
@@ -11,15 +11,14 @@ class KissType {
   String confirmMessage;
   String? assetPath;
   DateTime? timeReceived;
-  KissTypeData? kissData;
+  Data? data;
 
   KissType(
       {required this.body,
       required this.title,
       required this.confirmMessage,
       this.assetPath,
-      this.timeReceived,
-      this.kissData});
+      this.data});
 
   bool get isQuickKiss => this == KissType.quickKiss;
 
@@ -28,8 +27,7 @@ class KissType {
         'title': title,
         'confirmMessage': confirmMessage,
         'assetPath': assetPath,
-        'kissData': kissData?.toJson(),
-        'timeReceived': timeReceived?.toIso8601String()
+        'kissData': data?.toJson(),
       };
 
   @override
@@ -40,10 +38,7 @@ class KissType {
         title = json['title'],
         confirmMessage = json['confirmMessage'],
         assetPath = json['assetPath'],
-        timeReceived = json['timeReceived'] != null
-            ? DateTime.tryParse(json['timeReceived'])
-            : null,
-        kissData = KissTypeData.fromJson(json['kissData'] ?? '{}');
+        data = Data.fromJson(json['kissData'] ?? '{}');
 
   static final List<KissType> kissTypes = [
     KissType(
@@ -87,30 +82,32 @@ class KissType {
   @override
   int get hashCode => title.hashCode;
 
-  static List<Map> validQuickKisses(Messages kisses) {
-    final validKisses = <Map>[];
+  static Messages validQuickKisses(Messages kisses) {
+    final Messages validKisses = [];
     final now = DateTime.now();
-    for (MessageModel kiss in kisses) {
+    for (Message kiss in kisses) {
       final timeReceived = kiss.data.receiveTime!;
       final int timePast = now.difference(timeReceived).inMinutes;
-      final timeLeft =
-          kiss.data.kissType!.kissData!.quickKissDuration! - timePast;
+      final timeLeft = kiss.data.kissType!.data!.quickKissDuration! - timePast;
       if (timeLeft > 0) {
-        validKisses.insert(0, {'timeLeft': timeLeft, 'message': kiss});
+        validKisses.insert(0, kiss..data.kissType!.data!.timeLeft = timeLeft);
       }
     }
     return validKisses;
   }
 }
 
-class KissTypeData {
+class Data {
   int? quickKissDuration;
-  KissTypeData({this.quickKissDuration});
+  int? timeLeft;
+  Data({this.quickKissDuration, this.timeLeft});
 
-  KissTypeData.fromJson(Map<String, dynamic> json)
-      : quickKissDuration = json['quickKissDuration'];
+  Data.fromJson(Map<String, dynamic> json)
+      : quickKissDuration = json['quickKissDuration'],
+        timeLeft = json['timeLeft'];
 
-  Map<String, dynamic> toJson() => {'quickKissDuration': quickKissDuration};
+  Map<String, dynamic> toJson() =>
+      {'quickKissDuration': quickKissDuration, 'timeLeft': timeLeft};
 }
 
 List<Widget> buildKissTypes(bool? disabled) {

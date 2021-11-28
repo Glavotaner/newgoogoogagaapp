@@ -2,14 +2,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/models/message.dart';
 import 'package:googoogagaapp/models/user.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/fcm.dart';
+import 'package:googoogagaapp/utils/fcm_handlers.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
-import 'package:googoogagaapp/utils/quick_kiss.dart';
 import 'package:googoogagaapp/utils/tokens.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
 import 'package:provider/provider.dart';
@@ -67,27 +66,12 @@ Future _refreshTokens(BuildContext context) async {
 /// Sets up Firebase messaging handlers.
 Future _setUpMessaging(BuildContext context) async {
   // foreground listener
-  FirebaseMessaging.onMessage.listen((message) {
-    final remoteMessage = MessageModel.fromRemote(message);
-    if (remoteMessage.data.kissType == KissType.quickKiss) {
-      showQuickKissAlert(context, remoteMessage.data.kissType!);
-    } else {
-      processMessageInForeground(context, MessageModel.fromRemote(message));
-    }
-  });
-
+  FirebaseMessaging.onMessage.listen((message) => onMessage(context, message));
   // background listener
-  FirebaseMessaging.onBackgroundMessage(processMessageInBackground);
-
+  FirebaseMessaging.onBackgroundMessage(onBackgroundMessage);
   // tap listener
-  FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    final remoteMessage = MessageModel.fromRemote(message);
-    if (remoteMessage.data.kissType == KissType.quickKiss) {
-      processTappedQuickKiss(context, remoteMessage);
-    } else {
-      processMessageInForeground(context, remoteMessage);
-    }
-  });
+  FirebaseMessaging.onMessageOpenedApp
+      .listen((message) => onTappedNotification(context, message));
 }
 
 /// Sets up high importance notification channel to enable foreground notifications.

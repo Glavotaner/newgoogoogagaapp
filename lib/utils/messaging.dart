@@ -1,17 +1,12 @@
-import 'dart:convert';
-
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/models/message.dart';
 import 'package:googoogagaapp/models/user.dart';
 import 'package:googoogagaapp/providers/app_state_manager.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
-import 'package:googoogagaapp/utils/archive.dart';
 import 'package:googoogagaapp/utils/fcm.dart';
 import 'package:googoogagaapp/utils/quick_kiss.dart';
 import 'package:googoogagaapp/utils/tokens.dart';
-import 'package:googoogagaapp/utils/user_data.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,69 +35,27 @@ Future sendRequest(BuildContext context, String message) async {
   sendKiss(context, KissType.kissRequest..body = message);
 }
 
-/// Process message while app in foreground and context
-/// is available.
-Future<void> processMessageInForeground(
-    BuildContext context, MessageModel message) async {
-  if (message.hasData) {
-    _processData(context, data: message.data);
-  }
-  if (message.isNotification) {
-    saveToArchive(message, (await SharedPreferences.getInstance()));
-    showAlert(
-        context: context,
-        body: message.body!,
-        title: message.title,
-        duration: 5);
-  }
-}
-
-Future<void> processMessageInBackground(RemoteMessage remoteMessage) async {
-  MessageModel message = MessageModel.fromRemote(remoteMessage);
-  final sharedPreferences = await SharedPreferences.getInstance();
-  if (message.isNotification) {
-    await saveToArchive(message, sharedPreferences);
-  }
-  if (message.isTokenRequest) {
-    final babyData = await getUserData(user: User.baby);
-    if (babyData.userName == message.data.userName) {
-      return _saveMessageInBg(
-          message, MessageModel.tokenRequest, sharedPreferences);
-    }
-  } else if (message.data.token != null) {
-    return _saveMessageInBg(
-        message, MessageModel.tokenResponse, sharedPreferences);
-  }
-  if (message.data.kissType != null) {
-    final KissType kissType = message.data.kissType!;
-    if (kissType == KissType.quickKiss) {
-      saveQuickKissInBg(
-          message..data.receiveTime = DateTime.now(), sharedPreferences);
-    }
-  }
-}
-
 /// Processes messages acquired while app was in background.
 Future processBackgroundMessages(
     BuildContext context, SharedPreferences sharedPreferences) async {
   final messages = _getBgMessages(sharedPreferences);
-  if (messages[MessageModel.tokenResponse] != null ||
-      messages[MessageModel.tokenRequest] != null) {
+  if (messages[Message.tokenResponse] != null ||
+      messages[Message.tokenRequest] != null) {
     final users = Provider.of<UsersManager>(context, listen: false);
     late String token;
 
     // if message is token response, save token to shared prefs,
     // show confirm snackbar
-    if (messages[MessageModel.tokenResponse] != null) {
-      token = processBgTokenResponse(context,
-          MessageModel.fromString(messages[MessageModel.tokenResponse]!));
+    if (messages[Message.tokenResponse] != null) {
+      token = processBgTokenResponse(
+          context, Message.fromString(messages[Message.tokenResponse]!));
     }
 
     // if message is token request, save received token,
     // send your token
-    if (messages[MessageModel.tokenRequest] != null) {
-      token = processBgTokenRequest(context,
-          MessageModel.fromString(messages[MessageModel.tokenRequest]!), users);
+    if (messages[Message.tokenRequest] != null) {
+      token = processBgTokenRequest(
+          context, Message.fromString(messages[Message.tokenRequest]!), users);
     }
     saveReceivedToken(context, token, users, sharedPreferences);
   }
@@ -110,42 +63,30 @@ Future processBackgroundMessages(
   // if there are quick kisses, filter valid ones, alert user for
   // kiss back
   if (!Provider.of<AppStateManager>(context, listen: false).isHandlingTap) {
-    if (messages[MessageModel.quickKiss] != null) {
-      final quickKisses = messages[MessageModel.quickKiss];
+    if (messages[Message.quickKiss] != null) {
+      final quickKisses = messages[Message.quickKiss];
       if (quickKisses.isNotEmpty) {
-        processBgQuickKisses(context, messages[MessageModel.quickKiss]);
+        processBgQuickKisses(context, messages[Message.quickKiss]);
       }
     }
   }
 }
 
 clearTokenMessages(SharedPreferences sharedPreferences) async {
-  sharedPreferences.remove(MessageModel.tokenRequest);
-  sharedPreferences.remove(MessageModel.tokenResponse);
+  sharedPreferences.remove(Message.tokenRequest);
+  sharedPreferences.remove(Message.tokenResponse);
 }
 
 Map<String, dynamic> _getBgMessages(SharedPreferences sharedPreferences) {
-  String? request = sharedPreferences.getString(MessageModel.tokenRequest);
-  String? response = sharedPreferences.getString(MessageModel.tokenResponse);
+  String? request = sharedPreferences.getString(Message.tokenRequest);
+  String? response = sharedPreferences.getString(Message.tokenResponse);
   List<String>? quickKisses =
-      sharedPreferences.getStringList(MessageModel.quickKiss);
+      sharedPreferences.getStringList(Message.quickKiss);
   return {
-    MessageModel.tokenRequest:
-        request != null ? MessageModel.fromString(request) : null,
-    MessageModel.tokenResponse:
-        response != null ? MessageModel.fromString(response) : null,
-    MessageModel.quickKiss:
-        quickKisses?.map((kiss) => MessageModel.fromString(kiss)).toList()
+    Message.tokenRequest: request != null ? Message.fromString(request) : null,
+    Message.tokenResponse:
+        response != null ? Message.fromString(response) : null,
+    Message.quickKiss:
+        quickKisses?.map((kiss) => Message.fromString(kiss)).toList()
   };
-}
-
-Future _processData(BuildContext context, {required MessageData data}) async {
-  if (data.tokenRequest == true || data.token != null) {
-    processTokenMessage(context: context, data: data);
-  }
-}
-
-Future _saveMessageInBg(MessageModel message, String key,
-    SharedPreferences sharedPreferences) async {
-  sharedPreferences.setString(key, message.toString());
 }

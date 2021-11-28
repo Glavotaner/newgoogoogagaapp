@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Saves a notifications message to shared preferences.
 ///
 /// Saves [message] to shared preferences. If [context] is available, app is in the foreground and archive list is updated.
-Future saveToArchive(MessageModel message, SharedPreferences sharedPreferences,
+Future saveToArchive(Message message, SharedPreferences sharedPreferences,
     [BuildContext? context]) async {
   var currentList = sharedPreferences.getStringList('messages') ?? [];
   final stringMessage = message.toString();
@@ -19,8 +19,7 @@ Future saveToArchive(MessageModel message, SharedPreferences sharedPreferences,
   if (context != null) {
     final archive = Provider.of<ArchiveManager>(context, listen: false);
     if (archive.isInitialized) {
-      archive
-          .updateMessages(additionalList.map(MessageModel.fromString).toList());
+      archive.updateMessages(additionalList.map(Message.fromString).toList());
     }
   }
 }
@@ -31,7 +30,7 @@ Future<void> getArchive(BuildContext context,
   sharedPreferences ??= await SharedPreferences.getInstance();
   final messages = sharedPreferences
           .getStringList('messages')
-          ?.map(MessageModel.fromString)
+          ?.map(Message.fromString)
           .toList() ??
       [];
   final archive = Provider.of<ArchiveManager>(context, listen: false);

@@ -39,7 +39,7 @@ class _QuickKissAlertState extends State<QuickKissAlert> {
   @override
   void initState() {
     super.initState();
-    minutesLeft = widget.quickKiss.kissData!.quickKissDuration!;
+    minutesLeft = widget.quickKiss.data!.quickKissDuration!;
     durationTimer = Timer.periodic(Duration(minutes: 1), _setRemainingTime);
   }
 

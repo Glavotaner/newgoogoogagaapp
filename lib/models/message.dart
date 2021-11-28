@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
 
-class MessageModel {
+class Message {
   final String messageId;
   final String? title;
   final String? body;
@@ -18,23 +18,22 @@ class MessageModel {
       (title ?? '').isNotEmpty || (body ?? '').isNotEmpty;
   bool get isTokenRequest => data.tokenRequest != null;
 
-  MessageModel(
-      {this.title, this.body, required this.messageId, required this.data});
+  Message({this.title, this.body, required this.messageId, required this.data});
 
-  MessageModel.fromRemote(RemoteMessage remoteMessage)
+  Message.fromRemote(RemoteMessage remoteMessage)
       : messageId = remoteMessage.messageId!,
         data = MessageData.fromRemote(remoteMessage),
         title = remoteMessage.notification?.title,
         body = remoteMessage.notification?.body;
 
-  MessageModel.fromJson(Map<String, dynamic> json)
+  Message.fromJson(Map<String, dynamic> json)
       : messageId = json['messageId'],
         title = json['title'],
         body = json['body'],
         data = MessageData.fromJson(json['data']);
 
-  static MessageModel fromString(String string) =>
-      MessageModel.fromJson(jsonDecode(string));
+  static Message fromString(String string) =>
+      Message.fromJson(jsonDecode(string));
 
   @override
   String toString() => jsonEncode(toJson());
@@ -97,4 +96,4 @@ class MessageData {
       };
 }
 
-typedef Messages = List<MessageModel>;
+typedef Messages = List<Message>;

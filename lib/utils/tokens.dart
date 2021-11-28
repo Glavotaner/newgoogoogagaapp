@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 String processBgTokenRequest(
-    BuildContext context, MessageModel request, UsersManager usersManager) {
+    BuildContext context, Message request, UsersManager usersManager) {
   final user = usersManager.usersData[User.me]!;
   String token = request.data.token!;
   sendDataMessage(token: token, data: MessageData(token: user.token));
@@ -19,7 +19,7 @@ String processBgTokenRequest(
   return token;
 }
 
-String processBgTokenResponse(BuildContext context, MessageModel response) {
+String processBgTokenResponse(BuildContext context, Message response) {
   FirebaseMessaging.instance.unsubscribeFromTopic('tokens');
   showConfirmSnackbar(context, 'Saved babba token!');
   return response.data.token!;
