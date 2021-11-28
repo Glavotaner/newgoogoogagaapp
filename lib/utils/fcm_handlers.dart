@@ -13,7 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 onMessage(BuildContext context, RemoteMessage message) async {
   final remoteMessage = Message.fromRemote(message);
-  if (remoteMessage.data.kissType == KissType.quickKiss) {
+  if (remoteMessage.kissType == KissType.quickKiss) {
     showQuickKissAlert(context, remoteMessage);
   } else {
     _processMessageInForeground(context,
@@ -35,8 +35,8 @@ Future<void> onBackgroundMessage(RemoteMessage remoteMessage) async {
   } else if (message.data.token != null) {
     return _saveMessage(message, Message.tokenResponse, sharedPreferences);
   }
-  if (message.data.kissType != null) {
-    final KissType kissType = message.data.kissType!;
+  if (message.kissType != null) {
+    final KissType kissType = message.kissType!;
     if (kissType == KissType.quickKiss) {
       saveQuickKiss(
           message..data.receiveTime = DateTime.now(), sharedPreferences);
@@ -49,7 +49,7 @@ Future<void> onTappedNotification(
   final sharedPreferences = await SharedPreferences.getInstance();
   await sharedPreferences.reload();
   final remoteMessage = Message.fromRemote(message);
-  if (remoteMessage.data.kissType == KissType.quickKiss) {
+  if (remoteMessage.kissType == KissType.quickKiss) {
     processTappedQuickKiss(context, remoteMessage);
   } else {
     _processMessageInForeground(context, sharedPreferences, remoteMessage);

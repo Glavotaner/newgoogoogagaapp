@@ -44,7 +44,7 @@ Future<dynamic> showQuickKissAlert(
   await showDialog(
       context: context,
       builder: (_) =>
-          QuickKissAlert(quickKiss.data.kissType!, parentContext: context));
+          QuickKissAlert(quickKiss.kissType!, parentContext: context));
   return _removeKissFromStorage(quickKiss.messageId);
 }
 
@@ -67,10 +67,10 @@ clearQuickKisses() async {
 
 bool quickKissIsValid(Message kiss) {
   final now = DateTime.now();
-  final kissDuration = kiss.data.kissType!.data!.quickKissDuration!;
+  final kissDuration = kiss.kissType!.data!.quickKissDuration!;
   final receiveTime = kiss.data.receiveTime!;
   final timeLeft = now.difference(receiveTime).inMinutes;
-  kiss.data.kissType!.data!.timeLeft = timeLeft;
+  kiss.kissType!.data!.timeLeft = timeLeft;
   return timeLeft < kissDuration;
 }
 

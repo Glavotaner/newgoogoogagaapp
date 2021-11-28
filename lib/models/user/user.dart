@@ -14,7 +14,8 @@ class User {
       : userName = json['userName'],
         token = json['token'];
 
-  static User fromString(String userString) => jsonDecode(userString);
+  static User fromString(String userString) =>
+      User.fromJson(jsonDecode(userString));
 
   Map<String, dynamic> toJson() => {'userName': userName, 'token': token};
 

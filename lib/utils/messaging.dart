@@ -21,7 +21,7 @@ Future sendKiss(BuildContext context, KissType kissType,
         'title': kissType.title,
         'body': kissType.body,
       },
-      data: kissType.isQuickKiss ? MessageData(kissType: kissType) : null);
+      data: kissType.isQuickKiss ? {'kissType': kissType.toJson()} : null);
   final provider = Provider.of<AppStateManager>(context, listen: false);
   if (!provider.snackbarExists) {
     provider.snackbarExists = true;

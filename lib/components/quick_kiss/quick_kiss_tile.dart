@@ -7,8 +7,8 @@ class QuickKissTile extends StatelessWidget {
   const QuickKissTile(this.quickKiss, {Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final progress = quickKiss.data.kissType!.data!.timeLeft!.toDouble() /
-        quickKiss.data.kissType!.data!.quickKissDuration!;
+    final progress = quickKiss.kissType!.data!.timeLeft!.toDouble() /
+        quickKiss.kissType!.data!.quickKissDuration!;
     final minutesAgo = DateTime.now()
         .difference(quickKiss.data.receiveTime!)
         .inMinutes

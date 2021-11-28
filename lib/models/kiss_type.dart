@@ -27,7 +27,7 @@ class KissType {
         'title': title,
         'confirmMessage': confirmMessage,
         'assetPath': assetPath,
-        'kissData': data?.toJson(),
+        'data': data?.toJson(),
       };
 
   @override
@@ -38,7 +38,7 @@ class KissType {
         title = json['title'],
         confirmMessage = json['confirmMessage'],
         assetPath = json['assetPath'],
-        data = Data.fromJson(json['kissData'] ?? '{}');
+        data = Data.fromJson(json['data'] ?? '{}');
 
   static final List<KissType> kissTypes = [
     KissType(
@@ -88,9 +88,9 @@ class KissType {
     for (Message kiss in kisses) {
       final timeReceived = kiss.data.receiveTime!;
       final int timePast = now.difference(timeReceived).inMinutes;
-      final timeLeft = kiss.data.kissType!.data!.quickKissDuration! - timePast;
+      final timeLeft = kiss.kissType!.data!.quickKissDuration! - timePast;
       if (timeLeft > 0) {
-        validKisses.insert(0, kiss..data.kissType!.data!.timeLeft = timeLeft);
+        validKisses.insert(0, kiss..kissType!.data!.timeLeft = timeLeft);
       }
     }
     return validKisses;

@@ -115,18 +115,15 @@ class _QuickKissListSheetState extends State<QuickKissListSheet> {
           _validKisses.where(quickKissIsValid).toList();
       if (validKisses.isNotEmpty) {
         for (var kiss in validKisses) {
-          if (kiss.data.kissType != null) {
-            final timeLeft = kiss.data.kissType!.data!.quickKissDuration! - 1;
+          if (kiss.kissType != null) {
+            final timeLeft = kiss.kissType!.data!.quickKissDuration! - 1;
             for (var currentKiss in _validKisses) {
               final existingKissIndex = validKisses.indexWhere(
                   (element) => element.messageId == currentKiss.messageId);
               if (existingKissIndex > -1) {
                 setState(() {
-                  _validKisses[existingKissIndex]
-                      .data
-                      .kissType!
-                      .data!
-                      .timeLeft = timeLeft;
+                  _validKisses[existingKissIndex].kissType!.data!.timeLeft =
+                      timeLeft;
                 });
               }
             }

@@ -8,6 +8,7 @@ class Message {
   final String? title;
   final String? body;
   final MessageData data;
+  final KissType? kissType;
 
   static final tokenRequest = 'request';
   static final tokenResponse = 'response';
@@ -18,19 +19,30 @@ class Message {
       (title ?? '').isNotEmpty || (body ?? '').isNotEmpty;
   bool get isTokenRequest => data.tokenRequest != null;
 
-  Message({this.title, this.body, required this.messageId, required this.data});
+  Message(
+      {required this.messageId,
+      required this.data,
+      this.title,
+      this.body,
+      this.kissType});
 
   Message.fromRemote(RemoteMessage remoteMessage)
       : messageId = remoteMessage.messageId!,
         data = MessageData.fromRemote(remoteMessage),
         title = remoteMessage.notification?.title,
-        body = remoteMessage.notification?.body;
+        body = remoteMessage.notification?.body,
+        kissType = remoteMessage.data['kissType'] != null
+            ? KissType.fromJson(jsonDecode(remoteMessage.data['kissType']))
+            : null;
 
   Message.fromJson(Map<String, dynamic> json)
       : messageId = json['messageId'],
         title = json['title'],
         body = json['body'],
-        data = MessageData.fromJson(json['data']);
+        data = MessageData.fromJson(json['data']),
+        kissType = json['kissType'] != null
+            ? KissType.fromJson(json['kissType'])
+            : null;
 
   static Message fromString(String string) =>
       Message.fromJson(jsonDecode(string));
@@ -42,7 +54,8 @@ class Message {
         'messageId': messageId,
         'title': title,
         'body': body,
-        'data': data.toJson()
+        'data': data.toJson(),
+        'kissType': kissType?.toJson()
       };
 }
 
@@ -51,14 +64,13 @@ class MessageData {
   String? token;
   String? userName;
   bool? tokenRequest;
-  KissType? kissType;
 
-  MessageData(
-      {this.receiveTime,
-      this.token,
-      this.userName,
-      this.tokenRequest,
-      this.kissType});
+  MessageData({
+    this.receiveTime,
+    this.token,
+    this.userName,
+    this.tokenRequest,
+  });
 
   MessageData.fromRemote(RemoteMessage remoteMessage) {
     final data = remoteMessage.data;
@@ -69,9 +81,6 @@ class MessageData {
     userName = data['userName'];
     tokenRequest =
         data['tokenRequest'] != null ? jsonDecode(data['tokenRequest']) : null;
-    kissType = data['kissType'] != null
-        ? KissType.fromJson(jsonDecode(data['kissType']))
-        : null;
   }
 
   MessageData.fromJson(Map<String, dynamic> json)
@@ -82,9 +91,6 @@ class MessageData {
         token = json['token'],
         tokenRequest = json['tokenRequest'] != null
             ? jsonDecode(json['tokenRequest'])
-            : null,
-        kissType = json['kissType'] != null
-            ? KissType.fromJson(json['kissType'])
             : null;
 
   Map<String, dynamic> toJson() => {
@@ -92,7 +98,6 @@ class MessageData {
         'token': token,
         'userName': userName,
         'tokenRequest': tokenRequest,
-        'kissType': kissType?.toJson()
       };
 }
 
