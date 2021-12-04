@@ -39,8 +39,8 @@ Future showQuickKissModal(BuildContext context, Messages validKisses) async {
       enableDrag: true);
 }
 
-Future<dynamic> showQuickKissAlert(Message quickKiss) async {
-  final context = getScaffoldContext();
+Future<dynamic> showQuickKissAlert(
+    BuildContext context, Message quickKiss) async {
   await showDialog(
       context: context,
       builder: (_) =>
@@ -116,7 +116,7 @@ Future<void> _showQuickKissAlerts(BuildContext context, Message message) async {
     final Message? kissInStorage = kissesData['message'];
     if (kissInStorage != null) {
       if (quickKissIsValid(kissInStorage)) {
-        showQuickKissAlert(kissInStorage);
+        showQuickKissAlert(context, kissInStorage);
       }
     }
     if (kisses.length > 2) {

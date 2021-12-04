@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/components/home/request_input.dart';
 import 'package:googoogagaapp/components/kiss_selection/kiss_selection.dart';
-import 'package:googoogagaapp/components/loading.dart';
-import 'package:googoogagaapp/utils/alerts.dart';
-import 'package:googoogagaapp/utils/initialization.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -13,32 +10,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late Future _setUpMessaging;
   int selectedPage = 0;
   double opacity = 1.0;
 
   @override
-  void initState() {
-    super.initState();
-    _setUpMessaging = setUpMessaging(context)
-        .catchError((error) => showErrorSnackbar(error));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: _setUpMessaging,
-        builder: (BuildContext context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return PageView(
-              scrollDirection: Axis.vertical,
-              children: [HomePage(), KissSelectionScreen()],
-            );
-          }
-          // TODO instead of this, incorporate init in splash page
-          return LoadingScreen(message: 'Setting up messaging...');
-        });
-  }
+  Widget build(BuildContext context) => PageView(
+        scrollDirection: Axis.vertical,
+        children: [HomePage(), KissSelectionScreen()],
+      );
 }
 
 class HomePage extends StatelessWidget {

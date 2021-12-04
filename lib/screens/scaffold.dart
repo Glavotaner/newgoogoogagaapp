@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:googoogagaapp/components/loading.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/models/routes.dart';
 import 'package:googoogagaapp/models/user/user.dart';
@@ -7,6 +8,7 @@ import 'package:googoogagaapp/providers/archive_manager.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:googoogagaapp/screens/home.dart';
 import 'package:googoogagaapp/screens/kiss_archive.dart';
+import 'package:googoogagaapp/services/services.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/archive.dart';
 import 'package:googoogagaapp/utils/initialization.dart';
@@ -34,6 +36,7 @@ class _ScaffoldScreenState extends State<ScaffoldScreen>
     with WidgetsBindingObserver {
   int _selectedTab = 0;
   bool _showingSnackbar = false;
+  late Future<void> _setUpMessaging;
 
   sendKissBack(BuildContext context) {
     sendKiss(context, KissType.kissBack)
@@ -65,6 +68,8 @@ class _ScaffoldScreenState extends State<ScaffoldScreen>
     super.initState();
     WidgetsBinding.instance!.addObserver(this);
     setScaffoldContext(context);
+    _setUpMessaging =
+        setUpMessaging(context).catchError((error) => showErrorSnackbar(error));
   }
 
   @override
@@ -78,10 +83,17 @@ class _ScaffoldScreenState extends State<ScaffoldScreen>
           centerTitle: true),
       bottomNavigationBar: _navBar(context),
       backgroundColor: Colors.white,
-      body: IndexedStack(
-        index: _selectedTab,
-        children: widget.pages,
-      ),
+      body: FutureBuilder(
+          future: _setUpMessaging,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return IndexedStack(
+                index: _selectedTab,
+                children: widget.pages,
+              );
+            }
+            return LoadingScreen(message: 'Setting up messaging...');
+          }),
       floatingActionButton: _clearArchiveButton(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );

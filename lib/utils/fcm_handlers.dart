@@ -12,11 +12,12 @@ import 'package:googoogagaapp/utils/tokens.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 onMessage(RemoteMessage message) async {
+  final context = getScaffoldContext();
   final remoteMessage = Message.fromRemote(message);
   if (remoteMessage.kissType == KissType.quickKiss) {
-    showQuickKissAlert(remoteMessage);
+    showQuickKissAlert(context, remoteMessage);
   } else {
-    _processMessageInForeground(
+    _processMessageInForeground(context,
         (await SharedPreferences.getInstance()), Message.fromRemote(message));
   }
 }
@@ -45,14 +46,14 @@ Future<void> onBackgroundMessage(RemoteMessage remoteMessage) async {
 }
 
 Future<void> onTappedNotification(RemoteMessage message) async {
-  final context = getService(Services.global).context;
+  final context = getScaffoldContext();
   final sharedPreferences = await SharedPreferences.getInstance();
   await sharedPreferences.reload();
   final remoteMessage = Message.fromRemote(message);
   if (remoteMessage.kissType == KissType.quickKiss) {
     processTappedQuickKiss(context, remoteMessage);
   } else {
-    _processMessageInForeground(sharedPreferences, remoteMessage);
+    _processMessageInForeground(context, sharedPreferences, remoteMessage);
   }
 }
 
@@ -63,9 +64,8 @@ Future _saveMessage(
 
 /// Process message while app in foreground and context
 /// is available.
-Future<void> _processMessageInForeground(
+Future<void> _processMessageInForeground(BuildContext context,
     SharedPreferences sharedPreferences, Message message) async {
-  final context = getService(Services.global).context;
   if (message.hasData) {
     _processData(context, data: message.data);
   }

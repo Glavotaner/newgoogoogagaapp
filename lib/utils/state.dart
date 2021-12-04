@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:googoogagaapp/services/services.dart';
 import 'package:googoogagaapp/utils/archive.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,8 +10,4 @@ refreshOnAppResumed(BuildContext context) async {
   await sharedPreferences.reload();
   processBackgroundMessages(context, sharedPreferences);
   getArchive(context);
-}
-
-setScaffoldContext(BuildContext context) {
-  getService(Services.global).context = context;
 }
