@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:googoogagaapp/components/loading.dart';
 import 'package:googoogagaapp/components/quick_kiss/quick_kiss_tile.dart';
 import 'package:googoogagaapp/models/message/message.dart';
+import 'package:googoogagaapp/models/message/message_repo.dart';
 import 'package:googoogagaapp/utils/quick_kiss.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class QuickKissListSheet extends StatefulWidget {
   final Messages validKisses;
@@ -157,8 +157,7 @@ class _QuickKissListSheetState extends State<QuickKissListSheet> {
   }
 
   _clearKisses([BuildContext? context]) async {
-    final sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.remove(Message.quickKiss);
+    await setMessages(Message.quickKiss, []);
     if (context != null) {
       Navigator.of(context).pop();
     }

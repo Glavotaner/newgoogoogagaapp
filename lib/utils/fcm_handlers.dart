@@ -8,7 +8,6 @@ import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/archive.dart';
 import 'package:googoogagaapp/utils/quick_kiss.dart';
 import 'package:googoogagaapp/utils/tokens.dart';
-import 'package:googoogagaapp/utils/user_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 onMessage(BuildContext context, RemoteMessage message) async {
@@ -25,9 +24,9 @@ Future<void> onBackgroundMessage(RemoteMessage remoteMessage) async {
   Message message = Message.fromRemote(remoteMessage);
   final sharedPreferences = await SharedPreferences.getInstance();
   if (message.isNotification) {
-    await saveToArchive(message, sharedPreferences);
+    await saveToArchive(message);
   }
-  if (message.isTokenRequest) {
+  if (message.data.tokenRequest != null) {
     final babyData = await getUser(User.baby);
     if (babyData.userName == message.data.userName) {
       return _saveMessage(message, Message.tokenRequest, sharedPreferences);
@@ -69,7 +68,7 @@ Future<void> _processMessageInForeground(BuildContext context,
     _processData(context, data: message.data);
   }
   if (message.isNotification) {
-    saveToArchive(message, sharedPreferences);
+    saveToArchive(message);
     showAlert(
         context: context,
         body: message.body!,

@@ -9,5 +9,5 @@ refreshOnAppResumed(BuildContext context) async {
   final sharedPreferences = await SharedPreferences.getInstance();
   await sharedPreferences.reload();
   processBackgroundMessages(context, sharedPreferences);
-  getArchive(context, sharedPreferences);
+  getArchive(context);
 }
