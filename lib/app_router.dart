@@ -75,7 +75,7 @@ class AppRouter extends RouterDelegate
     if (_backPressed == false) {
       _backPressed = true;
       Timer(Duration(seconds: 2), () => _backPressed = false);
-      showErrorSnackbar(context, 'Tap back button again to leave app');
+      showErrorSnackbar('Tap back button again to leave app');
       return Future.value(true);
     }
     return Future.value(false);

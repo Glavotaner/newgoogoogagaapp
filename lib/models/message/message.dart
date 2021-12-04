@@ -5,19 +5,17 @@ import 'package:googoogagaapp/models/kiss_type.dart';
 
 class Message {
   final String messageId;
+  final MessageData data;
   final String? title;
   final String? body;
-  final MessageData data;
   final KissType? kissType;
 
   static final tokenRequest = 'request';
   static final tokenResponse = 'response';
   static final quickKiss = 'quickKiss';
 
-  bool get hasData => data.toJson().values.any((value) => value != null);
   bool get isNotification =>
       (title ?? '').isNotEmpty || (body ?? '').isNotEmpty;
-  bool get isTokenRequest => data.tokenRequest != null;
 
   Message(
       {required this.messageId,
@@ -28,10 +26,11 @@ class Message {
 
   Message.fromRemote(RemoteMessage remoteMessage)
       : messageId = remoteMessage.messageId!,
-        data = MessageData.fromRemote(remoteMessage),
+        data = MessageData.fromJson(
+            jsonDecode(remoteMessage.data['customData'] ?? '{}')),
         title = remoteMessage.notification?.title,
         body = remoteMessage.notification?.body,
-        kissType = remoteMessage.data['kissType'] != null
+        kissType = remoteMessage.data.containsKey('kissType')
             ? KissType.fromJson(jsonDecode(remoteMessage.data['kissType']))
             : null;
 
@@ -39,8 +38,8 @@ class Message {
       : messageId = json['messageId'],
         title = json['title'],
         body = json['body'],
-        data = MessageData.fromJson(json['data']),
-        kissType = json['kissType'] != null
+        data = MessageData.fromJson(json['data'] ?? {}),
+        kissType = json.containsKey('kissType')
             ? KissType.fromJson(json['kissType'])
             : null;
 
@@ -50,13 +49,19 @@ class Message {
   @override
   String toString() => jsonEncode(toJson());
 
-  Map<String, dynamic> toJson() => {
-        'messageId': messageId,
-        'title': title,
-        'body': body,
-        'data': data.toJson(),
-        'kissType': kissType?.toJson()
-      };
+  Map<String, dynamic> toJson() {
+    final jsonMessage = {
+      'messageId': messageId,
+      'title': title,
+      'body': body,
+      'data': data.toJson(),
+      'kissType': kissType?.toJson()
+    };
+    jsonMessage.removeWhere((_, value) => value == null);
+    return jsonMessage;
+  }
+
+  bool get hasData => data.toJson().isNotEmpty;
 }
 
 class MessageData {
@@ -73,14 +78,16 @@ class MessageData {
   });
 
   MessageData.fromRemote(RemoteMessage remoteMessage) {
-    final data = remoteMessage.data;
-    receiveTime = data['receiveTime'] != null
+    var data = remoteMessage.data['customData'];
+    if (data != null) {
+      data = jsonDecode(data);
+    }
+    receiveTime = data?['receiveTime'] != null
         ? DateTime.tryParse(data['receiveTime'])
         : null;
-    token = data['token'];
-    userName = data['userName'];
-    tokenRequest =
-        data['tokenRequest'] != null ? jsonDecode(data['tokenRequest']) : null;
+    token = data?['token'];
+    userName = data?['userName'];
+    tokenRequest = data['tokenRequest'] ?? false;
   }
 
   MessageData.fromJson(Map<String, dynamic> json)
@@ -89,9 +96,7 @@ class MessageData {
             : null,
         userName = json['userName'],
         token = json['token'],
-        tokenRequest = json['tokenRequest'] != null
-            ? jsonDecode(json['tokenRequest'])
-            : null;
+        tokenRequest = json['tokenRequest'];
 
   Map<String, dynamic> toJson() => {
         'receiveTime': receiveTime?.toIso8601String(),
@@ -99,6 +104,8 @@ class MessageData {
         'userName': userName,
         'tokenRequest': tokenRequest,
       };
+
+  bool get isNotEmpty => toJson().isNotEmpty;
 }
 
 typedef Messages = List<Message>;

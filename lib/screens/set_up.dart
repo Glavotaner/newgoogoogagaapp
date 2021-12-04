@@ -3,6 +3,7 @@ import 'package:googoogagaapp/models/routes.dart';
 import 'package:googoogagaapp/models/user/user.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/providers/app_state_manager.dart';
+import 'package:googoogagaapp/utils/state.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:provider/provider.dart';
@@ -54,6 +55,7 @@ class _SetUpScreenState extends State<SetUpScreen> {
         body: _form(_usersData),
       );
     }
+    setScaffoldContext(context);
     return Scaffold(body: _form(_usersData));
   }
 
@@ -118,7 +120,7 @@ class _SetUpScreenState extends State<SetUpScreen> {
   // TODO implement updating usernames
   Future _saveData(NullableUsersData usersData) async {
     if (_formKey.currentState!.validate()) {
-      showConfirmSnackbar(context, 'saving da data');
+      showConfirmSnackbar('saving da data');
       final UsersData newUsers = {
         for (var user in _controllers.entries)
           user.key:
@@ -127,6 +129,6 @@ class _SetUpScreenState extends State<SetUpScreen> {
       await updateAllUsers(context, newUsers);
       return Provider.of<AppStateManager>(context, listen: false).logIn();
     }
-    showErrorSnackbar(context, 'fix your errors then we can talk');
+    showErrorSnackbar('fix your errors then we can talk');
   }
 }

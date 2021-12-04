@@ -3,15 +3,15 @@ import 'package:googoogagaapp/components/quick_kiss/quick_kiss_alert.dart';
 import 'package:googoogagaapp/components/quick_kiss/quick_kiss_list.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/models/message/message.dart';
-import 'package:googoogagaapp/providers/app_state_manager.dart';
+import 'package:googoogagaapp/models/message/message_repo.dart';
+import 'package:googoogagaapp/services/services.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/messaging.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future sendQuickKiss(BuildContext context, double duration) async {
   await sendKiss(context,
-      KissType.quickKiss..data = Data(quickKissDuration: duration.toInt()));
+      KissType.quickKiss..data = KissData(quickKissDuration: duration.toInt()));
 }
 
 Future<void> saveQuickKiss(
@@ -22,7 +22,7 @@ Future<void> saveQuickKiss(
 }
 
 Future processBgQuickKisses(BuildContext context, Messages kisses) async {
-  final Messages validKisses = KissType.validQuickKisses(kisses);
+  final Messages validKisses = validQuickKisses(kisses);
   if (validKisses.isNotEmpty) {
     return showQuickKissModal(context, validKisses);
   }
@@ -39,8 +39,8 @@ Future showQuickKissModal(BuildContext context, Messages validKisses) async {
       enableDrag: true);
 }
 
-Future<dynamic> showQuickKissAlert(
-    BuildContext context, Message quickKiss) async {
+Future<dynamic> showQuickKissAlert(Message quickKiss) async {
+  final context = getScaffoldContext();
   await showDialog(
       context: context,
       builder: (_) =>
@@ -49,12 +49,12 @@ Future<dynamic> showQuickKissAlert(
 }
 
 Future processTappedQuickKiss(BuildContext context, Message kissMessage) async {
-  final appState = Provider.of<AppStateManager>(context, listen: false);
+  final AlertsService alertsService = getService(ServicesEnum.alerts);
   try {
-    appState.handleQuickKissTap(true);
+    alertsService.isHandlingTap = true;
     await _showQuickKissAlerts(context, kissMessage);
   } finally {
-    appState.handleQuickKissTap(false);
+    alertsService.isHandlingTap = false;
   }
 }
 
@@ -84,7 +84,7 @@ Future<Map<String, dynamic>?> _getTappedMessage(String messageId) async {
     if (messageIndex > -1) {
       final messageById = kissMessages.removeAt(messageIndex);
       return {
-        'messages': KissType.validQuickKisses(kissMessages),
+        'messages': validQuickKisses(kissMessages),
         'message': messageById
       };
     }
@@ -116,13 +116,13 @@ Future<void> _showQuickKissAlerts(BuildContext context, Message message) async {
     final Message? kissInStorage = kissesData['message'];
     if (kissInStorage != null) {
       if (quickKissIsValid(kissInStorage)) {
-        showQuickKissAlert(context, kissInStorage);
+        showQuickKissAlert(kissInStorage);
       }
     }
     if (kisses.length > 2) {
       return await showQuickKissModal(context, kisses);
     }
   } else {
-    return await showErrorSnackbar(context, "you didn't catched kiss in time");
+    return await showErrorSnackbar("you didn't catched kiss in time");
   }
 }

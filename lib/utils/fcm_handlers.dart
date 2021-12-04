@@ -4,18 +4,19 @@ import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/models/message/message.dart';
 import 'package:googoogagaapp/models/user/user.dart';
 import 'package:googoogagaapp/models/user/user_repo.dart';
+import 'package:googoogagaapp/services/services.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/archive.dart';
 import 'package:googoogagaapp/utils/quick_kiss.dart';
 import 'package:googoogagaapp/utils/tokens.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-onMessage(BuildContext context, RemoteMessage message) async {
+onMessage(RemoteMessage message) async {
   final remoteMessage = Message.fromRemote(message);
   if (remoteMessage.kissType == KissType.quickKiss) {
-    showQuickKissAlert(context, remoteMessage);
+    showQuickKissAlert(remoteMessage);
   } else {
-    _processMessageInForeground(context,
+    _processMessageInForeground(
         (await SharedPreferences.getInstance()), Message.fromRemote(message));
   }
 }
@@ -43,15 +44,15 @@ Future<void> onBackgroundMessage(RemoteMessage remoteMessage) async {
   }
 }
 
-Future<void> onTappedNotification(
-    BuildContext context, RemoteMessage message) async {
+Future<void> onTappedNotification(RemoteMessage message) async {
+  final context = getService(ServicesEnum.global).context;
   final sharedPreferences = await SharedPreferences.getInstance();
   await sharedPreferences.reload();
   final remoteMessage = Message.fromRemote(message);
   if (remoteMessage.kissType == KissType.quickKiss) {
     processTappedQuickKiss(context, remoteMessage);
   } else {
-    _processMessageInForeground(context, sharedPreferences, remoteMessage);
+    _processMessageInForeground(sharedPreferences, remoteMessage);
   }
 }
 
@@ -62,8 +63,9 @@ Future _saveMessage(
 
 /// Process message while app in foreground and context
 /// is available.
-Future<void> _processMessageInForeground(BuildContext context,
+Future<void> _processMessageInForeground(
     SharedPreferences sharedPreferences, Message message) async {
+  final context = getService(ServicesEnum.global).context;
   if (message.hasData) {
     _processData(context, data: message.data);
   }

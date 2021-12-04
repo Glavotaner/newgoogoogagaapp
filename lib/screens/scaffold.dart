@@ -7,7 +7,6 @@ import 'package:googoogagaapp/providers/archive_manager.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:googoogagaapp/screens/home.dart';
 import 'package:googoogagaapp/screens/kiss_archive.dart';
-import 'package:googoogagaapp/services/services.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/archive.dart';
 import 'package:googoogagaapp/utils/initialization.dart';
@@ -38,10 +37,10 @@ class _ScaffoldScreenState extends State<ScaffoldScreen>
 
   sendKissBack(BuildContext context) {
     sendKiss(context, KissType.kissBack)
-        .catchError((error) => showErrorSnackbar(context, error));
+        .catchError((error) => showErrorSnackbar(error));
     if (!_showingSnackbar) {
       _showingSnackbar = true;
-      showConfirmSnackbar(context, KissType.kissBack.confirmMessage)
+      showConfirmSnackbar(KissType.kissBack.confirmMessage)
           .closed
           .then((_) => _showingSnackbar = false);
     }
@@ -65,9 +64,7 @@ class _ScaffoldScreenState extends State<ScaffoldScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance!.addObserver(this);
-    registerService(ServicesEnum.global);
-    final GlobalService globalService = getService(ServicesEnum.global);
-    globalService.context = context;
+    setScaffoldContext(context);
   }
 
   @override
@@ -105,7 +102,7 @@ class _ScaffoldScreenState extends State<ScaffoldScreen>
               onPressed: usersManager.usersData[User.me]?.token == null
                   ? null
                   : () => refreshBabyToken(context)
-                      .catchError((error) => showErrorSnackbar(context, error)),
+                      .catchError((error) => showErrorSnackbar(error)),
               icon: Icon(usersManager.usersData[User.baby]?.token == null
                   ? Icons.favorite_border
                   : Icons.favorite));
@@ -136,7 +133,7 @@ class _ScaffoldScreenState extends State<ScaffoldScreen>
           visible: _selectedTab == 1 && archive.messages.isNotEmpty,
           child: FloatingActionButton(
               onPressed: () => clearArchive(context)
-                  .catchError((error) => showErrorSnackbar(context, error)),
+                  .catchError((error) => showErrorSnackbar(error)),
               backgroundColor: Colors.redAccent,
               child: Icon(Icons.delete_forever)),
         );

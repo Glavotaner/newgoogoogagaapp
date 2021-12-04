@@ -30,5 +30,5 @@ Future<void> getArchive(BuildContext context) async {
 Future clearArchive(BuildContext context) async {
   await setMessages('messages', []);
   Provider.of<ArchiveManager>(context, listen: false).updateMessages([]);
-  showConfirmSnackbar(context, 'Archive cleared!');
+  showConfirmSnackbar('Archive cleared!');
 }

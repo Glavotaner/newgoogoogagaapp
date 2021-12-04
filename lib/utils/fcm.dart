@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/models/message/message.dart';
 import 'package:http/http.dart';
 
@@ -18,14 +19,16 @@ Future<Response> sendMessage(
     {String? token,
     String? topic,
     Map<String, String>? notification,
-    Map? data}) async {
+    MessageData? data,
+    KissType? kissType}) async {
   final fcmData = await getFCMData();
   Map<String, dynamic> requestBody = {
     "project_id": fcmData['projectId'],
     "to": token ?? '/topics/$topic'
   };
   requestBody['notification'] = notification;
-  requestBody['data'] = data;
+  requestBody['data'] = {'customData': data?.toJson(), 'kissType': kissType};
+  requestBody.removeWhere((_, value) => value == null);
   return await post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
       headers: {
         'Content-Type': 'application/json',
@@ -37,5 +40,5 @@ Future<Response> sendMessage(
 /// Sends data only FCM message to [token] or [topic].
 Future sendDataMessage(
     {String? token, String? topic, required MessageData data}) async {
-  return await sendMessage(token: token, topic: topic, data: data.toJson());
+  return await sendMessage(token: token, topic: topic, data: data);
 }

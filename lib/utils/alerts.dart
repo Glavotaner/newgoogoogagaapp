@@ -33,8 +33,8 @@ Future showAlert(
   }
 }
 
-ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showConfirmSnackbar(
-    BuildContext context, String message) {
+ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showConfirmSnackbar(String message) {
+  final context = getScaffoldContext();
   return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     content: Text(message),
     duration: Duration(seconds: 2),
@@ -42,7 +42,8 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showConfirmSnackbar(
   ));
 }
 
-showErrorSnackbar(BuildContext context, String message) {
+showErrorSnackbar(String message) {
+  final context = getScaffoldContext();
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(message),
       duration: Duration(seconds: 2),

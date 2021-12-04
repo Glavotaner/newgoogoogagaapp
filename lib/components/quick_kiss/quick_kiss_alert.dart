@@ -26,7 +26,7 @@ class _QuickKissAlertState extends State<QuickKissAlert> {
       });
     }
     timer?.cancel();
-    showErrorSnackbar(context,
+    showErrorSnackbar(
         "uhoh looks like you didn't send kiss back in time, this is very sad thing");
     Navigator.of(context, rootNavigator: true).pop();
   }

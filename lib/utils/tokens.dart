@@ -15,13 +15,13 @@ String processBgTokenRequest(
   final user = usersManager.usersData[User.me]!;
   String token = request.data.token!;
   sendDataMessage(token: token, data: MessageData(token: user.token));
-  showConfirmSnackbar(context, 'Sending token to babby!');
+  showConfirmSnackbar('Sending token to babby!');
   return token;
 }
 
 String processBgTokenResponse(BuildContext context, Message response) {
   FirebaseMessaging.instance.unsubscribeFromTopic('tokens');
-  showConfirmSnackbar(context, 'Saved babba token!');
+  showConfirmSnackbar('Saved babba token!');
   return response.data.token!;
 }
 
@@ -44,13 +44,13 @@ processTokenMessage(
       final userData = users[User.me]!;
       sendDataMessage(
           token: data.token, data: MessageData(token: userData.token));
-      showConfirmSnackbar(context, 'Sending token to babby!');
+      showConfirmSnackbar('Sending token to babby!');
     }
   } else if (data.token != null) {
     updateUserData(context, User.baby, babyData..token = data.token);
     FirebaseMessaging.instance.unsubscribeFromTopic('tokens');
     clearSearchingForToken((await SharedPreferences.getInstance()), context);
-    showConfirmSnackbar(context, 'Saved babba token!');
+    showConfirmSnackbar('Saved babba token!');
   }
 }
 

@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _setUpMessaging = setUpMessaging(context)
-        .catchError((error) => showErrorSnackbar(context, error));
+        .catchError((error) => showErrorSnackbar(error));
   }
 
   @override

@@ -3,32 +3,35 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/components/kiss_selection/kiss_type.dart';
 import 'package:googoogagaapp/components/quick_kiss/quick_kiss.dart';
-import 'package:googoogagaapp/models/message/message.dart';
 
 class KissType {
   String body;
   String title;
   String confirmMessage;
+  KissData? data;
   String? assetPath;
-  DateTime? timeReceived;
-  Data? data;
 
-  KissType(
-      {required this.body,
-      required this.title,
-      required this.confirmMessage,
-      this.assetPath,
-      this.data});
+  KissType({
+    required this.body,
+    required this.title,
+    required this.confirmMessage,
+    this.data,
+    this.assetPath,
+  });
 
   bool get isQuickKiss => this == KissType.quickKiss;
 
-  Map<String, dynamic> toJson() => {
-        'body': body,
-        'title': title,
-        'confirmMessage': confirmMessage,
-        'assetPath': assetPath,
-        'data': data?.toJson(),
-      };
+  Map<String, dynamic> toJson() {
+    final jsonMessage = {
+      'body': body,
+      'title': title,
+      'confirmMessage': confirmMessage,
+      'assetPath': assetPath,
+      'data': data?.toJson(),
+    };
+    jsonMessage.removeWhere((_, value) => value == null);
+    return jsonMessage;
+  }
 
   @override
   String toString() => jsonEncode(toJson());
@@ -38,7 +41,12 @@ class KissType {
         title = json['title'],
         confirmMessage = json['confirmMessage'],
         assetPath = json['assetPath'],
-        data = Data.fromJson(json['data'] ?? '{}');
+        data = KissData.fromJson(json['data'] ?? {});
+
+  static KissType fromString(String kissType) =>
+      KissType.fromJson(jsonDecode(kissType));
+
+  bool get hasData => (data?.toJson() ?? {}).isNotEmpty;
 
   static final List<KissType> kissTypes = [
     KissType(
@@ -81,33 +89,21 @@ class KissType {
 
   @override
   int get hashCode => title.hashCode;
-
-  static Messages validQuickKisses(Messages kisses) {
-    final Messages validKisses = [];
-    final now = DateTime.now();
-    for (Message kiss in kisses) {
-      final timeReceived = kiss.data.receiveTime!;
-      final int timePast = now.difference(timeReceived).inMinutes;
-      final timeLeft = kiss.kissType!.data!.quickKissDuration! - timePast;
-      if (timeLeft > 0) {
-        validKisses.insert(0, kiss..kissType!.data!.timeLeft = timeLeft);
-      }
-    }
-    return validKisses;
-  }
 }
 
-class Data {
+class KissData {
   int? quickKissDuration;
   int? timeLeft;
-  Data({this.quickKissDuration, this.timeLeft});
+  KissData({this.quickKissDuration, this.timeLeft});
 
-  Data.fromJson(Map<String, dynamic> json)
+  KissData.fromJson(Map<String, dynamic> json)
       : quickKissDuration = json['quickKissDuration'],
         timeLeft = json['timeLeft'];
 
   Map<String, dynamic> toJson() =>
       {'quickKissDuration': quickKissDuration, 'timeLeft': timeLeft};
+
+  bool get isNotEmpty => toJson().isNotEmpty;
 }
 
 List<Widget> buildKissTypes(bool? disabled) {

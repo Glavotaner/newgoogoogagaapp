@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/models/message/message.dart';
 import 'package:googoogagaapp/models/user/user.dart';
@@ -26,7 +25,7 @@ Future sendKiss(BuildContext context, KissType kissType,
   final AlertsService alertsService = getService(ServicesEnum.alerts);
   if (!alertsService.snackBarExists) {
     alertsService.snackBarExists = true;
-    showConfirmSnackbar(context, kissType.confirmMessage)
+    showConfirmSnackbar(kissType.confirmMessage)
         .closed
         .then((_) => alertsService.snackBarExists = false);
   }

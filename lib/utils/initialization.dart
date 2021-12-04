@@ -42,7 +42,7 @@ Future refreshBabyToken([BuildContext? context]) async {
       await SharedPreferences.getInstance();
   if (!checkIsWaitingForToken(sharedPreferences)) {
     if (context != null) {
-      showConfirmSnackbar(context, 'Refreshing!');
+      showConfirmSnackbar('Refreshing!');
     }
   }
   setSearchingForToken(sharedPreferences, context);
@@ -66,12 +66,11 @@ Future _refreshTokens(BuildContext context) async {
 /// Sets up Firebase messaging handlers.
 Future _setUpMessaging(BuildContext context) async {
   // foreground listener
-  FirebaseMessaging.onMessage.listen((message) => onMessage(context, message));
+  FirebaseMessaging.onMessage.listen(onMessage);
   // background listener
   FirebaseMessaging.onBackgroundMessage(onBackgroundMessage);
   // tap listener
-  FirebaseMessaging.onMessageOpenedApp
-      .listen((message) => onTappedNotification(context, message));
+  FirebaseMessaging.onMessageOpenedApp.listen(onTappedNotification);
 }
 
 /// Sets up high importance notification channel to enable foreground notifications.
@@ -100,7 +99,7 @@ Future _setFCMToken(
   if (token?.isNotEmpty ?? false) {
     updateUserData(context, User.me, userData..token = token);
   } else {
-    showErrorSnackbar(context, 'Token error!');
+    showErrorSnackbar('Token error!');
     throw ErrorDescription('Token error!');
   }
 }
