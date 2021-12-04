@@ -14,5 +14,5 @@ refreshOnAppResumed(BuildContext context) async {
 }
 
 setScaffoldContext(BuildContext context) {
-  getService(ServicesEnum.global).context = context;
+  getService(Services.global).context = context;
 }

@@ -9,7 +9,7 @@ Future showAlert(
     String? title,
     int? duration,
     List<TextButton>? actions}) async {
-  final AlertsService alertsService = getService(ServicesEnum.alerts);
+  final AlertsService alertsService = getService(Services.alerts);
   if (!alertsService.alertExists) {
     alertsService.alertExists = true;
     Timer? timer;
@@ -33,7 +33,8 @@ Future showAlert(
   }
 }
 
-ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showConfirmSnackbar(String message) {
+ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showConfirmSnackbar(
+    String message) {
   final context = getScaffoldContext();
   return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     content: Text(message),

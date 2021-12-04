@@ -8,20 +8,29 @@ class _Services {
   ];
 }
 
-enum ServicesEnum {
+enum Services {
   global,
   alerts,
 }
 
-void registerService(ServicesEnum service) {
+void registerService(Services service) {
   _getOrRegister(service, 'register');
 }
 
-dynamic getService(ServicesEnum service) {
+dynamic getService(Services service) {
   return _getOrRegister(service, 'get');
 }
 
-dynamic _getOrRegister(ServicesEnum service, String action) {
+void registerInitServices() {
+  registerService(Services.global);
+  registerService(Services.alerts);
+}
+
+BuildContext getScaffoldContext() {
+  return getService(Services.global).context;
+}
+
+dynamic _getOrRegister(Services service, String action) {
   String injectionToken = _Services.injectionTokens[service.index];
   final _ = GetIt.instance;
   switch (injectionToken) {
@@ -34,10 +43,6 @@ dynamic _getOrRegister(ServicesEnum service, String action) {
           ? _.get<GlobalService>()
           : _.registerSingleton<GlobalService>(GlobalService());
   }
-}
-
-BuildContext getScaffoldContext() {
-  return getService(ServicesEnum.global).context;
 }
 
 class GlobalService {

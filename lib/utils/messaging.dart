@@ -22,7 +22,7 @@ Future sendKiss(BuildContext context, KissType kissType,
         'body': kissType.body,
       },
       kissType: kissType.isQuickKiss ? kissType : null);
-  final AlertsService alertsService = getService(ServicesEnum.alerts);
+  final AlertsService alertsService = getService(Services.alerts);
   if (!alertsService.snackBarExists) {
     alertsService.snackBarExists = true;
     showConfirmSnackbar(kissType.confirmMessage)
@@ -62,7 +62,7 @@ Future processBackgroundMessages(
 
   // if there are quick kisses, filter valid ones, alert user for
   // kiss back
-  if (!getService(ServicesEnum.alerts).isHandlingTap) {
+  if (!getService(Services.alerts).isHandlingTap) {
     if (messages[Message.quickKiss] != null) {
       final quickKisses = messages[Message.quickKiss];
       if (quickKisses.isNotEmpty) {

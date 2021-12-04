@@ -49,7 +49,7 @@ Future<dynamic> showQuickKissAlert(Message quickKiss) async {
 }
 
 Future processTappedQuickKiss(BuildContext context, Message kissMessage) async {
-  final AlertsService alertsService = getService(ServicesEnum.alerts);
+  final AlertsService alertsService = getService(Services.alerts);
   try {
     alertsService.isHandlingTap = true;
     await _showQuickKissAlerts(context, kissMessage);

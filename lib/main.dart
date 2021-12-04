@@ -39,8 +39,7 @@ class _GoogooGagaAppState extends State<GoogooGagaApp> {
     FlutterError.onError = (FlutterErrorDetails details) {
       showErrorSnackbar(details.exceptionAsString());
     };
-    registerService(ServicesEnum.alerts);
-    registerService(ServicesEnum.global);
+    registerInitServices();
     super.initState();
   }
 

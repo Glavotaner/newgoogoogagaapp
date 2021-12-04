@@ -45,7 +45,7 @@ Future<void> onBackgroundMessage(RemoteMessage remoteMessage) async {
 }
 
 Future<void> onTappedNotification(RemoteMessage message) async {
-  final context = getService(ServicesEnum.global).context;
+  final context = getService(Services.global).context;
   final sharedPreferences = await SharedPreferences.getInstance();
   await sharedPreferences.reload();
   final remoteMessage = Message.fromRemote(message);
@@ -65,7 +65,7 @@ Future _saveMessage(
 /// is available.
 Future<void> _processMessageInForeground(
     SharedPreferences sharedPreferences, Message message) async {
-  final context = getService(ServicesEnum.global).context;
+  final context = getService(Services.global).context;
   if (message.hasData) {
     _processData(context, data: message.data);
   }
