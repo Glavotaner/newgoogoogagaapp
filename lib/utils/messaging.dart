@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/models/message/message.dart';
 import 'package:googoogagaapp/models/user/user.dart';
-import 'package:googoogagaapp/providers/app_state_manager.dart';
+import 'package:googoogagaapp/services/services.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/fcm.dart';
 import 'package:googoogagaapp/utils/quick_kiss.dart';
@@ -21,13 +22,13 @@ Future sendKiss(BuildContext context, KissType kissType,
         'title': kissType.title,
         'body': kissType.body,
       },
-      data: kissType.isQuickKiss ? {'kissType': kissType.toJson()} : null);
-  final provider = Provider.of<AppStateManager>(context, listen: false);
-  if (!provider.snackbarExists) {
-    provider.snackbarExists = true;
+      kissType: kissType.isQuickKiss ? kissType : null);
+  final AlertsService alertsService = getService(ServicesEnum.alerts);
+  if (!alertsService.snackBarExists) {
+    alertsService.snackBarExists = true;
     showConfirmSnackbar(context, kissType.confirmMessage)
         .closed
-        .then((_) => provider.snackbarExists = false);
+        .then((_) => alertsService.snackBarExists = false);
   }
 }
 
@@ -62,7 +63,7 @@ Future processBackgroundMessages(
 
   // if there are quick kisses, filter valid ones, alert user for
   // kiss back
-  if (!Provider.of<AppStateManager>(context, listen: false).isHandlingTap) {
+  if (!getService(ServicesEnum.alerts).isHandlingTap) {
     if (messages[Message.quickKiss] != null) {
       final quickKisses = messages[Message.quickKiss];
       if (quickKisses.isNotEmpty) {

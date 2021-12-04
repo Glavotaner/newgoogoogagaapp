@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:googoogagaapp/providers/app_state_manager.dart';
-import 'package:provider/provider.dart';
+import 'package:googoogagaapp/services/services.dart';
 
 Future showAlert(
     {required BuildContext context,
@@ -10,9 +9,9 @@ Future showAlert(
     String? title,
     int? duration,
     List<TextButton>? actions}) async {
-  final provider = Provider.of<AppStateManager>(context, listen: false);
-  if (!provider.alertExists) {
-    provider.alertExists = true;
+  final AlertsService alertsService = getService(ServicesEnum.alerts);
+  if (!alertsService.alertExists) {
+    alertsService.alertExists = true;
     Timer? timer;
     await showDialog(
         context: context,
@@ -30,7 +29,7 @@ Future showAlert(
         });
     timer?.cancel();
     timer = null;
-    provider.alertExists = false;
+    alertsService.alertExists = false;
   }
 }
 

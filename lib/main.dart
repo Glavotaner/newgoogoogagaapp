@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get_it/get_it.dart';
+import 'package:googoogagaapp/services/services.dart';
 import 'package:googoogagaapp/providers/archive_manager.dart';
 import 'package:googoogagaapp/app_router.dart';
 import 'package:googoogagaapp/providers/app_state_manager.dart';
@@ -38,6 +40,7 @@ class _GoogooGagaAppState extends State<GoogooGagaApp> {
     FlutterError.onError = (FlutterErrorDetails details) {
       showErrorSnackbar(context, details.exceptionAsString());
     };
+    registerService(ServicesEnum.alerts);
     super.initState();
   }
 

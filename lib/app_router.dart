@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/routes.dart';
 import 'package:googoogagaapp/providers/archive_manager.dart';
@@ -6,6 +8,7 @@ import 'package:googoogagaapp/screens/splash.dart';
 import 'package:googoogagaapp/providers/app_state_manager.dart';
 import 'package:googoogagaapp/screens/set_up.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
+import 'package:googoogagaapp/utils/alerts.dart';
 
 class AppRouter extends RouterDelegate
     with ChangeNotifier, PopNavigatorRouterDelegateMixin {
@@ -14,6 +17,7 @@ class AppRouter extends RouterDelegate
   final AppStateManager appStateManager;
   final UsersManager usersManager;
   final ArchiveManager archiveManager;
+  bool _backPressed = false;
   AppRouter(
       {required this.appStateManager,
       required this.usersManager,
@@ -61,9 +65,19 @@ class AppRouter extends RouterDelegate
         return appStateManager.leaveUserNamesSetup();
       }
     }
-    return appStateManager.leaveApp(context!);
+    return _handleBackButton(context!);
   }
 
   @override
   Future<void> setNewRoutePath(configuration) async => Future.value();
+
+  Future<bool> _handleBackButton(BuildContext context) {
+    if (_backPressed == false) {
+      _backPressed = true;
+      Timer(Duration(seconds: 2), () => _backPressed = false);
+      showErrorSnackbar(context, 'Tap back button again to leave app');
+      return Future.value(true);
+    }
+    return Future.value(false);
+  }
 }
