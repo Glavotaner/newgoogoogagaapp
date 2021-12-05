@@ -29,7 +29,6 @@ Future<void> saveReceivedToken(BuildContext context, String token,
     UsersManager manager, sharedPreferences) async {
   final babyData = manager.usersData[User.baby]!;
   updateUserData(context, User.baby, babyData..token = token);
-  manager.updateUserNames({User.baby: babyData..token = token});
   clearSearchingForToken(sharedPreferences, context);
   clearTokenMessages(sharedPreferences);
 }

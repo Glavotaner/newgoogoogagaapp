@@ -37,6 +37,7 @@ class _ScaffoldScreenState extends State<ScaffoldScreen>
   int _selectedTab = 0;
   bool _showingSnackbar = false;
   late Future<void> _setUpMessaging;
+  bool _hideFab = true;
 
   sendKissBack(BuildContext context) {
     sendKiss(context, KissType.kissBack)
@@ -140,16 +141,22 @@ class _ScaffoldScreenState extends State<ScaffoldScreen>
   Widget _clearArchiveButton(BuildContext context) {
     return Consumer<ArchiveManager>(
       builder: (context, archive, child) {
-        // TODO animate click
-        return Visibility(
-          visible: _selectedTab == 1 && archive.messages.isNotEmpty,
-          child: FloatingActionButton(
-              onPressed: () => clearArchive(context)
-                  .catchError((error) => showErrorSnackbar(error)),
-              backgroundColor: Colors.redAccent,
-              child: Icon(Icons.delete_forever)),
-        );
+        _hideFab = archive.messages.isEmpty || _selectedTab == 0;
+        return AnimatedCrossFade(
+            firstChild: buildShownClearButton(context),
+            secondChild: buildHiddenClearButton(context),
+            crossFadeState:
+                _hideFab ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+            duration: Duration(milliseconds: 1000));
       },
     );
   }
+
+  Widget buildShownClearButton(BuildContext context) => FloatingActionButton(
+      onPressed: () => clearArchive(context),
+      backgroundColor: Colors.redAccent,
+      child: Icon(Icons.delete_forever));
+
+  Widget buildHiddenClearButton(BuildContext context) =>
+      Visibility(child: buildShownClearButton(context), visible: false);
 }

@@ -21,18 +21,14 @@ Future setUpMessaging(BuildContext context) async {
   await Future.delayed(Duration(seconds: 1));
   await Firebase.initializeApp();
   await FirebaseMessaging.instance.getInitialMessage();
-  await Future.wait([_setUpNotificationChannel(), _setUpMessaging(context)]);
+  await Future.wait([_setUpNotificationChannel(), _setUpMessaging()]);
   _refreshTokens(context);
 }
 
 /// Sends a token request to the tokens topic.
-/// If [context] is available, shows a confirmation snackbar.
-Future refreshBabyToken([BuildContext? context]) async {
-  final users = context != null
-      ? Provider.of<UsersManager>(context, listen: false)
-      : null;
+Future refreshBabyToken(BuildContext context) async {
   final myUser =
-      context == null ? await getUser(User.me) : users!.usersData[User.me]!;
+      Provider.of<UsersManager>(context, listen: false).usersData[User.me]!;
   await FirebaseMessaging.instance.subscribeToTopic('tokens');
   sendDataMessage(
       topic: 'tokens',
@@ -41,9 +37,7 @@ Future refreshBabyToken([BuildContext? context]) async {
   final SharedPreferences sharedPreferences =
       await SharedPreferences.getInstance();
   if (!checkIsWaitingForToken(sharedPreferences)) {
-    if (context != null) {
-      showConfirmSnackbar('Refreshing!');
-    }
+    showConfirmSnackbar('Refreshing!');
   }
   setSearchingForToken(sharedPreferences, context);
 }
@@ -64,7 +58,7 @@ Future _refreshTokens(BuildContext context) async {
 }
 
 /// Sets up Firebase messaging handlers.
-Future _setUpMessaging(BuildContext context) async {
+Future _setUpMessaging() async {
   // foreground listener
   FirebaseMessaging.onMessage.listen(onMessage);
   // background listener
