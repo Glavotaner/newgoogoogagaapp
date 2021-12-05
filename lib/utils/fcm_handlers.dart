@@ -70,7 +70,7 @@ Future<void> _processMessageInForeground(BuildContext context,
     _processData(context, data: message.data);
   }
   if (message.isNotification) {
-    saveToArchive(message);
+    saveToArchive(message, context);
     showAlert(
         context: context,
         body: message.body!,

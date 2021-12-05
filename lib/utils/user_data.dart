@@ -9,13 +9,13 @@ import 'package:provider/provider.dart';
 Future updateUserData(BuildContext context, String name, User userData) async {
   await updateUser(name, userData);
   Provider.of<UsersManager>(context, listen: false)
-      .updateUserNames({name: userData});
+      .updateUsersData({name: userData});
 }
 
 Future<dynamic> updateAllUsers(BuildContext context, UsersData users) async {
   return Future.wait([
     updateUsers(users[User.me]!, users[User.baby]!),
-    Provider.of<UsersManager>(context, listen: false).updateUserNames(users)
+    Provider.of<UsersManager>(context, listen: false).updateUsersData(users)
   ]);
 }
 
@@ -33,8 +33,8 @@ Future<void> checkUsernamesSetUp(BuildContext context) async {
   if (usersData.containsValue(null)) {
     return state.finishLoading();
   }
-  users.updateUserNames(usersData);
-  state.logIn();
+  users.updateUsersData(usersData);
+  state.initialize();
 }
 
 /// Checks whether any user in [usersData] is missing a token.

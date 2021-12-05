@@ -13,7 +13,7 @@ Future saveToArchive(Message message, [BuildContext? context]) async {
   if (context != null) {
     final archive = Provider.of<ArchiveManager>(context, listen: false);
     if (archive.isInitialized) {
-      archive.updateMessages(messages);
+      archive.updateArchive(messages);
     }
   }
 }
@@ -22,13 +22,12 @@ Future saveToArchive(Message message, [BuildContext? context]) async {
 Future<void> getArchive(BuildContext context) async {
   final messages = await getMessages('messages');
   final archive = Provider.of<ArchiveManager>(context, listen: false);
-  archive.updateMessages(messages);
-  archive.isInitialized = true;
+  archive.updateArchive(messages);
 }
 
 /// Clears the message archive in shared preferences, as well as the displayed archive list.
 Future clearArchive(BuildContext context) async {
   await setMessages('messages', []);
-  Provider.of<ArchiveManager>(context, listen: false).updateMessages([]);
+  Provider.of<ArchiveManager>(context, listen: false).updateArchive([]);
   showConfirmSnackbar('Archive cleared!');
 }

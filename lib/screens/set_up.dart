@@ -46,7 +46,7 @@ class _SetUpScreenState extends State<SetUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (context.watch<AppStateManager>().isLoggedIn) {
+    if (context.watch<AppStateManager>().isInitialized) {
       return Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -127,7 +127,7 @@ class _SetUpScreenState extends State<SetUpScreen> {
               User(userName: user.value.text, token: usersData[user.key]?.token)
       };
       await updateAllUsers(context, newUsers);
-      return Provider.of<AppStateManager>(context, listen: false).logIn();
+      return Provider.of<AppStateManager>(context, listen: false).initialize();
     }
     showErrorSnackbar('fix your errors then we can talk');
   }

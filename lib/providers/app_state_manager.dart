@@ -3,39 +3,34 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class AppStateManager extends ChangeNotifier {
-  bool _isUserNamesSetUp = false;
+  bool _isUsersSetUp = false;
   bool _isLoading = true;
-  bool _isLoggedIn = false;
+  bool _isInitialized = false;
 
   bool get isLoading => _isLoading;
-  bool get isUserNamesSetUp => _isUserNamesSetUp;
-  bool get isLoggedIn => _isLoggedIn;
-
-  setUpUserNames() {
-    _isUserNamesSetUp = false;
-    notifyListeners();
-  }
-
-  Future<bool> leaveUserNamesSetup() {
-    _isUserNamesSetUp = true;
-    notifyListeners();
-    return Future.value(true);
-  }
+  bool get isUsersSetUp => _isUsersSetUp;
+  bool get isInitialized => _isInitialized;
 
   finishLoading() {
     _isLoading = false;
     notifyListeners();
   }
 
-  logIn() {
-    _isUserNamesSetUp = true;
-    _isLoggedIn = true;
+  initialize() {
+    _isUsersSetUp = true;
+    _isInitialized = true;
     _isLoading = false;
     notifyListeners();
   }
 
-  logOut() {
-    _isLoggedIn = false;
+  enterUsersSetUp() {
+    _isUsersSetUp = false;
     notifyListeners();
+  }
+
+  Future<bool> leaveUsersSetUp() {
+    _isUsersSetUp = true;
+    notifyListeners();
+    return Future.value(true);
   }
 }

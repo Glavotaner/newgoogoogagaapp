@@ -7,8 +7,9 @@ class ArchiveManager extends ChangeNotifier {
 
   Messages get messages => _messages;
 
-  updateMessages(Messages messages) {
+  updateArchive(Messages messages) {
     _messages = messages;
+    isInitialized = true;
     notifyListeners();
   }
 }

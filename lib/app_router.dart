@@ -41,8 +41,8 @@ class AppRouter extends RouterDelegate
       key: navigatorKey,
       pages: [
         if (appStateManager.isLoading) SplashScreen.page(),
-        if (appStateManager.isLoggedIn) ScaffoldScreen.page(),
-        if (!appStateManager.isUserNamesSetUp && !appStateManager.isLoading)
+        if (appStateManager.isInitialized) ScaffoldScreen.page(),
+        if (!appStateManager.isUsersSetUp && !appStateManager.isLoading)
           SetUpScreen.page(),
       ],
       onPopPage: (route, result) {
@@ -50,7 +50,7 @@ class AppRouter extends RouterDelegate
           return false;
         }
         if (route.settings.name == Routes.setUp) {
-          appStateManager.leaveUserNamesSetup();
+          appStateManager.leaveUsersSetUp();
         }
         return true;
       },
@@ -60,9 +60,9 @@ class AppRouter extends RouterDelegate
   @override
   Future<bool> popRoute() {
     final context = navigatorKey.currentContext;
-    if (appStateManager.isLoggedIn) {
-      if (!appStateManager.isUserNamesSetUp) {
-        return appStateManager.leaveUserNamesSetup();
+    if (appStateManager.isInitialized) {
+      if (!appStateManager.isUsersSetUp) {
+        return appStateManager.leaveUsersSetUp();
       }
     }
     return _handleBackButton(context!);

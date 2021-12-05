@@ -105,7 +105,7 @@ class _ScaffoldScreenState extends State<ScaffoldScreen>
       IconButton(
           color: Theme.of(context).cardColor,
           onPressed: () => Provider.of<AppStateManager>(context, listen: false)
-              .setUpUserNames(),
+              .enterUsersSetUp(),
           icon: Icon(Icons.people)),
       Consumer<UsersManager>(
         builder: (context, usersManager, child) {
@@ -142,21 +142,16 @@ class _ScaffoldScreenState extends State<ScaffoldScreen>
     return Consumer<ArchiveManager>(
       builder: (context, archive, child) {
         _hideFab = archive.messages.isEmpty || _selectedTab == 0;
-        return AnimatedCrossFade(
-            firstChild: buildShownClearButton(context),
-            secondChild: buildHiddenClearButton(context),
-            crossFadeState:
-                _hideFab ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-            duration: Duration(milliseconds: 1000));
+        return buildClearFab(context, !_hideFab);
       },
     );
   }
 
-  Widget buildShownClearButton(BuildContext context) => FloatingActionButton(
+  Widget buildClearFab(BuildContext context, bool visible) =>
+      Visibility(child: _buildClearButton(context), visible: visible);
+
+  Widget _buildClearButton(BuildContext context) => FloatingActionButton(
       onPressed: () => clearArchive(context),
       backgroundColor: Colors.redAccent,
       child: Icon(Icons.delete_forever));
-
-  Widget buildHiddenClearButton(BuildContext context) =>
-      Visibility(child: buildShownClearButton(context), visible: false);
 }
