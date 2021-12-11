@@ -1,35 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:googoogagaapp/components/archive/archive_list.dart';
-import 'package:googoogagaapp/components/loading.dart';
-import 'package:googoogagaapp/utils/archive.dart';
+import 'package:googoogagaapp/components/archive/archive_tile.dart';
+import 'package:googoogagaapp/components/no_data.dart';
+import 'package:googoogagaapp/providers/archive_manager.dart';
+import 'package:provider/provider.dart';
+import 'package:googoogagaapp/models/message/message.dart';
 
-class KissArchiveScreen extends StatefulWidget {
+class KissArchiveScreen extends StatelessWidget {
   const KissArchiveScreen({Key? key}) : super(key: key);
-
   @override
-  _KissArchiveScreenState createState() => _KissArchiveScreenState();
-}
-
-class _KissArchiveScreenState extends State<KissArchiveScreen> {
-  late Future<void> _getArchive;
-
-  @override
-  void initState() {
-    super.initState();
-    _getArchive = getArchive(context);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _getArchive,
-      builder: (context, AsyncSnapshot<void> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return KissArchiveList();
+  Widget build(BuildContext context) => Selector<ArchiveManager, Messages>(
+      builder: (context, archive, child) {
+        if (archive.isNotEmpty) {
+          return ListView.builder(
+            itemCount: archive.length,
+            itemBuilder: (context, int index) {
+              return ArchiveTile(archive[index]);
+            },
+          );
         }
-        // TODO instead of this, incorporate init in splash page
-        return LoadingScreen(message: 'Loading messages...');
+        return NoDataScreen(message: 'There is nofing here!');
       },
-    );
-  }
+      selector: (buildContext, archiveProvider) => archiveProvider.messages);
 }

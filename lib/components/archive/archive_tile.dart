@@ -12,9 +12,9 @@ class ArchiveTile extends StatelessWidget {
         child: ListTile(
       contentPadding: EdgeInsets.all(5.0),
       title: message.title != null
-          ? Text(message.title!, style: textTheme.headline5)
+          ? Text(message.title!, style: textTheme.subtitle1)
           : null,
-      subtitle: Text(message.body!, style: textTheme.headline6),
+      subtitle: Text(message.body!, style: textTheme.subtitle2),
     ));
   }
 }

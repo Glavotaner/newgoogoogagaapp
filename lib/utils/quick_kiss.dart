@@ -14,8 +14,9 @@ Future sendQuickKiss(BuildContext context, double duration) async {
       KissType.quickKiss..data = KissData(quickKissDuration: duration.toInt()));
 }
 
-Future<void> saveQuickKiss(
-    Message message, SharedPreferences sharedPreferences) async {
+Future<void> saveQuickKiss(Message message) async {
+  final SharedPreferences sharedPreferences =
+      await SharedPreferences.getInstance();
   final kissesQueue = sharedPreferences.getStringList(Message.quickKiss);
   sharedPreferences
       .setStringList(Message.quickKiss, [message.toString(), ...?kissesQueue]);

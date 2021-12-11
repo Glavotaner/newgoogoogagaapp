@@ -17,30 +17,27 @@ onMessage(RemoteMessage message) async {
   if (remoteMessage.kissType == KissType.quickKiss) {
     showQuickKissAlert(context, remoteMessage);
   } else {
-    _processMessageInForeground(context,
-        (await SharedPreferences.getInstance()), Message.fromRemote(message));
+    _processMessageInForeground(context, Message.fromRemote(message));
   }
 }
 
 Future<void> onBackgroundMessage(RemoteMessage remoteMessage) async {
   Message message = Message.fromRemote(remoteMessage);
-  final sharedPreferences = await SharedPreferences.getInstance();
   if (message.isNotification) {
     await saveToArchive(message);
   }
   if (message.data.tokenRequest != null) {
     final babyData = await getUser(User.baby);
     if (babyData.userName == message.data.userName) {
-      return _saveMessage(message, Message.tokenRequest, sharedPreferences);
+      return _saveMessage(message, Message.tokenRequest);
     }
   } else if (message.data.token != null) {
-    return _saveMessage(message, Message.tokenResponse, sharedPreferences);
+    return _saveMessage(message, Message.tokenResponse);
   }
   if (message.kissType != null) {
     final KissType kissType = message.kissType!;
     if (kissType == KissType.quickKiss) {
-      saveQuickKiss(
-          message..data.receiveTime = DateTime.now(), sharedPreferences);
+      saveQuickKiss(message..data.receiveTime = DateTime.now());
     }
   }
 }
@@ -53,19 +50,18 @@ Future<void> onTappedNotification(RemoteMessage message) async {
   if (remoteMessage.kissType == KissType.quickKiss) {
     processTappedQuickKiss(context, remoteMessage);
   } else {
-    _processMessageInForeground(context, sharedPreferences, remoteMessage);
+    _processMessageInForeground(context, remoteMessage);
   }
 }
 
-Future _saveMessage(
-    Message message, String key, SharedPreferences sharedPreferences) async {
-  sharedPreferences.setString(key, message.toString());
+Future _saveMessage(Message message, String key) async {
+  (await SharedPreferences.getInstance()).setString(key, message.toString());
 }
 
 /// Process message while app in foreground and context
 /// is available.
-Future<void> _processMessageInForeground(BuildContext context,
-    SharedPreferences sharedPreferences, Message message) async {
+Future<void> _processMessageInForeground(
+    BuildContext context, Message message) async {
   if (message.hasData) {
     _processData(context, data: message.data);
   }

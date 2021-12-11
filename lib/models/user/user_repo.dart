@@ -16,8 +16,8 @@ Future<User?> getUserIfExists(String user) async {
 }
 
 Future<User> getUser(String user) async {
-  final sharedPrefs = await SharedPreferences.getInstance();
-  final userData = sharedPrefs.getString(user);
+  final sharedPreferences = await SharedPreferences.getInstance();
+  final userData = sharedPreferences.getString(user);
   if (userData == null) {
     throw FlutterError('User data missing for $user!');
   }
@@ -32,8 +32,8 @@ Future<UsersData> getUsers() async {
 }
 
 Future<bool> updateUser(String user, User userData) async {
-  final sharedPrefs = await SharedPreferences.getInstance();
-  return sharedPrefs.setString(user, jsonEncode(userData));
+  final sharedPreferences = await SharedPreferences.getInstance();
+  return sharedPreferences.setString(user, jsonEncode(userData));
 }
 
 Future<UsersData> updateUsers(User me, User baby) async {
@@ -42,6 +42,6 @@ Future<UsersData> updateUsers(User me, User baby) async {
 }
 
 Future<bool> removeUser(String user) async {
-  final sharedPrefs = await SharedPreferences.getInstance();
-  return sharedPrefs.remove(user);
+  final sharedPreferences = await SharedPreferences.getInstance();
+  return sharedPreferences.remove(user);
 }

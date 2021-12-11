@@ -36,9 +36,8 @@ Future sendRequest(BuildContext context, String message) async {
 }
 
 /// Processes messages acquired while app was in background.
-Future processBackgroundMessages(
-    BuildContext context, SharedPreferences sharedPreferences) async {
-  final messages = _getBgMessages(sharedPreferences);
+Future processBackgroundMessages(BuildContext context) async {
+  final messages = await _getBgMessages();
   if (messages[Message.tokenResponse] != null ||
       messages[Message.tokenRequest] != null) {
     final users = Provider.of<UsersManager>(context, listen: false);
@@ -57,7 +56,7 @@ Future processBackgroundMessages(
       token = processBgTokenRequest(
           context, Message.fromString(messages[Message.tokenRequest]!), users);
     }
-    saveReceivedToken(context, token, users, sharedPreferences);
+    saveReceivedToken(context, token, users);
   }
 
   // if there are quick kisses, filter valid ones, alert user for
@@ -72,12 +71,16 @@ Future processBackgroundMessages(
   }
 }
 
-clearTokenMessages(SharedPreferences sharedPreferences) async {
+clearTokenMessages() async {
+  final SharedPreferences sharedPreferences =
+      await SharedPreferences.getInstance();
   sharedPreferences.remove(Message.tokenRequest);
   sharedPreferences.remove(Message.tokenResponse);
 }
 
-Map<String, dynamic> _getBgMessages(SharedPreferences sharedPreferences) {
+Future<Map<String, dynamic>> _getBgMessages() async {
+  final SharedPreferences sharedPreferences =
+      await SharedPreferences.getInstance();
   String? request = sharedPreferences.getString(Message.tokenRequest);
   String? response = sharedPreferences.getString(Message.tokenResponse);
   List<String>? quickKisses =

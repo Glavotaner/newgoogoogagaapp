@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:googoogagaapp/models/routes.dart';
+import 'package:googoogagaapp/services/services.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -21,6 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance?.addPostFrameCallback((_) {
+      registerInitServices();
       checkUsernamesSetUp(context);
     });
   }

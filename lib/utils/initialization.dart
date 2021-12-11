@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:googoogagaapp/models/message/message.dart';
 import 'package:googoogagaapp/models/user/user.dart';
-import 'package:googoogagaapp/models/user/user_repo.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/fcm.dart';
@@ -13,7 +12,6 @@ import 'package:googoogagaapp/utils/messaging.dart';
 import 'package:googoogagaapp/utils/tokens.dart';
 import 'package:googoogagaapp/utils/user_data.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Initializes Firebase, sets up notifications channel for foreground notifications,
 /// sets up message handlers, sets up user token, if missing, requests baby token, if missing.
@@ -34,12 +32,10 @@ Future refreshBabyToken(BuildContext context) async {
       topic: 'tokens',
       data: MessageData(
           token: myUser.token, tokenRequest: true, userName: myUser.userName));
-  final SharedPreferences sharedPreferences =
-      await SharedPreferences.getInstance();
-  if (!checkIsWaitingForToken(sharedPreferences)) {
+  if (!(await checkIsWaitingForToken())) {
     showConfirmSnackbar('Refreshing!');
   }
-  setSearchingForToken(sharedPreferences, context);
+  setSearchingForToken();
 }
 
 /// Gets user token from FCM, if missing, calls [refreshBabyToken] to request baby token, if missing.
@@ -54,7 +50,7 @@ Future _refreshTokens(BuildContext context) async {
   if (!babyUserData.hasToken) {
     refreshBabyToken(context);
   }
-  processBackgroundMessages(context, (await SharedPreferences.getInstance()));
+  processBackgroundMessages(context);
 }
 
 /// Sets up Firebase messaging handlers.

@@ -87,13 +87,15 @@ class _ScaffoldScreenState extends State<ScaffoldScreen>
       body: FutureBuilder(
           future: _setUpMessaging,
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return IndexedStack(
-                index: _selectedTab,
-                children: widget.pages,
-              );
+            switch (snapshot.connectionState) {
+              case ConnectionState.done:
+                return IndexedStack(
+                  index: _selectedTab,
+                  children: widget.pages,
+                );
+              default:
+                return LoadingScreen(message: 'Setting up messaging...');
             }
-            return LoadingScreen(message: 'Setting up messaging...');
           }),
       floatingActionButton: _clearArchiveButton(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,

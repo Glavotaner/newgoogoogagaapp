@@ -25,12 +25,12 @@ String processBgTokenResponse(BuildContext context, Message response) {
   return response.data.token!;
 }
 
-Future<void> saveReceivedToken(BuildContext context, String token,
-    UsersManager manager, sharedPreferences) async {
+Future<void> saveReceivedToken(
+    BuildContext context, String token, UsersManager manager) async {
   final babyData = manager.usersData[User.baby]!;
   updateUserData(context, User.baby, babyData..token = token);
-  clearSearchingForToken(sharedPreferences, context);
-  clearTokenMessages(sharedPreferences);
+  clearSearchingForToken();
+  clearTokenMessages();
 }
 
 processTokenMessage(
@@ -48,25 +48,29 @@ processTokenMessage(
   } else if (data.token != null) {
     updateUserData(context, User.baby, babyData..token = data.token);
     FirebaseMessaging.instance.unsubscribeFromTopic('tokens');
-    clearSearchingForToken((await SharedPreferences.getInstance()), context);
+    clearSearchingForToken(context);
     showConfirmSnackbar('Saved babba token!');
   }
 }
 
-bool checkIsWaitingForToken(SharedPreferences sharedPreferences) {
+Future<bool> checkIsWaitingForToken() async {
+  final SharedPreferences sharedPreferences =
+      await SharedPreferences.getInstance();
   return sharedPreferences.getBool(User.searchingForToken) ?? false;
 }
 
-Future setSearchingForToken(SharedPreferences sharedPreferences,
-    [BuildContext? context]) async {
+Future setSearchingForToken([BuildContext? context]) async {
+  final SharedPreferences sharedPreferences =
+      await SharedPreferences.getInstance();
   await sharedPreferences.setBool(User.searchingForToken, true);
   if (context != null) {
     Provider.of<UsersManager>(context, listen: false).startSearchingForToken();
   }
 }
 
-Future clearSearchingForToken(SharedPreferences sharedPreferences,
-    [BuildContext? context]) async {
+Future clearSearchingForToken([BuildContext? context]) async {
+  final SharedPreferences sharedPreferences =
+      await SharedPreferences.getInstance();
   await sharedPreferences.setBool(User.searchingForToken, false);
   if (context != null) {
     Provider.of<UsersManager>(context, listen: false).stopSearchingForToken();
