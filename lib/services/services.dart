@@ -13,8 +13,9 @@ enum Services {
   alerts,
 }
 
-void registerService(Services service) {
+dynamic registerService(Services service) {
   _getOrRegister(service, 'register');
+  return getService(service);
 }
 
 dynamic getService(Services service) {
@@ -23,7 +24,6 @@ dynamic getService(Services service) {
 
 void registerInitServices() {
   registerService(Services.global);
-  registerService(Services.alerts);
 }
 
 BuildContext getScaffoldContext() {
@@ -54,6 +54,7 @@ class GlobalService {
 }
 
 class AlertsService {
+  late GlobalKey<ScaffoldMessengerState> scaffoldKey;
   bool isHandlingTap = false;
   bool snackBarExists = false;
   bool alertExists = false;

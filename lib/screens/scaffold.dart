@@ -40,8 +40,7 @@ class _ScaffoldScreenState extends State<ScaffoldScreen>
   bool _hideFab = true;
 
   sendKissBack(BuildContext context) {
-    sendKiss(context, KissType.kissBack)
-        .catchError((error) => showErrorSnackbar(error));
+    sendKiss(context, KissType.kissBack);
     if (!_showingSnackbar) {
       _showingSnackbar = true;
       showConfirmSnackbar(KissType.kissBack.confirmMessage)
@@ -69,8 +68,7 @@ class _ScaffoldScreenState extends State<ScaffoldScreen>
     super.initState();
     WidgetsBinding.instance!.addObserver(this);
     setScaffoldContext(context);
-    _setUpMessaging =
-        setUpMessaging(context).catchError((error) => showErrorSnackbar(error));
+    _setUpMessaging = setUpMessaging(context);
   }
 
   @override
@@ -116,8 +114,7 @@ class _ScaffoldScreenState extends State<ScaffoldScreen>
               color: Colors.redAccent,
               onPressed: usersManager.usersData[User.me]?.token == null
                   ? null
-                  : () => refreshBabyToken(context)
-                      .catchError((error) => showErrorSnackbar(error)),
+                  : () => refreshBabyToken(context),
               icon: Icon(usersManager.usersData[User.baby]?.token == null
                   ? Icons.favorite_border
                   : Icons.favorite));

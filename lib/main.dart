@@ -1,29 +1,35 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:googoogagaapp/providers/archive_manager.dart';
 import 'package:googoogagaapp/app_router.dart';
 import 'package:googoogagaapp/providers/app_state_manager.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
+import 'package:googoogagaapp/services/services.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    systemNavigationBarColor: Colors.transparent,
-  ));
-  runApp(GoogooGagaApp());
+  runZonedGuarded(() {
+    WidgetsFlutterBinding.ensureInitialized();
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
+    ));
+    runApp(GoogooGagaApp());
+  }, (object, _) => showErrorSnackbar(object.toString()));
 }
 
 class GoogooGagaApp extends StatefulWidget {
   GoogooGagaApp({Key? key}) : super(key: key);
-
   @override
   State<GoogooGagaApp> createState() => _GoogooGagaAppState();
 }
 
 class _GoogooGagaAppState extends State<GoogooGagaApp> {
+  final GlobalKey<ScaffoldMessengerState> scaffoldKey =
+      GlobalKey<ScaffoldMessengerState>();
   late AppRouter _appRouter;
   final _appStateManager = AppStateManager();
   final _usersManager = UsersManager();
@@ -35,6 +41,8 @@ class _GoogooGagaAppState extends State<GoogooGagaApp> {
         appStateManager: _appStateManager,
         usersManager: _usersManager,
         archiveManager: _archiveManager);
+    final AlertsService alertsService = registerService(Services.alerts);
+    alertsService.scaffoldKey = scaffoldKey;
     FlutterError.onError = (FlutterErrorDetails details) {
       showErrorSnackbar(details.exceptionAsString());
     };
@@ -50,8 +58,11 @@ class _GoogooGagaAppState extends State<GoogooGagaApp> {
           ChangeNotifierProvider(create: (context) => _archiveManager),
         ],
         child: MaterialApp(
-            home: Router(
-                routerDelegate: _appRouter,
-                backButtonDispatcher: RootBackButtonDispatcher())));
+            home: Scaffold(
+          key: scaffoldKey,
+          body: Router(
+              routerDelegate: _appRouter,
+              backButtonDispatcher: RootBackButtonDispatcher()),
+        )));
   }
 }

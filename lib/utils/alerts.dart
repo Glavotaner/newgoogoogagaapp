@@ -34,8 +34,10 @@ Future showAlert(
 }
 
 ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showConfirmSnackbar(
-    String message) {
-  final context = getScaffoldContext();
+    String message,
+    [BuildContext? scaffoldContext]) {
+  final context =
+      scaffoldContext ?? getService(Services.alerts).scaffoldKey.currentContext;
   return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     content: Text(message),
     duration: Duration(seconds: 2),
@@ -43,8 +45,9 @@ ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showConfirmSnackbar(
   ));
 }
 
-showErrorSnackbar(String message) {
-  final context = getScaffoldContext();
+showErrorSnackbar(String message, [BuildContext? scaffoldContext]) {
+  final context =
+      scaffoldContext ?? getService(Services.alerts).scaffoldKey.currentContext;
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(message),
       duration: Duration(seconds: 2),
