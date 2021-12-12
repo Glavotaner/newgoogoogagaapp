@@ -73,7 +73,6 @@ class _ScaffoldScreenState extends State<ScaffoldScreen>
 
   @override
   Widget build(BuildContext context) {
-    // TODO add swipe hint
     return Scaffold(
       appBar: AppBar(
           actions: _appBarButtons(context),
@@ -85,15 +84,13 @@ class _ScaffoldScreenState extends State<ScaffoldScreen>
       body: FutureBuilder(
           future: _setUpMessaging,
           builder: (context, snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.done:
-                return IndexedStack(
-                  index: _selectedTab,
-                  children: widget.pages,
-                );
-              default:
-                return LoadingScreen(message: 'Setting up messaging...');
+            if (snapshot.connectionState == ConnectionState.done) {
+              return IndexedStack(
+                index: _selectedTab,
+                children: widget.pages,
+              );
             }
+            return LoadingScreen(message: 'Setting up messaging...');
           }),
       floatingActionButton: _clearArchiveButton(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
