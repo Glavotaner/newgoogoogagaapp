@@ -83,18 +83,19 @@ class _QuickKissAlertState extends State<QuickKissAlert> {
                 textAlign: TextAlign.center,
               ),
             ),
-            ElevatedButton.icon(
-                style: ButtonStyle(
-                    minimumSize: MaterialStateProperty.all(Size(100, 50))),
-                onPressed: () => _sendKissBack(context),
-                icon: Icon(Icons.favorite),
-                label: Text(
-                  'send kiss baccc',
-                  style: TextStyle(fontSize: 18),
-                ))
+            sendBaccButton(context)
           ],
         ),
       ),
     );
   }
+
+  Widget sendBaccButton(BuildContext context) => ElevatedButton.icon(
+      style: ButtonStyle(minimumSize: MaterialStateProperty.all(Size(100, 50))),
+      onPressed: () => _sendKissBack(context),
+      icon: Icon(Icons.favorite),
+      label: Text(
+        'send kiss baccc',
+        style: TextStyle(fontSize: 18),
+      ));
 }
