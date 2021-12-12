@@ -8,7 +8,6 @@ import 'package:googoogagaapp/providers/archive_manager.dart';
 import 'package:googoogagaapp/providers/users_manager.dart';
 import 'package:googoogagaapp/screens/home.dart';
 import 'package:googoogagaapp/screens/kiss_archive.dart';
-import 'package:googoogagaapp/services/services.dart';
 import 'package:googoogagaapp/utils/alerts.dart';
 import 'package:googoogagaapp/utils/archive.dart';
 import 'package:googoogagaapp/utils/initialization.dart';
@@ -67,7 +66,6 @@ class _ScaffoldScreenState extends State<ScaffoldScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance!.addObserver(this);
-    setScaffoldContext(context);
     _setUpMessaging = setUpMessaging(context);
   }
 

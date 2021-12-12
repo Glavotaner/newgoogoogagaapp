@@ -26,14 +26,6 @@ void registerInitServices() {
   registerService(Services.global);
 }
 
-BuildContext getScaffoldContext() {
-  return getService(Services.global).context;
-}
-
-setScaffoldContext(BuildContext context) {
-  getService(Services.global).context = context;
-}
-
 dynamic _getOrRegister(Services service, String action) {
   String injectionToken = _Services.injectionTokens[service.index];
   final _ = GetIt.instance;

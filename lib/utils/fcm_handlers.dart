@@ -12,7 +12,7 @@ import 'package:googoogagaapp/utils/tokens.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 onMessage(RemoteMessage message) async {
-  final context = getScaffoldContext();
+  final context = getService(Services.alerts).scaffoldKey.context;
   final remoteMessage = Message.fromRemote(message);
   if (remoteMessage.kissType == KissType.quickKiss) {
     showQuickKissAlert(context, remoteMessage);
@@ -43,7 +43,7 @@ Future<void> onBackgroundMessage(RemoteMessage remoteMessage) async {
 }
 
 Future<void> onTappedNotification(RemoteMessage message) async {
-  final context = getScaffoldContext();
+  final context = getService(Services.alerts).scaffoldKey.context;
   final sharedPreferences = await SharedPreferences.getInstance();
   await sharedPreferences.reload();
   final remoteMessage = Message.fromRemote(message);
