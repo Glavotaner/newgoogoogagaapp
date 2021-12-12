@@ -21,7 +21,7 @@ class _KissTypeWidgetState extends State<KissTypeWidget> {
   Widget build(BuildContext context) {
     return Card(
         margin:
-            EdgeInsets.only(left: 20.0, right: 20.0, top: 40.0, bottom: 20.0),
+            EdgeInsets.only(left: 20.0, right: 20.0, top: 30.0, bottom: 20.0),
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
         elevation: 3,

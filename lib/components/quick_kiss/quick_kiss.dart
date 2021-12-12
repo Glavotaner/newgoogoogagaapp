@@ -29,7 +29,7 @@ class _QuickKissState extends State<QuickKiss> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(15.0),
-                  child: Placeholder(),
+                  child: Image(image: AssetImage('assets/time.png')),
                 ),
               ),
               Slider(
@@ -39,9 +39,7 @@ class _QuickKissState extends State<QuickKiss> {
                 min: 10,
                 max: 60,
                 divisions: 5,
-                onChanged: (slider) => setState(() {
-                  _sliderValue = slider;
-                }),
+                onChanged: (slider) => setState(() => _sliderValue = slider),
                 onChangeEnd: widget.disabled ? null : _sendKiss,
               ),
               Padding(
