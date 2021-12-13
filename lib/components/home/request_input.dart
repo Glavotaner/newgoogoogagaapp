@@ -16,12 +16,6 @@ class _KissRequestState extends State<KissRequest> {
   final _textController = TextEditingController();
   static const _placeholder = 'I am babby and I ask for kiss';
 
-  _sendRequest(BuildContext context) {
-    sendRequest(context,
-        _textController.text.isNotEmpty ? _textController.text : _placeholder);
-    _textController.clear();
-  }
-
   @override
   void dispose() {
     super.dispose();
@@ -63,5 +57,11 @@ class _KissRequestState extends State<KissRequest> {
         ),
       ),
     );
+  }
+
+  _sendRequest(BuildContext context) {
+    sendRequest(context,
+        _textController.text.isNotEmpty ? _textController.text : _placeholder);
+    _textController.clear();
   }
 }

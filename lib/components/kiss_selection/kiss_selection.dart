@@ -11,9 +11,8 @@ class KissSelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<UsersManager>(builder: (context, users, child) {
       final disabled = anyTokenMissing(users.usersData);
-      return AnimatedOpacity(
+      return Opacity(
         opacity: opacity,
-        duration: Duration(milliseconds: 500),
         child: Column(
           children: [
             Expanded(
