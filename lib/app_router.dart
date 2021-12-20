@@ -1,14 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:googoogagaapp/logic/providers/app_state_manager.dart';
+import 'package:googoogagaapp/logic/providers/users_manager.dart';
+import 'package:googoogagaapp/logic/utils/alerts.dart';
 import 'package:googoogagaapp/models/routes.dart';
-import 'package:googoogagaapp/providers/archive_manager.dart';
-import 'package:googoogagaapp/screens/scaffold.dart';
-import 'package:googoogagaapp/screens/splash.dart';
-import 'package:googoogagaapp/providers/app_state_manager.dart';
-import 'package:googoogagaapp/screens/set_up.dart';
-import 'package:googoogagaapp/providers/users_manager.dart';
-import 'package:googoogagaapp/utils/alerts.dart';
+import 'package:googoogagaapp/ui/screens/scaffold.dart';
+import 'package:googoogagaapp/ui/screens/set_up.dart';
+import 'package:googoogagaapp/ui/screens/splash.dart';
 
 class AppRouter extends RouterDelegate
     with ChangeNotifier, PopNavigatorRouterDelegateMixin {
@@ -16,12 +15,9 @@ class AppRouter extends RouterDelegate
   final GlobalKey<NavigatorState> navigatorKey;
   final AppStateManager appStateManager;
   final UsersManager usersManager;
-  final ArchiveManager archiveManager;
   bool _backPressed = false;
-  AppRouter(
-      {required this.appStateManager,
-      required this.usersManager,
-      required this.archiveManager})
+
+  AppRouter({required this.appStateManager, required this.usersManager})
       : navigatorKey = GlobalKey<NavigatorState>() {
     appStateManager.addListener(notifyListeners);
     usersManager.addListener(notifyListeners);
@@ -31,7 +27,6 @@ class AppRouter extends RouterDelegate
   void dispose() {
     appStateManager.removeListener(notifyListeners);
     usersManager.removeListener(notifyListeners);
-    archiveManager.removeListener(notifyListeners);
     super.dispose();
   }
 

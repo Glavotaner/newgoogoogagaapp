@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:googoogagaapp/components/kiss_selection/kiss_type.dart';
-import 'package:googoogagaapp/components/quick_kiss/quick_kiss.dart';
+import 'package:googoogagaapp/ui/components/kiss_selection/kiss_type.dart';
+import 'package:googoogagaapp/ui/components/quick_kiss/quick_kiss.dart';
 
 class KissType {
   String body;
@@ -94,6 +94,7 @@ class KissType {
 class KissData {
   int? quickKissDuration;
   int? timeLeft;
+
   KissData({this.quickKissDuration, this.timeLeft});
 
   KissData.fromJson(Map<String, dynamic> json)
