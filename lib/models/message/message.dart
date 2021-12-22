@@ -12,7 +12,6 @@ class Message {
 
   static final tokenRequest = 'request';
   static final tokenResponse = 'response';
-  static final quickKiss = 'quickKiss';
 
   bool get isNotification =>
       (title ?? '').isNotEmpty || (body ?? '').isNotEmpty;

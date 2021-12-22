@@ -3,7 +3,7 @@ import 'package:googoogagaapp/logic/providers/users_manager.dart';
 import 'package:googoogagaapp/logic/services.dart';
 import 'package:googoogagaapp/logic/utils/alerts.dart';
 import 'package:googoogagaapp/logic/utils/fcm.dart';
-import 'package:googoogagaapp/logic/utils/quick_kiss.dart';
+
 import 'package:googoogagaapp/logic/utils/tokens.dart';
 import 'package:googoogagaapp/models/kiss_type.dart';
 import 'package:googoogagaapp/models/message/message.dart';
@@ -15,13 +15,11 @@ Future sendKiss(BuildContext context, KissType kissType,
     {Map<String, dynamic>? data}) async {
   final babyData =
       Provider.of<UsersManager>(context, listen: false).usersData[User.baby]!;
-  await sendMessage(
-      token: babyData.token,
-      notification: {
-        'title': kissType.title,
-        'body': kissType.body,
-      },
-      kissType: kissType.isQuickKiss ? kissType : null);
+  await sendMessage(token: babyData.token, notification: {
+    'title': kissType.title,
+    'body': kissType.body,
+  });
+
   final AlertsService alertsService = getService(Services.alerts);
   if (!alertsService.snackBarExists) {
     alertsService.snackBarExists = true;
@@ -58,17 +56,6 @@ Future processBackgroundMessages(BuildContext context) async {
     }
     saveReceivedToken(context, token, users);
   }
-
-  // if there are quick kisses, filter valid ones, alert user for
-  // kiss back
-  if (!getService(Services.alerts).isHandlingTap) {
-    if (messages[Message.quickKiss] != null) {
-      final quickKisses = messages[Message.quickKiss];
-      if (quickKisses.isNotEmpty) {
-        processBgQuickKisses(context, messages[Message.quickKiss]);
-      }
-    }
-  }
 }
 
 clearTokenMessages() async {
@@ -83,13 +70,10 @@ Future<Map<String, dynamic>> _getBgMessages() async {
       await SharedPreferences.getInstance();
   String? request = sharedPreferences.getString(Message.tokenRequest);
   String? response = sharedPreferences.getString(Message.tokenResponse);
-  List<String>? quickKisses =
-      sharedPreferences.getStringList(Message.quickKiss);
+
   return {
     Message.tokenRequest: request != null ? Message.fromString(request) : null,
     Message.tokenResponse:
         response != null ? Message.fromString(response) : null,
-    Message.quickKiss:
-        quickKisses?.map((kiss) => Message.fromString(kiss)).toList()
   };
 }

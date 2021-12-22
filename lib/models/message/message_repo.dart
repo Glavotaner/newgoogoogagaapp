@@ -29,20 +29,6 @@ Future<Message?> getTokenMessage(String tokenType) async {
   }
 }
 
-Messages validQuickKisses(Messages kisses) {
-  final Messages validKisses = [];
-  final now = DateTime.now();
-  for (Message kiss in kisses) {
-    final timeReceived = kiss.data.receiveTime!;
-    final int timePast = now.difference(timeReceived).inMinutes;
-    final timeLeft = kiss.kissType!.data!.quickKissDuration! - timePast;
-    if (timeLeft > 0) {
-      validKisses.insert(0, kiss..kissType!.data!.timeLeft = timeLeft);
-    }
-  }
-  return validKisses;
-}
-
 Future<bool> setTokenMessage(Message tokenMessage, String tokenType) async {
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   return sharedPreferences.setString(tokenType, tokenMessage.toString());
